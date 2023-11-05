@@ -3,10 +3,10 @@
         <div class="mainArticle">
             <div class="mainArticle__inner">
                 <ul class="mainArticle__categories">
-                    <li class="mainArticle__categoory">
+                    <li class="mainArticle__category">
                         <a href="#" class="mainArticle__category-link">ADVENTURE</a>
                     </li>
-                    <li class="mainArticle__categoory">
+                    <li class="mainArticle__category">
                         <a href="#" class="mainArticle__category-link">TRAVEL</a>
                     </li>
                 </ul>
@@ -14,9 +14,9 @@
                     Richird Norton photorealistic rendering as real photos
                 </h2>
                 <p class="mainArticle__content">
-                    <time class="mainArticle__content--time">08.08.2021</time>
-                    <span class="mainArticle__content--divider"></span>
-                    <span class="mainArticle__content--text">
+                    <time class="mainArticle__time">08.08.2021</time>
+                    <span class="mainArticle__divider"></span>
+                    <span class="mainArticle__text">
                         Progressively incentivize cooperative systems through technically sound functionalities. The credibly productivate seamless data.
                     </span>
                 </p>
@@ -31,7 +31,7 @@
             </div>
         </div>
 
-        <section class="section section--popularTopics">
+        <section class="section section__popularTopics">
             <div class="section__inner">
                 <h2 class="section__heading">Popular topics</h2>
 
@@ -252,38 +252,38 @@
             </div>
         </section>
 
-        <section class="section section-editorPicks">
+        <section class="section section__editorPicks">
             <div class="section__inner">
                 <h2 class="section__heading">Editor's Pick</h2>
                 <div class="editor__articles">
                     <div class="editor__article">
-                        <img class="editor__article--image" src="/images/editor_article_bg1.jpeg">
-                        <div class="editor__article-category">FASHION</div>
+                        <img class="editor__article-image" src="/images/editor_article_bg1.jpeg">
+                        <div class="editor__article__category">FASHION</div>
                         <div class="editor__article__inner">
-                            <img src="/images/premium-icon.png" class="editor__article--premiumIcon">
-                            <time class="editor__article--time">08.08.2021</time>
-                            <p class="editor__article--heading">Richird Norton photorealistic rendering as real photos</p>
-                            <p class="editor__article--text">Progressively incentivize cooperative systems through technically sound functionalities. The credibly productivate seamless data.</p>
+                            <img src="/images/premium-icon.png" class="editor__article-premiumIcon">
+                            <time class="editor__article-time">08.08.2021</time>
+                            <p class="editor__article-heading">Richird Norton photorealistic rendering as real photos</p>
+                            <p class="editor__article-text">Progressively incentivize cooperative systems through technically sound functionalities. The credibly productivate seamless data.</p>
                         </div>
                     </div>
 
                     <div class="editor__article">
-                        <img class="editor__article--image" src="/images/editor_article_bg2.jpeg">
-                        <span class="editor__article-category">FASHION</span>
+                        <img class="editor__article-image" src="/images/editor_article_bg2.jpeg">
+                        <span class="editor__article__category">FASHION</span>
                         <div class="editor__article__inner">
-                            <time class="editor__article--time">08.08.2021</time>
-                            <p class="editor__article--heading">Richird Norton photorealistic rendering as real photos</p>
-                            <p class="editor__article--text">Progressively incentivize cooperative systems through technically sound functionalities. The credibly productivate seamless data.</p>
+                            <time class="editor__article-time">08.08.2021</time>
+                            <p class="editor__article-heading">Richird Norton photorealistic rendering as real photos</p>
+                            <p class="editor__article-text">Progressively incentivize cooperative systems through technically sound functionalities. The credibly productivate seamless data.</p>
                         </div>
                     </div>
 
                     <div class="editor__article">
-                        <img class="editor__article--image" src="/images/editor_article_bg3.jpeg">
-                        <span class="editor__article-category">FASHION</span>
+                        <img class="editor__article-image" src="/images/editor_article_bg3.jpeg">
+                        <span class="editor__article__category">FASHION</span>
                         <div class="editor__article__inner">
-                            <time class="editor__article--time">08.08.2021</time>
-                            <p class="editor__article--heading">Richird Norton photorealistic rendering as real photos</p>
-                            <p class="editor__article--text">Progressively incentivize cooperative systems through technically sound functionalities. The credibly productivate seamless data.</p>
+                            <time class="editor__article-time">08.08.2021</time>
+                            <p class="editor__article-heading">Richird Norton photorealistic rendering as real photos</p>
+                            <p class="editor__article-text">Progressively incentivize cooperative systems through technically sound functionalities. The credibly productivate seamless data.</p>
                         </div>
                     </div>
                 </div>
