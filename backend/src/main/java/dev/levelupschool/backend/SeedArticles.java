@@ -15,7 +15,8 @@ public class SeedArticles {
     @Bean
     CommandLineRunner init(
         ArticleRepository articleRepository,
-        CommentRepository commentRepository
+        CommentRepository commentRepository,
+        UserRepository userRepository
     ) {
         return new CommandLineRunner() {
             @Override
@@ -23,10 +24,13 @@ public class SeedArticles {
                 if (articleRepository.count() == 0) {
                     log.info("Seeding articles");
 
-                    var article1 = articleRepository.save(new Article("test title 1", "test content 1"));
-                    articleRepository.save(new Article("test title 2", "test content 2"));
+                    var user = userRepository.save(new User("John Uzodinma"));
 
-                    commentRepository.save(new Comment("test comment", article1));
+                    var article1 = articleRepository.save(new Article("test title 1", "test content 1", user));
+                    articleRepository.save(new Article("test title 2", "test content 2", user));
+
+                    commentRepository.save(new Comment("test comment", user, article1));
+
                 }
             }
         };

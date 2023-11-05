@@ -23,6 +23,9 @@ class BackendApplicationTests {
     private MockMvc mvc;
 
     @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
     private ArticleRepository articleRepository;
 
     @Autowired
@@ -34,7 +37,10 @@ class BackendApplicationTests {
 
     @Test
     public void givenArticle_whenGetArticles_thenReturnJsonArray() throws Exception {
-        var article = new Article("test title 1", "test content 1");
+        var user = new User("John Uzodinma");
+        userRepository.save(user);
+
+        var article = new Article("test title 1", "test content 1", user);
 
         articleRepository.save(article);
 
@@ -48,9 +54,12 @@ class BackendApplicationTests {
 
     @Test
     public void givenComment_whenGetArticle_thenReturnCommentsArray() throws Exception {
-        var article = articleRepository.save(new Article("test title", "test content 1"));
+        var user = new User("John Uzodinma");
+        userRepository.save(user);
 
-        commentRepository.save(new Comment("test comment", article));
+        var article = articleRepository.save(new Article("test title", "test content 1", user));
+
+        commentRepository.save(new Comment("test comment", user, article));
 
         mvc.perform(
                 get("/articles/{id}", article.getId())

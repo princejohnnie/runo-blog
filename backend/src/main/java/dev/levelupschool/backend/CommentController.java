@@ -9,10 +9,13 @@ import java.util.Map;
 public class CommentController {
     private final CommentRepository commentRepository;
 
+    private final UserRepository userRepository;
+
     private final ArticleRepository articleRepository;
 
-    CommentController(CommentRepository commentRepository, ArticleRepository articleRepository) {
+    CommentController(CommentRepository commentRepository, UserRepository userRepository, ArticleRepository articleRepository) {
         this.commentRepository = commentRepository;
+        this.userRepository = userRepository;
         this.articleRepository = articleRepository;
     }
 
@@ -30,12 +33,14 @@ public class CommentController {
 
     @PostMapping("/comments")
     Comment store(@RequestBody Map<String, Object> request) {
+        Long userId = ((Number) request.get("user_id")).longValue();
         Long articleId = ((Number) request.get("articleId")).longValue();
         String content = (String) request.get("content");
 
         return commentRepository.save(
             new Comment(
                 content,
+                userRepository.findById(userId).orElseThrow(),
                 articleRepository.findById(articleId).orElseThrow()
             )
         );

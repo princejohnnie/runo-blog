@@ -3,13 +3,17 @@ package dev.levelupschool.backend;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 public class ArticleController {
     private final ArticleRepository articleRepository;
 
-    ArticleController(ArticleRepository articleRepository) {
+    private final UserRepository userRepository;
+
+    ArticleController(ArticleRepository articleRepository, UserRepository userRepository) {
         this.articleRepository = articleRepository;
+        this.userRepository = userRepository;
     }
 
     @GetMapping("/articles")
@@ -25,8 +29,18 @@ public class ArticleController {
     }
 
     @PostMapping("/articles")
-    Article store(@RequestBody Article article) {
-        return articleRepository.save(article);
+    Article store(@RequestBody Map<String, Object> request) {
+        Long userId = ((Number) request.get("user_id")).longValue();
+        String title = (String) request.get("title");
+        String content = (String) request.get("content");
+
+        return articleRepository.save(
+            new Article(
+                title,
+                content,
+                userRepository.findById(userId).orElseThrow()
+            )
+        );
     }
 
     @PutMapping("/articles/{id}")

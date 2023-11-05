@@ -13,12 +13,17 @@ public class Article {
     private String title;
     private String content;
 
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User author;
+
     @OneToMany(mappedBy = "article", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private List<Comment> comments;
 
-    public Article(String title, String content) {
+    public Article(String title, String content, User author) {
         this.title = title;
         this.content = content;
+        this.author = author;
     }
 
     protected Article() {
@@ -52,8 +57,16 @@ public class Article {
         return comments;
     }
 
+    public User getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(User author) {
+        this.author = author;
+    }
+
     @Override
     public String toString() {
-        return String.format("Article[id=%d, title='%s', content='%s']", id, title, content);
+        return String.format("Article[id=%d, user.id=%d, title='%s', content='%s']", id, author.getId(), title, content);
     }
 }
