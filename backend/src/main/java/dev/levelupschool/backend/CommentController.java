@@ -37,6 +37,9 @@ public class CommentController {
         Long articleId = ((Number) request.get("articleId")).longValue();
         String content = (String) request.get("content");
 
+//        var fakeCommentNotActuallyStored = new Comment(content, articleRepository.findById(articleId).orElseThrow());
+//        return fakeCommentNotActuallyStored;
+
         return commentRepository.save(
             new Comment(
                 content,

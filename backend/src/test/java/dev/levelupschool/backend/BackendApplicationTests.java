@@ -1,22 +1,26 @@
 package dev.levelupschool.backend;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @AutoConfigureMockMvc
 @SpringBootTest
 @ActiveProfiles("test")
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class BackendApplicationTests {
 
     @Autowired
@@ -30,6 +34,9 @@ class BackendApplicationTests {
 
     @Autowired
     private CommentRepository commentRepository;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @Test
     void contextLoads() {
@@ -67,5 +74,58 @@ class BackendApplicationTests {
             )
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.comments", hasSize(1)));
+    }
+
+    @Test
+    public void givenArticle_whenPostComment_thenStoreComment() throws Exception {
+        var article = articleRepository.save(new Article("test title", "test content 1"));
+
+        var payloadDto = new CommentCreationDto();
+        payloadDto.setArticleId(article.getId());
+        payloadDto.setContent("some content");
+
+
+        var payload = objectMapper.writeValueAsString(payloadDto);
+
+        mvc.perform(
+                post("/comments")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(payload)
+            )
+            .andExpect(status().isOk());
+
+        // VERY IMPORTANT TO CHECK THAT THINGS WERE ACTUALLY STORED
+        //Assertions.assertEquals(1, commentRepository.count());
+    }
+
+    /**
+     * TODO: your homework here will be to add tests covering the expected scenarios for all methods
+     * <p>
+     * Please note that the expected outcome is different for every method.
+     * - For GET   methods, the expected outcome is successful status + correct thing returned from the API
+     * - For POST  methods, the expected outcome is successful status + something stored in the database
+     * - For PATCH methods, the expected outcome is successful status + data updated in the database
+     */
+
+
+    private static class CommentCreationDto {
+        public Long articleId;
+        public String content;
+
+        public Long getArticleId() {
+            return articleId;
+        }
+
+        public void setArticleId(Long articleId) {
+            this.articleId = articleId;
+        }
+
+        public String getContent() {
+            return content;
+        }
+
+        public void setContent(String content) {
+            this.content = content;
+        }
     }
 }
