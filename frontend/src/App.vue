@@ -80,7 +80,7 @@ import { RouterView } from "vue-router";
     </div>
 
     <div class="mainFooter__bottom">
-      <div class="mainFooter__bottom__inner">
+      <div class="mainFooter__bottom-inner">
         <p class="mainFooter__bottom-text">2021 | RUNO Publisher Studio</p>
         <p class="mainFooter__bottom-text">Subscribe Now</p>
       </div>
