@@ -5,6 +5,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
+// You can also enable CORS per controller
+//@CrossOrigin(origins = "http://localhost", maxAge = 3600)
 @RestController
 public class ArticleController {
     private final ArticleRepository articleRepository;
