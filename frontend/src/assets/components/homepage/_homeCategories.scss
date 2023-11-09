@@ -1,0 +1,32 @@
+
+.section__categories {
+    display: flex;
+    gap: 20px;
+    padding: 0;
+}
+
+.section__category {
+    list-style: none;
+
+    &:last-child {
+        margin-left: auto;
+    }
+}
+
+.section__category-link {
+    color: $headingColor;
+    font-family: $primaryFontFamily;
+    font-size: 0.75rem;
+    font-style: normal;
+    font-weight: $baseFontWeight;
+    text-decoration: none;
+    transition: .3s;
+}
+
+.section__category-link--active {
+    color: $brandColor;
+
+    &:hover {
+        text-decoration: underline;
+    }
+}

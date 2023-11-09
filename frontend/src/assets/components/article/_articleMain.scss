@@ -1,0 +1,85 @@
+.mainArticle {
+    background: url(/images/mainBg.jpg) no-repeat center / cover;
+    min-height: 600px;
+    display: flex;
+    align-items: end;
+}
+
+.mainArticle__inner {
+    margin: 0 70px;
+    padding: 70px 0;
+    width: 100%;
+
+    @include for-phone {
+        text-align: center;
+        padding: 70px 15px;
+    }
+}
+
+.mainArticle__categories {
+    display: flex;
+    padding: 0;
+    gap: 15px;
+
+    @include for-phone {
+        @include flex-center;
+    }
+}
+
+.mainArticle__category {
+    @include flex-center;
+    list-style: none;
+    border-radius: 8px;
+    background: $categoryBackgroundColor;
+    padding: 7px 12px;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.mainArticle__category-link {
+    color: $white;
+    font-family: $secondaryFontFamily;
+    font-size: 0.75rem;
+    font-weight: $baseFontWeight;
+    text-decoration: none;
+    border-radius: 8px;
+}
+
+.mainArticle__heading {
+    color: $white;
+    max-width: 530px;
+    font-family: $primaryFontFamily;
+    font-size: 2.25rem;
+    font-style: normal;
+    line-height: normal;
+}
+
+.mainArticle__content {
+    color: $secondaryWhite;
+    font-family: $primaryFontFamily;
+    font-size: 1.125rem;
+    font-weight: $smallFontWeight;
+    line-height: 1.5;
+    display: flex;
+    gap: 10px;
+
+    @include for-phone {
+        flex-direction: column;
+        align-items: center;
+    }
+}
+
+.mainArticle__divider {
+    width: 30px;
+    height: 2px;
+    margin: 10px 0;
+    background: $secondaryWhite;
+}
+
+.mainArticle__text {
+    max-width: 550px;
+}
+
+.mainArticle__pagination {
+    margin-top: 80px;
+}
