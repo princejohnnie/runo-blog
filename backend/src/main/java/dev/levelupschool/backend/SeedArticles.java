@@ -1,5 +1,11 @@
 package dev.levelupschool.backend;
 
+import dev.levelupschool.backend.model.Article;
+import dev.levelupschool.backend.model.Comment;
+import dev.levelupschool.backend.model.User;
+import dev.levelupschool.backend.repository.ArticleRepository;
+import dev.levelupschool.backend.repository.CommentRepository;
+import dev.levelupschool.backend.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;

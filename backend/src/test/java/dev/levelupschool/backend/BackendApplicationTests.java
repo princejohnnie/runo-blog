@@ -1,6 +1,13 @@
 package dev.levelupschool.backend;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import dev.levelupschool.backend.model.Article;
+import dev.levelupschool.backend.model.Comment;
+import dev.levelupschool.backend.model.User;
+import dev.levelupschool.backend.repository.ArticleRepository;
+import dev.levelupschool.backend.repository.CommentRepository;
+import dev.levelupschool.backend.repository.UserRepository;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -78,9 +85,12 @@ class BackendApplicationTests {
 
     @Test
     public void givenArticle_whenPostComment_thenStoreComment() throws Exception {
-        var article = articleRepository.save(new Article("test title", "test content 1"));
+        var user = userRepository.save(new User("John Uzodinma"));
+
+        var article = articleRepository.save(new Article("test title", "test content 1", user));
 
         var payloadDto = new CommentCreationDto();
+        payloadDto.setUserId(user.getId());
         payloadDto.setArticleId(article.getId());
         payloadDto.setContent("some content");
 
@@ -95,7 +105,7 @@ class BackendApplicationTests {
             .andExpect(status().isOk());
 
         // VERY IMPORTANT TO CHECK THAT THINGS WERE ACTUALLY STORED
-        //Assertions.assertEquals(1, commentRepository.count());
+        Assertions.assertEquals(1, commentRepository.count());
     }
 
     /**
@@ -109,8 +119,17 @@ class BackendApplicationTests {
 
 
     private static class CommentCreationDto {
+        public Long userId;
         public Long articleId;
         public String content;
+
+        public Long getUserId() {
+            return userId;
+        }
+
+        public void setUserId(Long userId) {
+            this.userId = userId;
+        }
 
         public Long getArticleId() {
             return articleId;
