@@ -168,6 +168,16 @@ public class UserController {
     }
 
 
+
+    @Getter
+    @Setter
+    private static class RegisterDto {
+        private String email;
+        private String name;
+        private String slug;
+        private String password;
+    }
+
     @Getter
     @Setter
     private static class LoginDto {
