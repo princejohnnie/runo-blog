@@ -4,12 +4,11 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 
 import java.util.List;
 
 @Getter
-@Setter
 @NoArgsConstructor
 @Entity
 @Table(name = "users", schema = "public")
@@ -18,7 +17,13 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String email;
+
     private String name;
+
+    private String slug;
+
+    private String password;
 
     @OneToMany(mappedBy = "author", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JsonIgnore
@@ -28,8 +33,27 @@ public class User {
     @JsonIgnore
     private List<Comment> comments;
 
-    public User(String name) {
+    public User(String email, String name, String slug, String password) {
+        this.email = email;
         this.name = name;
+        this.slug = slug;
+        this.setPassword(password);
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setSlug(String slug) {
+        this.slug = slug;
+    }
+
+    public void setPassword(String password) {
+        this.password = BCrypt.hashpw(password.getBytes(), BCrypt.gensalt());
     }
 
     @Override

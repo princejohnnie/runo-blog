@@ -1,6 +1,9 @@
 create table users (
-    id   serial not null primary key,
-    name text   not null
+    id serial not null primary key,
+    email varchar(255) unique not null,
+    name text not null,
+    slug text,
+    password varchar(255) not null
 );
 
 create table articles (

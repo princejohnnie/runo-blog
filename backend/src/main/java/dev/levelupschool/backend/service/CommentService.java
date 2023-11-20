@@ -1,7 +1,9 @@
 package dev.levelupschool.backend.service;
 
 import dev.levelupschool.backend.exception.ModelNotFoundException;
+import dev.levelupschool.backend.model.Article;
 import dev.levelupschool.backend.model.Comment;
+import dev.levelupschool.backend.model.User;
 import dev.levelupschool.backend.repository.ArticleRepository;
 import dev.levelupschool.backend.repository.CommentRepository;
 import dev.levelupschool.backend.repository.UserRepository;
@@ -30,7 +32,7 @@ public class CommentService {
     public Comment getComment(Long id) {
         return commentRepository
             .findById(id)
-            .orElseThrow(() -> new ModelNotFoundException(id));
+            .orElseThrow(() -> new ModelNotFoundException(Comment.class, id));
     }
 
     public Comment createComment(CreateCommentRequest request) {
@@ -41,8 +43,8 @@ public class CommentService {
         return commentRepository.save(
             new Comment(
                 content,
-                userRepository.findById(userId).orElseThrow(() -> new ModelNotFoundException(userId)),
-                articleRepository.findById(articleId).orElseThrow(() -> new ModelNotFoundException(articleId))
+                userRepository.findById(userId).orElseThrow(() -> new ModelNotFoundException(User.class, userId)),
+                articleRepository.findById(articleId).orElseThrow(() -> new ModelNotFoundException(Article.class, articleId))
             )
         );
     }
@@ -54,7 +56,7 @@ public class CommentService {
                 comment.setContent(newComment.getContent());
                 return commentRepository.save(comment);
             })
-            .orElseThrow(() -> new ModelNotFoundException(id));
+            .orElseThrow(() -> new ModelNotFoundException(Comment.class, id));
     }
 
     public void deleteComment(Long id) {

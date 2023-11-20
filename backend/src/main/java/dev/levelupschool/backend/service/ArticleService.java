@@ -25,7 +25,7 @@ public class ArticleService {
 
     public Article getArticle(Long id) {
         return articleRepository.findById(id)
-            .orElseThrow(() -> new ModelNotFoundException(id));
+            .orElseThrow(() -> new ModelNotFoundException(Article.class, id));
     }
 
     public Article createArticle(CreateArticleRequest request) {
@@ -37,7 +37,7 @@ public class ArticleService {
             new Article(
                 title,
                 content,
-                userRepository.findById(userId).orElseThrow(() -> new ModelNotFoundException(userId))
+                userRepository.findById(userId).orElseThrow(() -> new ModelNotFoundException(Article.class, userId))
             )
         );
     }
@@ -48,7 +48,7 @@ public class ArticleService {
                 article.setTitle(newArticle.getTitle());
                 article.setContent(newArticle.getContent());
                 return articleRepository.save(article);
-            }).orElseThrow(() -> new ModelNotFoundException(id));
+            }).orElseThrow(() -> new ModelNotFoundException(Article.class, id));
     }
 
     public void deleteArticle(Long id) {
