@@ -4,6 +4,8 @@ import dev.levelupschool.backend.model.Comment;
 import dev.levelupschool.backend.request.CreateCommentRequest;
 import dev.levelupschool.backend.service.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -30,12 +32,22 @@ public class CommentController {
     }
 
     @PutMapping("/comments/{id}")
-    Comment update(@RequestBody Comment newComment, @PathVariable Long id) {
-        return commentService.updateComment(newComment, id);
+    ResponseEntity<Object> update(@RequestBody Comment newComment, @PathVariable Long id) {
+        try {
+            var comment = commentService.updateComment(newComment, id);
+            return new ResponseEntity<>(comment, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.FORBIDDEN);
+        }
     }
 
     @DeleteMapping("/comments/{id}")
-    void delete(@PathVariable Long id) {
-        commentService.deleteComment(id);
+    ResponseEntity<Void> delete(@PathVariable Long id) {
+        try {
+            commentService.deleteComment(id);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
     }
 }

@@ -1,5 +1,6 @@
 package dev.levelupschool.backend.service;
 
+import dev.levelupschool.backend.auth.AuthenticationUtils;
 import dev.levelupschool.backend.exception.ModelNotFoundException;
 import dev.levelupschool.backend.model.Article;
 import dev.levelupschool.backend.model.Comment;
@@ -11,6 +12,7 @@ import dev.levelupschool.backend.request.CreateCommentRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.nio.file.AccessDeniedException;
 import java.util.List;
 
 @Service
@@ -36,30 +38,41 @@ public class CommentService {
     }
 
     public Comment createComment(CreateCommentRequest request) {
-        Long userId = request.getUserId();
-        Long articleId = request.getArticleId();
-        String content = request.getContent();
+        User loggedInUser = AuthenticationUtils.getLoggedInUser(userRepository);
 
-        return commentRepository.save(
-            new Comment(
-                content,
-                userRepository.findById(userId).orElseThrow(() -> new ModelNotFoundException(User.class, userId)),
-                articleRepository.findById(articleId).orElseThrow(() -> new ModelNotFoundException(Article.class, articleId))
-            )
-        );
+        Article article = articleRepository.findById(request.getArticleId())
+            .orElseThrow(() -> new ModelNotFoundException(Article.class, request.getArticleId()));
+
+        Comment comment = new Comment(request.getContent(), loggedInUser, article);
+
+        return commentRepository.save(comment);
     }
 
-    public Comment updateComment(Comment newComment, Long id) {
-        return commentRepository
-            .findById(id)
-            .map(comment -> {
-                comment.setContent(newComment.getContent());
-                return commentRepository.save(comment);
-            })
+    public Comment updateComment(Comment newComment, Long id) throws Exception {
+        var loggedInUser = AuthenticationUtils.getLoggedInUser(userRepository);
+
+        var comment = commentRepository.findById(id)
             .orElseThrow(() -> new ModelNotFoundException(Comment.class, id));
+
+        if (!comment.getAuthor().getId().equals(loggedInUser.getId())) {
+            throw new AccessDeniedException("You cannot edit a comment not created by you!");
+        }
+
+        comment.setContent(newComment.getContent());
+
+        return commentRepository.save(comment);
     }
 
-    public void deleteComment(Long id) {
+    public void deleteComment(Long id) throws Exception {
+        var loggedInUser = AuthenticationUtils.getLoggedInUser(userRepository);
+
+        var comment = commentRepository.findById(id)
+                .orElseThrow(() -> new ModelNotFoundException(Comment.class, id));
+
+        if (!loggedInUser.getId().equals(comment.getAuthor().getId())) {
+            throw new AccessDeniedException("You cannot delete an article not created by you!");
+        }
+
         commentRepository.deleteById(id);
     }
 }

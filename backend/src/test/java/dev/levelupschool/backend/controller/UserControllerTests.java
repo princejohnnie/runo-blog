@@ -3,7 +3,11 @@ package dev.levelupschool.backend.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.levelupschool.backend.model.User;
 import dev.levelupschool.backend.repository.UserRepository;
+import dev.levelupschool.backend.service.TokenService;
 import dev.levelupschool.backend.service.UserService;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,12 +17,14 @@ import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultActions;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -38,15 +44,47 @@ public class UserControllerTests {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @Autowired
+    private TokenService tokenService;
+
+    private String firstUserToken;
+    private String differentUserToken;
+
     @Test
     void  contextLoads() {
 
     }
 
 
+    private void registerUser() throws Exception {
+        var firstUser = new User("john@gmail.com", "John Uzodinma", "slug", "password");
+
+        var payload = objectMapper.writeValueAsString(firstUser);
+
+        MvcResult result = mockMvc.perform(
+            post(("/register"))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(payload)).andDo(print()).andReturn();
+
+        firstUserToken = "Bearer " + result.getResponse().getContentAsString();
+    }
+
+    private void registerDifferentUser() throws Exception {
+        User secondUser = new User("luka@gmail.com", "Luka Papez", "slug", "password");
+
+        var payload = objectMapper.writeValueAsString(secondUser);
+
+        MvcResult result = mockMvc.perform(
+            post(("/register"))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(payload)).andDo(print()).andReturn();
+
+        differentUserToken = "Bearer " + result.getResponse().getContentAsString();
+    }
+
     @Test
     public void givenUser_whenGetUsers_thenReturnJsonArray() throws Exception {
-        userService.createUser(new User("John Uzodinma"));
+        userService.createUser(new User("john@gmail.com", "John Uzodinma", "slug", "password"));
 
         mockMvc.perform(
             get("/users")
@@ -58,7 +96,7 @@ public class UserControllerTests {
 
     @Test
     public void givenUser_whenGetUser_thenReturnJson() throws Exception {
-        var user = userService.createUser(new User("John Uzodinma"));
+        var user = userService.createUser(new User("john@gmail.com", "John Uzodinma", "slug", "password"));
 
         mockMvc.perform(
                 get("/users/{id}", user.getId())
@@ -69,29 +107,53 @@ public class UserControllerTests {
     }
 
     @Test
-    public void givenUser_whenPostUser_thenStoreUser() throws Exception {
-        var user = new User("John Uzodinma");
+    public void givenUser_whenRegisterUser_thenStoreUser() throws Exception {
+        var user = new User("john@gmail.com", "John Uzodinma", "slug", "password");
         var payload = objectMapper.writeValueAsString(user);
 
         mockMvc.perform(
-            post("/users")
+            post("/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(payload)
-        ).andExpect(status().isOk())
-                .andExpect(jsonPath("$.name", is("John Uzodinma")));
+        ).andExpect(status().isOk());
 
         Assertions.assertEquals(1, userRepository.count()); // Confirm that user was actually stored in the DB
     }
 
     @Test
-    public void givenUser_whenPutUser_thenUpdateUser() throws Exception {
-        var user = userService.createUser(new User("John Uzodinma"));
+    public void givenUser_whenLoginUser_thenReturnToken() throws Exception {
+        var user = userService.createUser(new User("john@gmail.com", "John Uzodinma", "slug", "password"));
 
-        var updateUserRequest = new User("John Prince");
+        var loginUserRequest = new LoginDto(user.getEmail(), "password"); // Login with created user credentials
+        var payload = objectMapper.writeValueAsString(loginUserRequest);
+
+        ResultActions resultActions = mockMvc.perform(
+            post("/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(payload)
+        ).andExpect(status().isOk());
+
+        String returnedToken = resultActions.andReturn().getResponse().getContentAsString();
+        TokenService.TokenData tokenData = tokenService.validateToken(returnedToken);
+
+        User loggedInUser = userRepository.findById(tokenData.getUserId()).get();
+
+        Assertions.assertEquals(loggedInUser.getEmail(), user.getEmail()); // Confirm that the Token returned actually belongs to the logged in user
+        Assertions.assertEquals(loggedInUser.getName(), user.getName());
+    }
+
+    @Test
+    public void givenOwnerUser_whenPutUser_thenUpdateUser() throws Exception {
+        registerUser(); // Register new user to get Token
+
+        var user = userRepository.findAll().get(0); // Get registered user
+
+        var updateUserRequest = new User("johndoe@gmail.com", "John Prince", "slug", "password2");
         var payload = objectMapper.writeValueAsString(updateUserRequest);
 
         mockMvc.perform(
                 put("/users/{id}", user.getId())
+                    .header("Authorization", firstUserToken)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(payload)
             ).andExpect(status().isOk())
@@ -101,13 +163,60 @@ public class UserControllerTests {
     }
 
     @Test
-    public void givenUser_whenDeleteUser_thenDeleteUser() throws Exception {
-        var user = userService.createUser(new User("John Uzodinma"));
+    public void givenDifferentUser_whenPutUser_thenReturnUnauthorized() throws Exception {
+        registerUser(); // Register new user to get token
+        registerDifferentUser(); // Register a different user to get second token
+
+        var user = userRepository.findAll().get(0); // Get registered user
+
+        var updateUserRequest = new User("john@gmail.com", "John Prince", "slug", "password2");
+        var payload = objectMapper.writeValueAsString(updateUserRequest);
+
+        mockMvc.perform(
+                put("/users/{id}", user.getId())
+                    .header("Authorization", differentUserToken) // NOTE: A different (second) User is trying to Update first user
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(payload)
+            ).andExpect(status().isForbidden());
+
+        Assertions.assertEquals("John Uzodinma", userRepository.findById(user.getId()).get().getName()); // Confirm that user was not updated in the DB
+    }
+
+    @Test
+    public void givenOwnerUser_whenDeleteUser_thenDeleteUser() throws Exception {
+        registerUser();
+
+        var user = userRepository.findAll().get(0);
 
         mockMvc.perform(
             delete("/users/{id}", user.getId())
+                .header("Authorization", firstUserToken)
         ).andExpect(status().isOk());
 
         Assertions.assertEquals(0, userRepository.count()); // Confirm that user was actually deleted from the DB
+    }
+
+    @Test
+    public void givenDifferentUser_whenDeleteUser_thenReturnUnauthorized() throws Exception {
+        registerUser();
+        registerDifferentUser();
+
+        var user = userRepository.findAll().get(0);
+
+        // Try to update the user using a different User
+        mockMvc.perform(
+            delete("/users/{id}", user.getId())
+                .header("Authorization", differentUserToken) // NOTE: A different (second) User is trying to Update First User
+        ).andExpect(status().isForbidden());
+
+        Assertions.assertEquals(2, userRepository.count()); // Confirm that user was not deleted from the DB. Count is 2 because we registered two users
+    }
+
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    private static class LoginDto {
+        private String email;
+        private String password;
     }
 }

@@ -1,12 +1,12 @@
 package dev.levelupschool.backend.service;
 
-import dev.levelupschool.backend.controller.UserController;
+import dev.levelupschool.backend.auth.AuthenticationUtils;
 import dev.levelupschool.backend.exception.ModelNotFoundException;
 import dev.levelupschool.backend.model.User;
 import dev.levelupschool.backend.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.nio.file.AccessDeniedException;
 import java.util.List;
 
 @Service
@@ -14,11 +14,8 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    private final TokenService tokenService;
-
-    UserService(UserRepository userRepository, TokenService tokenService) {
+    UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
-        this.tokenService = tokenService;
     }
 
     public List<User> getAllUsers() {
@@ -30,19 +27,48 @@ public class UserService {
             .orElseThrow(() -> new ModelNotFoundException(User.class, id));
     }
 
-    public User createUser(User user) {
+    public User createUser(User newUser) throws Exception {
+        var user = userRepository.findByEmail(newUser.getEmail());
+
+        if (user != null) {
+            throw new Exception("user with email already exists");
+        }
+
+        return userRepository.save(newUser);
+    }
+
+    public User updateUser(User newUser, Long id) throws Exception {
+        var loggedInUser = AuthenticationUtils.getLoggedInUser(userRepository);
+
+        var checkUser = userRepository.findByEmail(newUser.getEmail());
+        if (checkUser != null) {
+            throw new Exception("user with email already exists");
+        }
+
+        var user = userRepository.findById(id)
+            .orElseThrow(() -> new ModelNotFoundException(User.class, id));
+
+        if (!loggedInUser.getId().equals(user.getId())) {
+            throw new AccessDeniedException("You cannot update another user's profile!");
+        }
+
+        user.setEmail(newUser.getEmail());
+        user.setName(newUser.getName());
+        user.setPassword(newUser.getPassword());
+
         return userRepository.save(user);
     }
 
-    public User updateUser(User newUser, Long id) {
-        return userRepository.findById(id)
-            .map(user -> {
-                user.setName(newUser.getName());
-                return userRepository.save(user);
-            }).orElseThrow(() -> new ModelNotFoundException(User.class, id));
-    }
+    public void deleteUser(Long id) throws AccessDeniedException {
+        var loggedInUser = AuthenticationUtils.getLoggedInUser(userRepository);
 
-    public void deleteUser(Long id) {
+        var user = userRepository.findById(id)
+            .orElseThrow(() -> new ModelNotFoundException(User.class, id));
+
+        if (!loggedInUser.getId().equals(user.getId())) {
+            throw new AccessDeniedException("You cannot delete another user!");
+        }
+
         userRepository.deleteById(id);
     }
 }

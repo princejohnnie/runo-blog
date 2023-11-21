@@ -9,6 +9,7 @@ import dev.levelupschool.backend.model.User;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.web.bind.annotation.*;
@@ -38,22 +39,33 @@ public class UserController {
     }
 
     @PutMapping("/users/{id}")
-    User update(@RequestBody User newUser, @PathVariable Long id) {
-        return userService.updateUser(newUser, id);
+    ResponseEntity<Object> update(@RequestBody User newUser, @PathVariable Long id) {
+        try {
+            var user = userService.updateUser(newUser, id);
+            return new ResponseEntity<>(user, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.FORBIDDEN);
+        }
     }
 
     @DeleteMapping("/users/{id}")
-    void delete(@PathVariable Long id) {
-        userService.deleteUser(id);
+    ResponseEntity<Void> delete(@PathVariable Long id) {
+        try {
+            userService.deleteUser(id);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
     }
 
     @PostMapping("/register")
-    ResponseEntity<String> register(@RequestBody RegisterDto registerDto) {
-        var user = new User(registerDto.getEmail(), registerDto.getName(), registerDto.getSlug(), registerDto.getPassword());
-
-        userService.createUser(user);
-
-        return ResponseEntity.ok(tokenService.generateToken(user.getId()));
+    ResponseEntity<?> register(@RequestBody User newUser) {
+        try {
+            var createdUser = userService.createUser(newUser);
+            return ResponseEntity.ok(tokenService.generateToken(createdUser.getId()));
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.FORBIDDEN);
+        }
     }
 
 
@@ -77,16 +89,6 @@ public class UserController {
         return AuthenticationUtils.getLoggedInUser(userRepository);
     }
 
-
-
-    @Getter
-    @Setter
-    private static class RegisterDto {
-        private String email;
-        private String name;
-        private String slug;
-        private String password;
-    }
 
     @Getter
     @Setter

@@ -21,6 +21,7 @@ public class User {
 
     private String name;
 
+    @JsonIgnore
     private String slug;
 
     private String password;

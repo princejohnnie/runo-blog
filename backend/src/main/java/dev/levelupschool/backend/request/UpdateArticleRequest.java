@@ -9,8 +9,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class CreateArticleRequest {
-    private Long userId;
+public class UpdateArticleRequest {
     private String title;
     private String content;
 }

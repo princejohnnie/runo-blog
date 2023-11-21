@@ -1,10 +1,12 @@
 package dev.levelupschool.backend.controller;
 
 import dev.levelupschool.backend.model.Article;
-import dev.levelupschool.backend.request.CreateArticleRequest;
 import dev.levelupschool.backend.service.ArticleService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 
 import java.util.List;
 
@@ -28,17 +30,27 @@ public class ArticleController {
     }
 
     @PostMapping("/articles")
-    Article store(@RequestBody CreateArticleRequest request) {
-        return articleService.createArticle(request);
+    Article store(@RequestBody Article article) {
+        return articleService.createArticle(article);
     }
 
     @PutMapping("/articles/{id}")
-    Article update(@RequestBody Article newArticle, @PathVariable Long id) {
-        return articleService.updateArticle(newArticle, id);
+    ResponseEntity<Object> update(@RequestBody Article newArticle, @PathVariable Long id) {
+        try {
+            var article = articleService.updateArticle(newArticle, id);
+            return new ResponseEntity<>(article, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.FORBIDDEN);
+        }
     }
 
     @DeleteMapping("/articles/{id}")
-    void delete(@PathVariable Long id) {
-        articleService.deleteArticle(id);
+    ResponseEntity<Void> delete(@PathVariable Long id) {
+        try {
+            articleService.deleteArticle(id);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
     }
 }
