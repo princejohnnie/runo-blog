@@ -1,0 +1,56 @@
+.mainHeader {
+    position: fixed;
+    background-color: $headerBackgroundColor;
+    z-index: 1;
+    left: 0;
+    right: 0;
+}
+
+.mainHeader__inner {
+    @include flex-center-vert;
+    justify-content: space-between;
+    margin: 0 70px;
+
+    @include for-phone {
+        margin: 0 30px;
+    }
+}
+
+.mainHeader__logo {
+    color: $mainBackgroundWhite;
+    font-family: $headerFontFamily;
+    font-size: 1.25rem;
+    font-weight: $baseFontWeight;
+    padding: 30px 0;
+    margin: 0;
+}
+
+.mainHeader__nav-list {
+    display: flex;
+    padding: 0;
+    gap: 25px;
+}
+
+.mainHeader__nav-item {
+    list-style: none;
+
+    @include for-phone {
+        &:first-child {
+            visibility: hidden;
+        }
+    }
+}
+
+.mainHeader__nav-link--active {
+    border-bottom: 3px solid $brandColor;
+    padding-bottom: 5px;
+}
+
+.mainHeader__nav-link {
+    color: $white;
+    font-family: $secondaryFontFamily;
+    font-size: 0.875rem;
+    line-height: normal;
+    text-decoration: none;
+    font-weight: $baseFontWeight;
+}

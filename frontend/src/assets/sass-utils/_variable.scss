@@ -1,0 +1,22 @@
+@import url('https://fonts.googleapis.com/css2?family=Lora:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lora:wght@400;700&family=Roboto:wght@100;400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=League+Spartan&display=swap');
+
+
+$primaryFontFamily: 'Lora', serif;
+$secondaryFontFamily: 'Roboto', sans-serif;
+$headerFontFamily: 'League Spartan', sans-serif;;
+
+$baseFontSize: 14px;
+$baseFontWeight: 700;
+$smallFontWeight: 400;
+
+$white: #FFF;
+$secondaryWhite: #E5E5E5;
+$brandColor: #D4A373;
+$headingColor: #495057;
+$paragraphColor: #6C757D;
+$mainBackgroundWhite: #F8F9FA;
+$footerBackgroundColor: #212529;
+$headerBackgroundColor: rgba(0, 0, 0, 0.20);
+$categoryBackgroundColor: rgba(255, 255, 255, 0.15);

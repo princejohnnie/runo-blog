@@ -1,0 +1,31 @@
+html {
+    font-size: $baseFontSize;
+    width: 100%;
+}
+
+
+main {
+    padding-bottom: 60px;
+    background: $mainBackgroundWhite;
+}
+
+.section__heading {
+    color: $headingColor;
+    font-family: $primaryFontFamily;
+    font-size: 2.25rem;
+    font-style: normal;
+    font-weight: $baseFontWeight;
+}
+
+
+.section__inner {
+    margin: 70px;
+
+    @include for-tablet {
+        margin: 30px;
+    }
+
+    @include for-phone {
+        margin: 0 30px;
+    }
+}
