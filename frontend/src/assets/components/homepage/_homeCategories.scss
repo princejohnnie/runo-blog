@@ -3,6 +3,11 @@
     display: flex;
     gap: 20px;
     padding: 0;
+    flex-wrap: wrap;
+
+    @include for-phone {
+        gap: 10px;
+    }
 }
 
 .section__category {
@@ -10,6 +15,12 @@
 
     &:last-child {
         margin-left: auto;
+    }
+
+    @include for-phone {
+        &:last-child {
+            margin-left: 0;
+        }
     }
 }
 

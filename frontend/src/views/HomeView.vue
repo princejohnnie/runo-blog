@@ -26,7 +26,6 @@ import HomeCategories from '@/components/homepage/HomeCategories.vue';
         <div class="section__inner">
             <h2 class="section__heading">Editor's Pick</h2>
             <div class="editorArticles">
-
                 <ArticleEditorCard v-for="(editorArticle, index) in editorArticles" :key="index" :editorArticle="editorArticle" />
                 </div>
             </div>

@@ -20,8 +20,12 @@ main {
 
 .section__inner {
     margin: 70px;
-    
-    @include for-phone {
+
+    @include for-tablet {
         margin: 30px;
+    }
+
+    @include for-phone {
+        margin: 0 30px;
     }
 }

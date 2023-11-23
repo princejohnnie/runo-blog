@@ -46,6 +46,8 @@
     @include flex-column;
     position: absolute;
     padding: 40px;
+    left: 0;
+    right: 0;
     gap: 10px;
 }
 
@@ -58,7 +60,6 @@
 
 .editorArticle__heading {
     color: $white;
-    width: 270px;
     font-family: $primaryFontFamily;
     font-size: 1.125rem;
     line-height: 25px;
@@ -67,7 +68,6 @@
 
 .editorArticle__text {
     color: $secondaryWhite;
-    width: 340px;
     font-family: $primaryFontFamily;
     font-size: 0.75rem;
     font-weight: $smallFontWeight;

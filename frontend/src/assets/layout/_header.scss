@@ -10,6 +10,10 @@
     @include flex-center-vert;
     justify-content: space-between;
     margin: 0 70px;
+
+    @include for-phone {
+        margin: 0 30px;
+    }
 }
 
 .mainHeader__logo {
@@ -29,6 +33,12 @@
 
 .mainHeader__nav-item {
     list-style: none;
+
+    @include for-phone {
+        &:first-child {
+            visibility: hidden;
+        }
+    }
 }
 
 .mainHeader__nav-link--active {
