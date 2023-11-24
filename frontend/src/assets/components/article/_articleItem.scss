@@ -80,6 +80,11 @@
     margin-top: 10px;
 }
 
+.article__heading-link {
+    color: $headingColor;
+    text-decoration: none;
+}
+
 .article__text {
     color: $paragraphColor;
     font-family: $primaryFontFamily;

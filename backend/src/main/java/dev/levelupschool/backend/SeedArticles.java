@@ -32,8 +32,8 @@ public class SeedArticles {
 
                     var user = userRepository.save(new User("John Uzodinma"));
 
-                    var article1 = articleRepository.save(new Article("test title 1", "test content 1", user));
-                    articleRepository.save(new Article("test title 2", "test content 2", user));
+                    var article1 = articleRepository.save(new Article("test title 1", "Lorem ipsum dolor sit amet consectetur adipisicing elit. Debitis, eveniet consequatur eos quod harum totam nulla repudiandae nemo saepe soluta vero quo, repellendus dicta sed minima amet ut recusandae maxime.", user));
+                    articleRepository.save(new Article("test title 2", "Lorem ipsum dolor sit amet consectetur adipisicing elit. Debitis, eveniet consequatur eos quod harum totam nulla repudiandae nemo saepe soluta vero quo, repellendus dicta sed minima amet ut recusandae maxime.", user));
 
                     commentRepository.save(new Comment("test comment", user, article1));
 

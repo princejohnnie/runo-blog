@@ -25,6 +25,11 @@
     margin: 0;
 }
 
+.mainHeader__logo-link {
+    color: $white;
+    text-decoration: none;
+}
+
 .mainHeader__nav-list {
     display: flex;
     padding: 0;
