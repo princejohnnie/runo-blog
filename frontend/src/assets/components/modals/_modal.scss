@@ -1,0 +1,111 @@
+.modal {
+    position: fixed;
+    background: rgba(0, 0, 0, 0.5);
+    width: 100vw;
+    height: 100vh;
+    z-index: 20;
+    top: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal__form {
+    padding: 20px;
+    background: #fff;
+    border-radius: 20px;
+    min-width: 350px;
+}
+
+.modal__inner {
+    position: relative;
+    z-index: 20;
+}
+
+.modal__backdrop {
+    position: fixed;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 10;
+}
+
+.modal__close {
+    position: absolute;
+    right: 12px;
+    top: 25px;
+    background: none;
+    border: none;
+    transition: .5s all;
+
+    &:hover {
+        cursor: pointer;
+        transform: rotate(180deg);
+    }
+
+}
+
+.modal__heading {
+    color: #495057;
+    font-family: $primaryFontFamily;
+    font-size: 18px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 25px; 
+    margin-bottom: 30px;
+}
+
+.modal__inputWrapper {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+}
+
+.modal__inputLabel {
+    color: #818181;
+    font-family: $primaryFontFamily;
+    font-size: 12px;
+    margin-bottom: 12px;
+    font-weight: $baseFontWeight;
+}
+
+.modal__input {
+    color: #818181;
+    font-family: $primaryFontFamily;
+    font-size: 12px;
+    padding: 12px 14px;
+    border: 1px solid #495057;
+}
+
+.modal__checkbox {
+    vertical-align: middle;
+    cursor: pointer;
+    margin-right: 10px;
+    width: 20px;
+    height: 20px;
+}
+
+.modal__checkLabel {
+    font-size: 11px;
+    font-family: $primaryFontFamily;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.modal__inputButton {
+    margin-top: 20px;
+    background: $brandColor;
+    color: #fff;
+    font-family: $primaryFontFamily;
+    font-size: 12px;
+    font-weight: $baseFontWeight;
+    padding: 10px;
+    text-align: center;
+    border: none;
+    transition: .5s all;
+
+    &:hover {
+        cursor: pointer;
+        background: #343A40;
+    }
+}

@@ -1,7 +1,7 @@
 <script setup>
 import ArticleMain from '@/components/article/ArticleMain.vue';
+import Article from '@/requests/Article.js';
 
-import axios from 'axios';
 import { ref } from 'vue';
 import { useRoute } from 'vue-router';
 
@@ -9,7 +9,7 @@ import { useRoute } from 'vue-router';
 const route = useRoute();
 const articleDetail = ref({});
 
-axios.get(`http://localhost:8080/articles/${route.params.id}`).then((res) => {
+Article.show(route.params.id).then((res) => {
     articleDetail.value = res.data
 })
 

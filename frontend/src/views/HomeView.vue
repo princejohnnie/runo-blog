@@ -6,11 +6,12 @@ import ArticleCard from '@/components/article/ArticleCard.vue';
 import ArticleEditorCard from '@/components/article/ArticleEditorCard.vue';
 import HomeCategories from '@/components/homepage/HomeCategories.vue';
 
-import axios from 'axios';
+import Article from '@/requests/Article.js';
 
 const articles = ref([])
 
-axios.get("http://localhost:8080/articles").then((res) => {
+Article.index().then((res) => {
+    console.log(res.data)
     articles.value = res.data;
 })
 

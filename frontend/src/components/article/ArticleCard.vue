@@ -4,7 +4,7 @@ import { defineProps, computed } from 'vue';
 const props = defineProps({
     article: {
         type: Object,
-        requires: true,
+        required: true,
     }
 })
 

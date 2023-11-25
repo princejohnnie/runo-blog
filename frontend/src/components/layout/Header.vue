@@ -1,3 +1,15 @@
+<script setup>
+import LoginModal from "@/components/modals/LoginModal.vue";
+import RegisterModal from "@/components/modals/RegisterModal.vue";
+
+import { ref } from 'vue';
+
+const openLoginModal = ref(false)
+const openRegisterModal = ref(false)
+
+</script>
+
+
 <template>
     <header class="mainHeader">
     <div class="mainHeader__inner">
@@ -18,10 +30,19 @@
             <a href="#" class="mainHeader__nav-link">Articles</a>
           </li>
           <li class="mainHeader__nav-item">
-            <a href="#" class="mainHeader__nav-link">Sign in</a>
+            <a href="#" @click.prevent="openLoginModal = true" class="mainHeader__nav-link">Login</a>
+          </li>
+          <li class="mainHeader__nav-item">
+            <a href="#" @click.prevent="openRegisterModal = true" class="mainHeader__nav-link">Register</a>
           </li>
         </ul>
       </nav>
     </div>
+    <Teleport to="body">
+      <LoginModal v-if="openLoginModal" @closeModal="openLoginModal = false"/>
+    </Teleport>
+    <Teleport to="body">
+      <RegisterModal v-if="openRegisterModal" @closeModal="openRegisterModal = false"/>
+    </Teleport>
   </header>
 </template>
