@@ -19,6 +19,11 @@ const onCloseModal = () => {
     emit('closeModal')
 }
 
+const submit = () => {
+    showAlert()
+    onCloseModal()
+}
+
 const showAlert = () => {
     Swal.fire({
     title: "Success!",
@@ -27,23 +32,10 @@ const showAlert = () => {
     });
 }
 
-const submit = () => {
-    showAlert()
-    onCloseModal()
-    Auth.register(data.value).then(response => {
-        localStorage.setItem('token', response.data)
-        showAlert()
-        onCloseModal()
-        console.log(response)
-    }).catch(error => {
-        console.log(error)
-    })
-}
-
 </script>
 
 <template>
-    <Modal>
+    <Modal @closeModal="onCloseModal()">
         <div class="modal__form">
             <h2 class="modal__heading">Register</h2>
             <form @submit.prevent="submit()">

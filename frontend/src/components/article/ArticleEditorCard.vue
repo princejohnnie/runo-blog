@@ -1,23 +1,32 @@
+<script setup>
+
+
+const props = defineProps({
+    article: {
+        type: Object,
+        required: true,
+    }
+})
+
+// const shortContent = computed(() => {
+//     if (props.article.content?.length < 100) {
+//         return props.article.content;
+//     } else {
+//         return props.article.content?.slice(0, 100) + "...";
+//     }
+// })
+
+</script>
+
 <template>
     <div class="editorArticle">
-        <img class="editorArticle__image" :src=editorArticle.image>
-        <div class="editorArticle__category" v-for="category in editorArticle.categories">{{ category }}</div>
+        <img class="editorArticle__image" src="/images/editor_article_bg1.jpeg">
+        <div class="editorArticle__category">"FASHION"</div>
         <div class="editorArticle__inner">
-            <img src="/images/premium-icon.png" class="editorArticle__premium-icon" v-if="editorArticle.isPremium">
-            <time class="editorArticle__time">{{ editorArticle.time }}</time>
-            <p class="editorArticle__heading">{{ editorArticle.title }}</p>
-            <p class="editorArticle__text">{{ editorArticle.content }}</p>
+            <img src="/images/premium-icon.png" class="editorArticle__premium-icon">
+            <time class="editorArticle__time">08.08.2021</time>
+            <p class="editorArticle__heading">{{ article.title }}</p>
+            <p class="editorArticle__text">{{ article.content.slice(0, 200) }}</p>
         </div>
     </div>
 </template>
-
-<script>
-    export default {
-        props: {
-            editorArticle : {
-                type: Object,
-                required: true
-            }
-        }
-    }
-</script>

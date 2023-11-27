@@ -12,9 +12,13 @@
 
 .modal__form {
     padding: 20px;
-    background: #fff;
+    background: $white;
     border-radius: 20px;
     min-width: 350px;
+
+    @include for-phone {
+        min-width: 250px;
+    }
 }
 
 .modal__inner {
@@ -36,22 +40,18 @@
     top: 25px;
     background: none;
     border: none;
-    transition: .5s all;
 
     &:hover {
         cursor: pointer;
-        transform: rotate(180deg);
     }
 
 }
 
 .modal__heading {
-    color: #495057;
+    color: $headingColor;
     font-family: $primaryFontFamily;
-    font-size: 18px;
-    font-style: normal;
-    font-weight: 700;
-    line-height: 25px; 
+    font-size: 1.125rem;
+    font-weight: $baseFontWeight;
     margin-bottom: 30px;
 }
 
@@ -62,17 +62,17 @@
 }
 
 .modal__inputLabel {
-    color: #818181;
+    color: $inputTextColor;
     font-family: $primaryFontFamily;
-    font-size: 12px;
+    font-size: 0.75rem;
     margin-bottom: 12px;
     font-weight: $baseFontWeight;
 }
 
 .modal__input {
-    color: #818181;
+    color: $inputTextColor;
     font-family: $primaryFontFamily;
-    font-size: 12px;
+    font-size: 0.75rem;
     padding: 12px 14px;
     border: 1px solid #495057;
 }
@@ -86,18 +86,16 @@
 }
 
 .modal__checkLabel {
-    font-size: 11px;
+    font-size: 0.688rem;
     font-family: $primaryFontFamily;
-    display: inline-block;
-    vertical-align: middle;
 }
 
 .modal__inputButton {
     margin-top: 20px;
     background: $brandColor;
-    color: #fff;
+    color: $white;
     font-family: $primaryFontFamily;
-    font-size: 12px;
+    font-size: 0.75rem;
     font-weight: $baseFontWeight;
     padding: 10px;
     text-align: center;

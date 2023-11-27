@@ -25,7 +25,7 @@ const shortContent = computed(() => {
             <router-link :to="`/articles/${article.id}`">
                 <img class="article__image" src="/images/public_article_image1.jpeg">
                 <div class="article__categories">
-                    <span class="article__category" v-for="category in article.categories">{{ category }}</span>
+                    <span class="article__category">FASHION</span>
                 </div>
             </router-link>
         </div>
@@ -43,9 +43,9 @@ const shortContent = computed(() => {
                 {{ shortContent }}
             </p>
             <p class="article__content-divider"></p>
-            <div class="article__content-author">
+            <div class="article__content-author-container">
                 <img class="article__content-author-image" src="/images/public_article_author_image1.jpeg">
-                <div class="article__content-author-text">
+                <div>
                     <h4 class="article__content-author-name"> By {{ article.author.name }}</h4>
                     <p class="article__content-author-title">Software Developer</p>
                 </div>

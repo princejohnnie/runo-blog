@@ -8,9 +8,12 @@
 
 @import './components/article/articleMain';
 @import './components/article/articleItem';
+@import './components/article/articleComment';
 @import './components/article/articleEditorItem';
 
 @import './components/homepage/homeCategories';
+
+@import './views/articleDetail';
 
 @import './components/modals/modal';
 

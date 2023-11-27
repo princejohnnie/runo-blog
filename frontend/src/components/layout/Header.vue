@@ -7,6 +7,7 @@ import { ref } from 'vue';
 const openLoginModal = ref(false)
 const openRegisterModal = ref(false)
 
+
 </script>
 
 
@@ -21,13 +22,17 @@ const openRegisterModal = ref(false)
       <nav class="mainHeader__nav">
         <ul class="mainHeader__nav-list">
           <li class="mainHeader__nav-item">
-            <a href="#" class="mainHeader__nav-link mainHeader__nav-link--active">Home</a>
+            <router-link to="/" class="mainHeader__nav-link">
+              Home
+            </router-link>
           </li>
           <li class="mainHeader__nav-item">
             <a href="#" class="mainHeader__nav-link">About</a>
           </li>
           <li class="mainHeader__nav-item">
-            <a href="#" class="mainHeader__nav-link">Articles</a>
+            <router-link to="/articles" class="mainHeader__nav-link">
+              Articles
+            </router-link>
           </li>
           <li class="mainHeader__nav-item">
             <a href="#" @click.prevent="openLoginModal = true" class="mainHeader__nav-link">Login</a>

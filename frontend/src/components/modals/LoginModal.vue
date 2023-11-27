@@ -1,6 +1,5 @@
 <script setup>
 import Modal from '@/components/modals/Modal.vue';
-import Auth from '@/requests/Auth.js';
 
 import { ref } from 'vue';
 
@@ -16,18 +15,13 @@ const onCloseModal = () => {
 }
 
 const submit = () => {
-    Auth.login(data.value).then(response => {
-        onCloseModal()
-        console.log(response)
-    }).catch(error => {
-        console.log(error)
-    })
+    onCloseModal()
 }
 
 </script>
 
 <template>
-    <Modal>
+    <Modal @closeModal="onCloseModal()">
         <div class="modal__form">
             <h2 class="modal__heading">Login</h2>
             <form @submit.prevent="submit()">

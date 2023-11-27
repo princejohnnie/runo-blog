@@ -2,16 +2,14 @@
 import { ref } from 'vue';
 
 import ArticleMain from '@/components/article/ArticleMain.vue';
-import ArticleCard from '@/components/article/ArticleCard.vue';
+import ArticlesList from '@/components/article/ArticlesList.vue';
 import ArticleEditorCard from '@/components/article/ArticleEditorCard.vue';
-import HomeCategories from '@/components/homepage/HomeCategories.vue';
 
 import Article from '@/requests/Article.js';
 
 const articles = ref([])
 
 Article.index().then((res) => {
-    console.log(res.data)
     articles.value = res.data;
 })
 
@@ -19,69 +17,56 @@ Article.index().then((res) => {
 
 <template>
     <main>
-        <ArticleMain v-if="articles.length" :article="articles[0]"/>
+        <ArticleMain v-if="articles.length" :article="articles[0]">
 
-        <section class="section section__popularTopics">
-        <div class="section__inner">
-
-            <HomeCategories />
-
-            <div class="articles">
-                <ArticleCard v-for="article in articles" :key="article.id" :article="article" />
+            <template #articleMainInner="shortContent">
+                <ul class="mainArticle__categories">
+                    <li class="mainArticle__category">
+                        <a href="#" class="mainArticle__category-link">ADVENTURE</a>
+                    </li>
+                    <li class="mainArticle__category">
+                        <a href="#" class="mainArticle__category-link">TRAVEL</a>
+                    </li>
+                </ul>
+                <h2 class="mainArticle__heading">
+                    {{ articles[0].title }}
+                </h2>
+                <p class="mainArticle__content">
+                    <time class="mainArticle__time">08.08.2021</time>
+                    <span class="mainArticle__divider"></span>
+                    <span class="mainArticle__text">
+                        {{ shortContent.shortContent }}
+                    </span>
+                </p>
+                
+                <div class="mainArticle__pagination">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="80" height="15" viewBox="0 0 44 8" fill="none">
+                        <circle cx="4" cy="4" r="4" fill="white"/>
+                        <circle cx="22" cy="4" r="4" fill="white" fill-opacity="0.2"/>
+                        <circle cx="40" cy="4" r="4" fill="white" fill-opacity="0.2"/>
+                    </svg>
                 </div>
+            </template>
+        </ArticleMain>
+
+        <section class="section__popularTopics">
+            <div class="section__inner">
+                
+                <ArticlesList v-if="articles.length" :articleList="articles" :showAllArticles="false"/>
+
             </div>
 
         </section>
 
-    <section class="section section__editorPicks">
-        <div class="section__inner">
-            <h2 class="section__heading">Editor's Pick</h2>
-            <div class="editorArticles">
-                <ArticleEditorCard v-for="(editorArticle, index) in editorArticles" :key="index" :editorArticle="editorArticle" />
+        <section class="section__editorPicks">
+            <div class="section__inner">
+                
+                <h2 class="section__heading">Editor's Pick</h2>
+                <div class="editorArticles">
+                    <ArticleEditorCard v-for="(editorArticle, index) in articles.slice(0, 3)" :key="index" :article="editorArticle" />
                 </div>
             </div>
         </section>
 
     </main>
 </template>
-
-<script>
-export default {
-    data() {
-        return {
-            editorArticles: [
-                {
-                    image: "/images/editor_article_bg1.jpeg",
-                    categories: [
-                        "FASHION"
-                    ],
-                    isPremium: true,
-                    time: "08.08.2021",
-                    title: "Richird Norton photorealistic rendering as real photos",
-                    content: "Progressively incentivize cooperative systems through technically sound functionalities. The credibly productivate seamless data."
-                },
-                {
-                    image: "/images/editor_article_bg2.jpeg",
-                    categories: [
-                        "FASHION"
-                    ],
-                    isPremium: false,
-                    time: "08.08.2021",
-                    title: "Richird Norton photorealistic rendering as real photos",
-                    content: "Progressively incentivize cooperative systems through technically sound functionalities. The credibly productivate seamless data."
-                },
-                {
-                    image: "/images/editor_article_bg3.jpeg",
-                    categories: [
-                        "FASHION"
-                    ],
-                    isPremium: false,
-                    time: "08.08.2021",
-                    title: "Richird Norton photorealistic rendering as real photos",
-                    content: "Progressively incentivize cooperative systems through technically sound functionalities. The credibly productivate seamless data."
-                }
-            ]
-        }
-    },
-}
-</script>

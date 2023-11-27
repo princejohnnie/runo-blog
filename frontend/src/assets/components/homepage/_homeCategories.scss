@@ -13,10 +13,6 @@
 .section__category {
     list-style: none;
 
-    &:last-child {
-        margin-left: auto;
-    }
-
     @include for-phone {
         &:last-child {
             margin-left: 0;
@@ -24,11 +20,15 @@
     }
 }
 
+.section__category-last {
+    margin-left: auto;
+    padding-right: 10px;
+}
+
 .section__category-link {
     color: $headingColor;
     font-family: $primaryFontFamily;
     font-size: 0.75rem;
-    font-style: normal;
     font-weight: $baseFontWeight;
     text-decoration: none;
     transition: .3s;
