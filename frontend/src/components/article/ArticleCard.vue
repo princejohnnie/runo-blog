@@ -9,10 +9,10 @@ const props = defineProps({
 })
 
 const shortContent = computed(() => {
-    if (props.article.content.length < 100) {
+    if (props.article.content.length < 200) {
         return props.article.content;
     } else {
-        return props.article.content.slice(0, 100) + "...";
+        return props.article.content.slice(0, 200) + "...";
     }
 })
 

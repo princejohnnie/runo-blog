@@ -30,7 +30,7 @@ const articlesToShow = computed(() => {
 
 <template>
 
-    <h2 v-if="!showAllArticles" class="section__heading">Popular topics</h2>
+    <!-- <h2 v-if="!showAllArticles" class="section__heading">Popular topics</h2> -->
 
     <HomeCategories :showingArticlesList="showAllArticles" />
 

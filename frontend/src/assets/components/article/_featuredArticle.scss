@@ -5,7 +5,7 @@
     align-items: end;
 }
 
-.mainArticle--showArticle {
+.mainArticle__header {
     background: url(/images/article_detail_bg.jpg) no-repeat center / cover;
     align-items: center;
 }
@@ -21,7 +21,7 @@
     }
 }
 
-.mainArticle__inner--showArticle {
+.mainArticle__header-inner {
     display: flex;
     flex-direction: column;
     align-items: center;
