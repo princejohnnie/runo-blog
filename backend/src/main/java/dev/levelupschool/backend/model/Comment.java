@@ -5,12 +5,14 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.hateoas.server.core.Relation;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @Entity
 @Table(name = "comments", schema = "public")
+@Relation(collectionRelation = "items", itemRelation = "item")
 public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

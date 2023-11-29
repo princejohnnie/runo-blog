@@ -1,30 +1,46 @@
 package dev.levelupschool.backend.service;
 
 import dev.levelupschool.backend.auth.AuthenticationUtils;
+import dev.levelupschool.backend.dtos.ArticleDto;
+import dev.levelupschool.backend.dtos.CommentDto;
+import dev.levelupschool.backend.dtos.UserDto;
 import dev.levelupschool.backend.exception.ModelNotFoundException;
+import dev.levelupschool.backend.model.Article;
 import dev.levelupschool.backend.model.User;
 import dev.levelupschool.backend.repository.UserRepository;
+import dev.levelupschool.backend.request.UpdateUserRequest;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.stereotype.Service;
 
 import java.nio.file.AccessDeniedException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class UserService {
 
     private final UserRepository userRepository;
 
+    @Autowired
+    private PagedResourcesAssembler<UserDto> pagedResourcesAssembler;
+
     UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
+    public PagedModel<EntityModel<UserDto>> getAllUsers(Pageable paging) {
+        var result = userRepository.findAll(paging).map(UserDto::new);
+        return pagedResourcesAssembler.toModel(result);
     }
 
-    public User getUser(Long id) {
-        return userRepository.findById(id)
-            .orElseThrow(() -> new ModelNotFoundException(User.class, id));
+    public UserDto getUser(Long id) {
+        return new UserDto(userRepository.findById(id)
+            .orElseThrow(() -> new ModelNotFoundException(User.class, id)));
     }
 
     public User createUser(User newUser) throws Exception {
@@ -37,7 +53,7 @@ public class UserService {
         return userRepository.save(newUser);
     }
 
-    public User updateUser(User newUser, Long id) throws Exception {
+    public UserDto updateUser(UpdateUserRequest newUser, Long id) throws Exception {
         var loggedInUser = AuthenticationUtils.getLoggedInUser(userRepository);
 
         var checkUser = userRepository.findByEmail(newUser.getEmail());
@@ -52,11 +68,11 @@ public class UserService {
             throw new AccessDeniedException("You cannot update another user's profile!");
         }
 
-        user.setEmail(newUser.getEmail());
-        user.setName(newUser.getName());
-        user.setPassword(newUser.getPassword());
+        user.setEmail(newUser.getEmail() == null ? user.getEmail() : newUser.getEmail());
+        user.setName(newUser.getName() == null ? user.getName() : newUser.getName());
+        user.setPassword(newUser.getPassword() == null ? user.getPassword() : newUser.getPassword());
 
-        return userRepository.save(user);
+        return new UserDto(userRepository.save(user));
     }
 
     public void deleteUser(Long id) throws AccessDeniedException {
@@ -70,5 +86,35 @@ public class UserService {
         }
 
         userRepository.deleteById(id);
+    }
+
+    public Map<String, List<ArticleDto>> getUserArticles(Long userId) {
+        var user = userRepository
+            .findById(userId)
+            .orElseThrow(() -> new ModelNotFoundException(User.class, userId));
+
+        if (user.getArticles() == null) {
+            return null;
+        }
+
+        Map<String, List<ArticleDto>> response = new HashMap<>();
+        response.put("items", user.getArticles().stream().map(ArticleDto::new).toList());
+
+        return response;
+    }
+
+    public Map<String, List<CommentDto>> getUserComments(Long userId) {
+        var user = userRepository
+            .findById(userId)
+            .orElseThrow(() -> new ModelNotFoundException(Article.class, userId));
+
+        if (user.getComments() == null) {
+            return null;
+        }
+
+        Map<String, List<CommentDto>> response = new HashMap<>();
+        response.put("items",user.getComments().stream().map(CommentDto::new).toList());
+
+        return response;
     }
 }

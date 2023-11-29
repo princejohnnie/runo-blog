@@ -98,9 +98,9 @@ public class ArticleControllerTests {
         mockMvc.perform(
                 get("/articles")
             ).andExpect(status().isOk())
-            .andExpect(jsonPath("$", hasSize(1)))
-            .andExpect(jsonPath("$[0].title", is("LevelUp Article")))
-            .andExpect(jsonPath("$[0].content", is("Luka is a great tutor")));
+            .andExpect(jsonPath("$._embedded.items", hasSize(1)))
+            .andExpect(jsonPath("$._embedded.items[0].title", is("LevelUp Article")))
+            .andExpect(jsonPath("$._embedded.items[0].content", is("Luka is a great tutor")));
     }
 
     @Test
@@ -310,6 +310,21 @@ public class ArticleControllerTests {
         ).andExpect(status().isOk());
 
         Assertions.assertEquals(0, articleRepository.count()); // Confirm that user's articles were actually deleted from the DB
+    }
+
+    @Test
+    public void givenArticle_whenGetComments_thenReturnArticleCommentsArray() throws Exception {
+        var user = userRepository.save(new User("john@gmail.com", "John Uzodinma", "Software Developer", "password"));
+
+        var article = articleRepository.save(new Article("Test Article", "Test Article content", user));
+
+        commentRepository.save(new Comment("Test content", user, article));
+
+        mockMvc.perform(
+                get("/articles/{id}/comments", article.getId())
+                    .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.items", hasSize(1)));
     }
 
 }

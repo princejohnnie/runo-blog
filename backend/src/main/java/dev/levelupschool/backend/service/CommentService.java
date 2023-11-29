@@ -1,6 +1,7 @@
 package dev.levelupschool.backend.service;
 
 import dev.levelupschool.backend.auth.AuthenticationUtils;
+import dev.levelupschool.backend.dtos.CommentDto;
 import dev.levelupschool.backend.exception.ModelNotFoundException;
 import dev.levelupschool.backend.model.Article;
 import dev.levelupschool.backend.model.Comment;
@@ -10,6 +11,10 @@ import dev.levelupschool.backend.repository.CommentRepository;
 import dev.levelupschool.backend.repository.UserRepository;
 import dev.levelupschool.backend.request.CreateCommentRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.stereotype.Service;
 
 import java.nio.file.AccessDeniedException;
@@ -27,17 +32,21 @@ public class CommentService {
     @Autowired
     private ArticleRepository articleRepository;
 
-    public List<Comment> getAllComments() {
-        return commentRepository.findAll();
+    @Autowired
+    private PagedResourcesAssembler<CommentDto> pagedResourcesAssembler;
+
+    public PagedModel<EntityModel<CommentDto>> getAllComments(Pageable paging) {
+        var result = commentRepository.findAll(paging).map(CommentDto::new);
+        return pagedResourcesAssembler.toModel(result);
     }
 
-    public Comment getComment(Long id) {
-        return commentRepository
+    public CommentDto getComment(Long id) {
+        return new CommentDto(commentRepository
             .findById(id)
-            .orElseThrow(() -> new ModelNotFoundException(Comment.class, id));
+            .orElseThrow(() -> new ModelNotFoundException(Comment.class, id)));
     }
 
-    public Comment createComment(CreateCommentRequest request) {
+    public CommentDto createComment(CreateCommentRequest request) {
         User loggedInUser = AuthenticationUtils.getLoggedInUser(userRepository);
 
         Article article = articleRepository.findById(request.getArticleId())
@@ -45,10 +54,10 @@ public class CommentService {
 
         Comment comment = new Comment(request.getContent(), loggedInUser, article);
 
-        return commentRepository.save(comment);
+        return new CommentDto(commentRepository.save(comment));
     }
 
-    public Comment updateComment(Comment newComment, Long id) throws Exception {
+    public CommentDto updateComment(Comment newComment, Long id) throws Exception {
         var loggedInUser = AuthenticationUtils.getLoggedInUser(userRepository);
 
         var comment = commentRepository.findById(id)
@@ -60,7 +69,7 @@ public class CommentService {
 
         comment.setContent(newComment.getContent());
 
-        return commentRepository.save(comment);
+        return new CommentDto(commentRepository.save(comment));
     }
 
     public void deleteComment(Long id) throws Exception {

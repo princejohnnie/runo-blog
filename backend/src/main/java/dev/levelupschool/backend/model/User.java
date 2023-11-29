@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.hateoas.server.core.Relation;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 @Table(name = "users", schema = "public")
+@Relation(collectionRelation = "items", itemRelation = "item")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,7 +23,6 @@ public class User {
 
     private String name;
 
-    @JsonIgnore
     private String slug;
 
     private String password;
@@ -54,7 +55,9 @@ public class User {
     }
 
     public void setPassword(String password) {
+        System.out.println("Plain password -> " + password);
         this.password = BCrypt.hashpw(password.getBytes(), BCrypt.gensalt());
+        System.out.println("Hashed password -> " + this.password);
     }
 
     @Override

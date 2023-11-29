@@ -98,8 +98,8 @@ public class CommentControllerTests {
         mockMvc.perform(
                 get("/comments")
             ).andExpect(status().isOk())
-            .andExpect(jsonPath("$", hasSize(1)))
-            .andExpect(jsonPath("$[0].content", is("This is my first comment")));
+            .andExpect(jsonPath("$._embedded.items", hasSize(1)))
+            .andExpect(jsonPath("$._embedded.items[0].content", is("This is my first comment")));
     }
 
     @Test

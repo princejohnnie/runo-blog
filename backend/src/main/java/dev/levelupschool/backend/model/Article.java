@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.hateoas.server.core.Relation;
 
 import java.util.List;
 
@@ -12,6 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 @Table(name = "articles", schema = "public")
+@Relation(collectionRelation = "items", itemRelation = "item")
 public class Article {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

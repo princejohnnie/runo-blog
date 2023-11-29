@@ -1,8 +1,13 @@
 package dev.levelupschool.backend.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import dev.levelupschool.backend.model.Article;
+import dev.levelupschool.backend.model.Comment;
 import dev.levelupschool.backend.model.User;
+import dev.levelupschool.backend.repository.ArticleRepository;
+import dev.levelupschool.backend.repository.CommentRepository;
 import dev.levelupschool.backend.repository.UserRepository;
+import dev.levelupschool.backend.request.CreateCommentRequest;
 import dev.levelupschool.backend.service.TokenService;
 import dev.levelupschool.backend.service.UserService;
 import lombok.AllArgsConstructor;
@@ -37,6 +42,12 @@ public class UserControllerTests {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private ArticleRepository articleRepository;
+
+    @Autowired
+    private CommentRepository commentRepository;
 
     @Autowired
     private UserService userService;
@@ -89,8 +100,8 @@ public class UserControllerTests {
         mockMvc.perform(
             get("/users")
         ).andExpect(status().isOk())
-            .andExpect(jsonPath("$", hasSize(1)))
-            .andExpect(jsonPath("$[0].name", is("John Uzodinma")));
+            .andExpect(jsonPath("$._embedded.items", hasSize(1)))
+            .andExpect(jsonPath("$._embedded.items[0].name", is("John Uzodinma")));
 
     }
 
@@ -210,6 +221,38 @@ public class UserControllerTests {
         ).andExpect(status().isForbidden());
 
         Assertions.assertEquals(2, userRepository.count()); // Confirm that user was not deleted from the DB. Count is 2 because we registered two users
+    }
+
+    @Test
+    public void givenUser_whenGetArticles_thenReturnUserArticlesArray() throws Exception {
+        var user = userRepository.save(new User("john@gmail.com", "John Uzodinma", "Software Developer", "password"));
+
+        articleRepository.save(new Article("Levelup Article", "Levelup is a wonderful internship", user));
+
+        // Get User articles
+        mockMvc.perform(
+            get("/users/{id}/articles", user.getId())
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.items", hasSize(1)))
+            .andExpect(jsonPath("$.items[0].author.id", is(user.getId().intValue())));
+    }
+
+    @Test
+    public void givenUser_whenGetComments_thenReturnUserCommentsArray() throws Exception {
+        var user = userRepository.save(new User("john@gmail.com", "John Uzodinma", "slug", "password"));
+
+        var article = articleRepository.save(new Article( "LevelUp Article", "Luka is a great tutor", user));
+
+        commentRepository.save(new Comment("This is a test comment", user, article));
+
+        // Get User comments
+        mockMvc.perform(
+                get("/users/{id}/comments", user.getId())
+                    .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.items", hasSize(1)))
+            .andExpect(jsonPath("$.items[0].author.id", is(user.getId().intValue())));
     }
 
     @Getter
