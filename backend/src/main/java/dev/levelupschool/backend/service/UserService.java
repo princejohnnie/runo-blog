@@ -117,4 +117,19 @@ public class UserService {
 
         return response;
     }
+
+    public List<UserDto> getFollowers(Long id) {
+        var user = userRepository.findById(id)
+            .orElseThrow(() -> new ModelNotFoundException(User.class, id));
+
+        return user.followers.stream().map(UserDto::new).toList();
+    }
+
+    public List<UserDto> getFollowing(Long id) {
+        var user = userRepository
+            .findById(id)
+            .orElseThrow(() -> new ModelNotFoundException(User.class, id));
+
+        return user.following.stream().map(UserDto::new).toList();
+    }
 }

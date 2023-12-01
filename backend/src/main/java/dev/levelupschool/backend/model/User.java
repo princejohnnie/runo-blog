@@ -35,6 +35,22 @@ public class User {
     @JsonIgnore
     private List<Comment> comments;
 
+    @ManyToMany
+    @JoinTable(
+        name = "followers",
+        joinColumns = @JoinColumn(name = "followed_id"),
+        inverseJoinColumns = @JoinColumn(name = "follower_id")
+    )
+    public List<User> followers;
+
+    @ManyToMany
+    @JoinTable(
+        name = "followers",
+        joinColumns = @JoinColumn(name = "follower_id"),
+        inverseJoinColumns = @JoinColumn(name = "followed_id")
+    )
+    public List<User> following;
+
     public User(String email, String name, String slug, String password) {
         this.email = email;
         this.name = name;
@@ -55,9 +71,7 @@ public class User {
     }
 
     public void setPassword(String password) {
-        System.out.println("Plain password -> " + password);
         this.password = BCrypt.hashpw(password.getBytes(), BCrypt.gensalt());
-        System.out.println("Hashed password -> " + this.password);
     }
 
     @Override

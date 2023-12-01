@@ -94,7 +94,6 @@ public class UserController {
             return new ResponseEntity<>("Incorrect Password", HttpStatus.UNAUTHORIZED);
         }
 
-//        return ResponseEntity.badRequest().build();
     }
 
     @GetMapping("/me")
@@ -110,6 +109,16 @@ public class UserController {
     @GetMapping("/users/{id}/comments")
     Map<String, List<CommentDto>> comments(@PathVariable Long id) {
         return userService.getUserComments(id);
+    }
+
+    @GetMapping("/users/{id}/followers")
+    List<UserDto> followers(@PathVariable Long id) {
+        return userService.getFollowers(id);
+    }
+
+    @GetMapping("/users/{id}/following")
+    List<UserDto> following(@PathVariable Long id) {
+        return userService.getFollowing(id);
     }
 
 

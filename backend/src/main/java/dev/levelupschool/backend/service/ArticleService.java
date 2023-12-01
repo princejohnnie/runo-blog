@@ -9,12 +9,14 @@ import dev.levelupschool.backend.model.Article;
 import dev.levelupschool.backend.model.User;
 import dev.levelupschool.backend.repository.ArticleRepository;
 import dev.levelupschool.backend.repository.UserRepository;
+import dev.levelupschool.backend.storage.StorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.nio.file.AccessDeniedException;
 import java.util.HashMap;
@@ -23,6 +25,9 @@ import java.util.Map;
 
 @Service
 public class ArticleService {
+
+    @Autowired
+    private StorageService storageService;
 
     @Autowired
     private ArticleRepository articleRepository;
@@ -43,9 +48,14 @@ public class ArticleService {
             .orElseThrow(() -> new ModelNotFoundException(Article.class, id)));
     }
 
-    public ArticleDto createArticle(Article article) throws CustomValidationException {
+    public ArticleDto createArticle(Article article, MultipartFile cover) throws CustomValidationException {
         User loggedInUser = AuthenticationUtils.getLoggedInUser(userRepository);
         article.setAuthor(loggedInUser);
+
+        if (cover != null) {
+            var coverUrl = storageService.store(cover);
+            article.setCoverUrl(coverUrl.toString());
+        }
 
         if (article.getContent().contains("Hate")) {
             throw new CustomValidationException("content", "Sorry, we do not support hate speech on our platform");

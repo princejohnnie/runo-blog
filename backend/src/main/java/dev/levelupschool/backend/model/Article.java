@@ -1,9 +1,11 @@
 package dev.levelupschool.backend.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import jakarta.annotation.Nullable;
 import org.springframework.hateoas.server.core.Relation;
 
 import java.util.List;
@@ -18,8 +20,13 @@ public class Article {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @NotEmpty
     private String title;
+    @NotEmpty
     private String content;
+
+    @Nullable
+    private String coverUrl;
 
     @ManyToOne
     @JoinColumn(name = "author_id")

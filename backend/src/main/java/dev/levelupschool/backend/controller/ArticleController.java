@@ -14,6 +14,7 @@ import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
@@ -25,7 +26,6 @@ public class ArticleController {
 
     @Autowired
     private ArticleService articleService;
-
 
     @GetMapping("/articles")
     PagedModel<EntityModel<ArticleDto>> index(
@@ -39,9 +39,11 @@ public class ArticleController {
     }
 
     @PostMapping("/articles")
-    ResponseEntity<Object> store(@RequestBody @Valid Article article) {
+    ResponseEntity<Object> store(
+        @ModelAttribute @Valid Article article,
+        @RequestParam(value = "cover", required = false) MultipartFile cover) {
         try {
-            var articleDto = articleService.createArticle(article);
+            var articleDto = articleService.createArticle(article, cover);
             return new ResponseEntity<>(articleDto, HttpStatus.OK);
         } catch (CustomValidationException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);

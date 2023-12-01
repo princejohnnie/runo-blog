@@ -10,6 +10,7 @@ public class ArticleDto {
     public Long id;
     public String title;
     public String content;
+    public String coverUrl;
     public AuthorDto author;
     public List<CommentDto> comments;
 
@@ -17,6 +18,7 @@ public class ArticleDto {
         this.id = article.getId();
         this.title = article.getTitle();
         this.content = article.getContent();
+        this.coverUrl = article.getCoverUrl();
         this.author = new AuthorDto(article.getAuthor());
 
         if (article.getComments() != null) {
