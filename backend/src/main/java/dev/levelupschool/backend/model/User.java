@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.hateoas.server.core.Relation;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -44,7 +45,7 @@ public class User {
         joinColumns = @JoinColumn(name = "followed_id"),
         inverseJoinColumns = @JoinColumn(name = "follower_id")
     )
-    public List<User> followers;
+    public List<User> followers = new ArrayList<>();
 
     @ManyToMany
     @JoinTable(
@@ -52,7 +53,15 @@ public class User {
         joinColumns = @JoinColumn(name = "follower_id"),
         inverseJoinColumns = @JoinColumn(name = "followed_id")
     )
-    public List<User> following;
+    public List<User> following = new ArrayList<>();
+
+    @ManyToMany
+    @JoinTable(
+        name = "bookmarks",
+        joinColumns = @JoinColumn(name = "bookmarker_id"),
+        inverseJoinColumns = @JoinColumn(name = "bookmarked_id")
+    )
+    public List<Article> bookmarks = new ArrayList<>();
 
     public User(String email, String name, String slug, String password) {
         this.email = email;
@@ -83,6 +92,6 @@ public class User {
 
     @Override
     public String toString() {
-        return String.format("User[id=%d, name='%s']", id, name);
+        return String.format("User[id=%d, name='%s', avatar='%s']", id, name, avatarUrl);
     }
 }

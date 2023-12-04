@@ -2,6 +2,7 @@ package dev.levelupschool.backend.service;
 
 import dev.levelupschool.backend.auth.AuthenticationUtils;
 import dev.levelupschool.backend.dtos.ArticleDto;
+import dev.levelupschool.backend.dtos.BookmarkDto;
 import dev.levelupschool.backend.dtos.CommentDto;
 import dev.levelupschool.backend.dtos.UserDto;
 import dev.levelupschool.backend.exception.ModelNotFoundException;
@@ -69,10 +70,11 @@ public class UserService {
         if (avatar != null) {
             var avatarUrl = storageService.store(avatar, "avatars/");
             loggedInUser.setAvatarUrl(avatarUrl.toString());
-            response.put("url", avatarUrl.toString());
-            return response;
+            response.put("avatarUrl", avatarUrl.toString());
         }
+
         userRepository.save(loggedInUser);
+
         return response;
     }
 
@@ -180,8 +182,6 @@ public class UserService {
     public void unfollowUser(Long userId) throws Exception {
         var loggedInUser = AuthenticationUtils.getLoggedInUser(userRepository);
 
-        System.out.println("Logged in user id -> " + loggedInUser.getId());
-
         var user = userRepository
             .findById(userId)
             .orElseThrow(() -> new ModelNotFoundException(User.class, userId));
@@ -194,6 +194,12 @@ public class UserService {
 
        userRepository.save(loggedInUser);
 
+    }
+
+    public List<BookmarkDto> getBookmarks() {
+        var loggedInUser = AuthenticationUtils.getLoggedInUser(userRepository);
+
+        return loggedInUser.bookmarks.stream().map(BookmarkDto::new).toList();
     }
 
 }

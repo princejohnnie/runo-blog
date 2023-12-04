@@ -25,6 +25,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.transaction.annotation.Transactional;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
@@ -290,7 +291,7 @@ public class UserControllerTests {
         String objectKey = directoryPath + avatar.getOriginalFilename();
 
         mockMvc.perform(
-            multipart("/users/upload-avatar")
+            multipart("/user/upload-avatar")
                 .file(avatar)
                 .header("Authorization", userToken)
         ).andExpect(status().isOk());
@@ -304,24 +305,25 @@ public class UserControllerTests {
 
         HeadObjectResponse headObjectResponse = s3Client.headObject(headObjectRequest);
 
-        Assertions.assertNotNull(headObjectResponse.metadata()); // Confirm that object actually exits in bucket
+        Assertions.assertNotNull(headObjectResponse.metadata()); // Confirm that object actually exists in bucket
         Assertions.assertNotNull(registeredUser.getAvatarUrl()); // Confirm that user avatar was saved to model
     }
 
     @Test
     public void givenUser_whenGetFollowers_thenReturnFollowersArray() throws Exception {
-        var mainUser = userRepository.save(new User("amaka@gmail.com", "Amaka Uzodinma", "Designer", "password"));
+        var loggedInUser = userRepository.save(new User("amaka@gmail.com", "Amaka Uzodinma", "Designer", "password"));
 
-        var userToFollow = new User("john@gmail.com", "John Uzodinma", "Developer", "password");
+        var follower = userRepository.save(new User("john@gmail.com", "John Uzodinma", "Developer", "password"));
 
-        userToFollow.getFollowers().add(mainUser);
+        loggedInUser.getFollowers().add(follower);
 
-        userRepository.save(userToFollow);
+        userRepository.save(loggedInUser);
 
         mockMvc.perform(
-            get("/user/{id}/followers", userToFollow.getId())
+            get("/users/{id}/followers", loggedInUser.getId())
                 .contentType(MediaType.APPLICATION_JSON)
-        ).andExpect(status().isOk());
+        ).andExpect(status().isOk())
+            .andExpect(jsonPath("$", hasSize(1)));
 
     }
 
@@ -329,53 +331,82 @@ public class UserControllerTests {
     public void givenUser_whenGetFollowing_thenReturnFollowingArray() throws Exception {
         var mainUser = userRepository.save(new User("amaka@gmail.com", "Amaka Uzodinma", "Designer", "password"));
 
-        var userToFollow = new User("john@gmail.com", "John Uzodinma", "Developer", "password");
+        var followee = userRepository.save(new User("john@gmail.com", "John Uzodinma", "Developer", "password"));
 
-        userToFollow.getFollowers().add(mainUser);
+        mainUser.getFollowing().add(followee);
 
-        userRepository.save(userToFollow);
+        userRepository.save(mainUser);
 
         mockMvc.perform(
-            get("/user/{id}/following", userToFollow.getId())
+            get("/users/{id}/following", mainUser.getId())
                 .contentType(MediaType.APPLICATION_JSON)
-        ).andExpect(status().isOk());
+        ).andExpect(status().isOk())
+            .andExpect(jsonPath("$", hasSize(1)));
 
     }
 
     @Test
+    @Transactional
     public void givenUser_whenFollowAnotherUser_thenFollowUser() throws Exception {
         registerUser();
         var loggedInUser = userRepository.findAll().get(0);
-        var userToFollow = userRepository.save(new User("johnny@gmail.com", "Johnny Doe", "Designer", "password"));
+        var followee = userRepository.save(new User("johnny@gmail.com", "Johnny Doe", "Designer", "password"));
 
         mockMvc.perform(
-                post("/user/follow/{id}", userToFollow.getId())
+                post("/users/{id}/follow", followee.getId())
                     .header("Authorization", userToken)
                     .contentType(MediaType.APPLICATION_JSON)
             ).andExpect(status().isOk());
 
-        Assertions.assertEquals(loggedInUser.getFollowing().size(), 1);
+        var updatedLoggedInUser = userRepository.findById(loggedInUser.getId()).get();
+        Assertions.assertEquals(updatedLoggedInUser.getFollowing().size(), 1);
     }
 
     @Test
+    @Transactional
     public void givenUser_whenUnfollowAnotherUser_thenUnfollowUser() throws Exception {
         registerUser();
         var loggedInUser = userRepository.findAll().get(0);
-        var userToFollow = userRepository.save(new User("johnny@gmail.com", "Johnny Doe", "Designer", "password"));
+        var followee = userRepository.save(new User("johnny@gmail.com", "Johnny Doe", "Designer", "password"));
 
         mockMvc.perform(
-            post("/user/follow/{id}", userToFollow.getId())
+            post("/users/{id}/follow", followee.getId())
                 .header("Authorization", userToken)
                 .contentType(MediaType.APPLICATION_JSON)
         ).andExpect(status().isOk());
 
+        var updatedUseAfterFollow = userRepository.findById(loggedInUser.getId()).get();
+
+        Assertions.assertEquals(updatedUseAfterFollow.getFollowing().size(), 1); // Confirm that User was followed
+
         mockMvc.perform(
-            post("/user/unfollow/{id}", userToFollow.getId())
+            post("/users/{id}/unfollow", followee.getId())
                 .header("Authorization", userToken)
                 .contentType(MediaType.APPLICATION_JSON)
         ).andExpect(status().isOk());
 
-        Assertions.assertEquals(loggedInUser.getFollowing().size(), 0);
+        var updatedUseAfterUnfollow = userRepository.findById(loggedInUser.getId()).get();
+
+        Assertions.assertEquals(updatedUseAfterUnfollow.getFollowing().size(), 0); // Confirm that User was unfollowed
+    }
+
+    @Test
+    @Transactional
+    public void givenUser_whenGetBookmarks_thenReturnBookmarksArray() throws Exception {
+        registerUser();
+        var loggedInUser = userRepository.findAll().get(0);
+
+        var article = articleRepository.save(new Article("Test title", "Test content", loggedInUser));
+        loggedInUser.bookmarks.add(article);
+
+        articleRepository.save(article);
+
+        mockMvc.perform(
+                get("/user/bookmarks")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .header("Authorization", userToken)
+            ).andExpect(status().isOk())
+            .andExpect(jsonPath("$", hasSize(1)));
     }
 
     @Getter

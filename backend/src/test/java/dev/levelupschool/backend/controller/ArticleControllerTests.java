@@ -359,4 +359,38 @@ public class ArticleControllerTests {
             .andExpect(jsonPath("$.items", hasSize(1)));
     }
 
+    @Test
+    public void givenArticle_whenBookmarkArticle_thenSaveBookmark() throws Exception {
+        var loggedInUser = userRepository.findAll().get(0);
+
+        var article = articleRepository.save(new Article("Test title", "Test content", loggedInUser));
+
+        mockMvc.perform(
+            post("/articles/{id}/bookmark", article.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", firstUserToken)
+        ).andExpect(status().isOk());
+
+        var userAfterBookmark = userRepository.findAll().get(0);
+
+        Assertions.assertNotNull(userAfterBookmark.getBookmarks());
+    }
+
+    @Test
+    public void givenArticle_whenGetBookmarkers_thenReturnBookmarkersArray() throws Exception {
+        var loggedInUser = userRepository.findAll().get(0);
+
+        var article = articleRepository.save(new Article("Test title", "Test content", loggedInUser));
+        article.bookmarkers.add(loggedInUser);
+
+        articleRepository.save(article);
+
+        mockMvc.perform(
+            get("/articles/{id}/bookmarkers", article.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", firstUserToken)
+        ).andExpect(status().isOk())
+            .andExpect(jsonPath("$", hasSize(1)));
+    }
+
 }

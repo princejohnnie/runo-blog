@@ -80,7 +80,6 @@ public class AWSStorageService implements StorageService {
                 .build();
 
             s3Client.deleteObject(deleteRequest);
-            System.out.println("Deleted object: " + object.key());
         });
     }
 }

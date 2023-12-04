@@ -3,6 +3,7 @@ package dev.levelupschool.backend.service;
 import dev.levelupschool.backend.auth.AuthenticationUtils;
 import dev.levelupschool.backend.dtos.ArticleDto;
 import dev.levelupschool.backend.dtos.CommentDto;
+import dev.levelupschool.backend.dtos.UserDto;
 import dev.levelupschool.backend.exception.CustomValidationException;
 import dev.levelupschool.backend.exception.ModelNotFoundException;
 import dev.levelupschool.backend.model.Article;
@@ -19,6 +20,7 @@ import org.springframework.hateoas.PagedModel;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.naming.OperationNotSupportedException;
 import java.nio.file.AccessDeniedException;
 import java.util.HashMap;
 import java.util.List;
@@ -109,5 +111,32 @@ public class ArticleService {
         response.put("items", article.getComments().stream().map(CommentDto::new).toList());
 
         return response;
+    }
+
+    public void bookmark(Long articleId) throws Exception {
+        var loggedInUser = AuthenticationUtils.getLoggedInUser(userRepository);
+
+        var article = articleRepository.findById(articleId).orElseThrow(() -> new ModelNotFoundException(Article.class, articleId));
+
+        if (loggedInUser.bookmarks.contains(article)) {
+            throw new OperationNotSupportedException("Article already added to bookmarks");
+        }
+
+        loggedInUser.bookmarks.add(article);
+
+        userRepository.save(loggedInUser);
+
+    }
+
+    public List<UserDto> bookmarkers(Long id) throws Exception {
+        var loggedInUser = AuthenticationUtils.getLoggedInUser(userRepository);
+
+        var article = articleRepository.findById(id).orElseThrow(() -> new ModelNotFoundException(Article.class, id));
+
+        if (!loggedInUser.getId().equals(article.getAuthor().getId())) {
+            throw new OperationNotSupportedException("You cannot see another user article's bookmarks");
+        }
+
+        return article.bookmarkers.stream().map(UserDto::new).toList();
     }
 }

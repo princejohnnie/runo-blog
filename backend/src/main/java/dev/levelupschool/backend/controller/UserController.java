@@ -2,6 +2,7 @@ package dev.levelupschool.backend.controller;
 
 import dev.levelupschool.backend.auth.AuthenticationUtils;
 import dev.levelupschool.backend.dtos.ArticleDto;
+import dev.levelupschool.backend.dtos.BookmarkDto;
 import dev.levelupschool.backend.dtos.CommentDto;
 import dev.levelupschool.backend.dtos.UserDto;
 import dev.levelupschool.backend.exception.ModelNotFoundException;
@@ -50,7 +51,7 @@ public class UserController {
         return userService.getUser(id);
     }
 
-    @PostMapping("/users/upload-avatar")
+    @PostMapping("/user/upload-avatar")
     ResponseEntity<?> upload(@RequestParam(value = "avatar")MultipartFile avatar) {
         try {
             Map<String, String> response = userService.uploadAvatar(avatar);
@@ -132,7 +133,7 @@ public class UserController {
         return userService.getFollowing(id);
     }
 
-    @PostMapping("/user/follow/{id}")
+    @PostMapping("/users/{id}/follow")
     ResponseEntity<?> follow(@PathVariable Long id) {
         try {
             userService.followUser(id);
@@ -142,13 +143,23 @@ public class UserController {
         }
     }
 
-    @PostMapping("/user/unfollow/{id}")
+    @PostMapping("/users/{id}/unfollow")
     ResponseEntity<?> unfollow(@PathVariable Long id) {
         try {
             userService.unfollowUser(id);
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @GetMapping("/user/bookmarks")
+    ResponseEntity<?> bookmarks() {
+        try {
+            List<BookmarkDto> bookmarks = userService.getBookmarks();
+            return new ResponseEntity<>(bookmarks, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 

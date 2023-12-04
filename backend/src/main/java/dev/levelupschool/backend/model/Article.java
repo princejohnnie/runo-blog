@@ -8,6 +8,7 @@ import lombok.Setter;
 import jakarta.annotation.Nullable;
 import org.springframework.hateoas.server.core.Relation;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -34,6 +35,14 @@ public class Article {
 
     @OneToMany(mappedBy = "article", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private List<Comment> comments;
+
+    @ManyToMany
+    @JoinTable(
+        name = "bookmarks",
+        joinColumns = @JoinColumn(name = "bookmarked_id"),
+        inverseJoinColumns = @JoinColumn(name = "bookmarker_id")
+    )
+    public List<User> bookmarkers = new ArrayList<>();
 
     public Article(String title, String content, User author) {
         this.title = title;

@@ -2,6 +2,7 @@ package dev.levelupschool.backend.controller;
 
 import dev.levelupschool.backend.dtos.ArticleDto;
 import dev.levelupschool.backend.dtos.CommentDto;
+import dev.levelupschool.backend.dtos.UserDto;
 import dev.levelupschool.backend.exception.CustomValidationException;
 import dev.levelupschool.backend.model.Article;
 import dev.levelupschool.backend.service.ArticleService;
@@ -73,6 +74,26 @@ public class ArticleController {
     @GetMapping("/articles/{id}/comments")
     Map<String, List<CommentDto>> comments(@PathVariable Long id) {
         return articleService.getArticleComments(id);
+    }
+
+    @PostMapping("/articles/{id}/bookmark")
+    ResponseEntity<?> bookmark(@PathVariable Long id) {
+        try {
+            articleService.bookmark(id);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @GetMapping("/articles/{id}/bookmarkers")
+    ResponseEntity<?> bookmarkers(@PathVariable Long id) {
+        try {
+            List<UserDto> users = articleService.bookmarkers(id);
+            return new ResponseEntity<>(users, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_GATEWAY);
+        }
     }
 
 }
