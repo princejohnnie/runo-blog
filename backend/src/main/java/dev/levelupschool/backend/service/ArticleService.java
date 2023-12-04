@@ -11,6 +11,7 @@ import dev.levelupschool.backend.repository.ArticleRepository;
 import dev.levelupschool.backend.repository.UserRepository;
 import dev.levelupschool.backend.storage.StorageService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.EntityModel;
@@ -26,6 +27,7 @@ import java.util.Map;
 @Service
 public class ArticleService {
 
+    @Qualifier("fileSystemStorageService")
     @Autowired
     private StorageService storageService;
 

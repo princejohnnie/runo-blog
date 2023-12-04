@@ -1,6 +1,7 @@
 package dev.levelupschool.backend.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,6 +27,8 @@ public class User {
     private String slug;
 
     private String password;
+
+    private String avatarUrl;
 
     @OneToMany(mappedBy = "author", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JsonIgnore
@@ -68,6 +71,10 @@ public class User {
 
     public void setSlug(String slug) {
         this.slug = slug;
+    }
+
+    public void setAvatarUrl(String url) {
+        this.avatarUrl = url;
     }
 
     public void setPassword(String password) {

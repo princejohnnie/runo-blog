@@ -172,7 +172,7 @@ public class CommentControllerTests {
         // Get created Comment
         var comment = commentRepository.findAll().get(0);
 
-        var updateCommentRequest = new Comment("This is my first updated comment", user, article);
+        var updateCommentRequest = new CreateCommentRequest("This is my first updated comment", article.getId());
         var updateCommentPayload = objectMapper.writeValueAsString(updateCommentRequest);
 
         // Update created comment by User
@@ -208,7 +208,7 @@ public class CommentControllerTests {
 
         var comment = commentRepository.findAll().get(0); // Get created Comment
 
-        var updateCommentRequest = new Comment("This is my first updated comment", user, article);
+        var updateCommentRequest = new CreateCommentRequest("This is my first updated comment", article.getId());
         var updateCommentPayload = objectMapper.writeValueAsString(updateCommentRequest);
 
         // Try to update the article using a different User

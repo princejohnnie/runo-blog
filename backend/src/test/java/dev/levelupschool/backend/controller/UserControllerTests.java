@@ -7,7 +7,6 @@ import dev.levelupschool.backend.model.User;
 import dev.levelupschool.backend.repository.ArticleRepository;
 import dev.levelupschool.backend.repository.CommentRepository;
 import dev.levelupschool.backend.repository.UserRepository;
-import dev.levelupschool.backend.request.CreateCommentRequest;
 import dev.levelupschool.backend.service.TokenService;
 import dev.levelupschool.backend.service.UserService;
 import lombok.AllArgsConstructor;
@@ -16,20 +15,32 @@ import lombok.Setter;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.HeadObjectRequest;
+import software.amazon.awssdk.services.s3.model.HeadObjectResponse;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -58,7 +69,13 @@ public class UserControllerTests {
     @Autowired
     private TokenService tokenService;
 
-    private String firstUserToken;
+    @Value("${aws.access-key}")
+    private String accessKey;
+
+    @Value("${aws.secret-key}")
+    private String secretKey;
+
+    private String userToken;
     private String differentUserToken;
 
     @Test
@@ -77,7 +94,7 @@ public class UserControllerTests {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(payload)).andDo(print()).andReturn();
 
-        firstUserToken = "Bearer " + result.getResponse().getContentAsString();
+        userToken = "Bearer " + result.getResponse().getContentAsString();
     }
 
     private void registerDifferentUser() throws Exception {
@@ -164,7 +181,7 @@ public class UserControllerTests {
 
         mockMvc.perform(
                 put("/users/{id}", user.getId())
-                    .header("Authorization", firstUserToken)
+                    .header("Authorization", userToken)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(payload)
             ).andExpect(status().isOk())
@@ -201,7 +218,7 @@ public class UserControllerTests {
 
         mockMvc.perform(
             delete("/users/{id}", user.getId())
-                .header("Authorization", firstUserToken)
+                .header("Authorization", userToken)
         ).andExpect(status().isOk());
 
         Assertions.assertEquals(0, userRepository.count()); // Confirm that user was actually deleted from the DB
@@ -253,6 +270,112 @@ public class UserControllerTests {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.items", hasSize(1)))
             .andExpect(jsonPath("$.items[0].author.id", is(user.getId().intValue())));
+    }
+
+    @Test
+    public void givenUser_whenPostAvatar_thenUploadAvatar() throws Exception {
+        registerUser();
+
+        S3Client s3Client = S3Client.builder()
+            .region(Region.EU_CENTRAL_1)
+            .credentialsProvider(StaticCredentialsProvider.create(AwsBasicCredentials.create(accessKey, secretKey)))
+            .build();
+
+        MockMultipartFile avatar = new MockMultipartFile(
+            "avatar", "photo.jpg", MediaType.IMAGE_JPEG_VALUE, "photo.jpg".getBytes());
+
+        String bucketName = "john-levelup-bucket";
+        String directoryPath = "avatars/" +  new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+
+        String objectKey = directoryPath + avatar.getOriginalFilename();
+
+        mockMvc.perform(
+            multipart("/users/upload-avatar")
+                .file(avatar)
+                .header("Authorization", userToken)
+        ).andExpect(status().isOk());
+
+        var registeredUser = userRepository.findAll().get(0);
+
+        HeadObjectRequest headObjectRequest = HeadObjectRequest.builder()
+            .bucket(bucketName)
+            .key(objectKey)
+            .build();
+
+        HeadObjectResponse headObjectResponse = s3Client.headObject(headObjectRequest);
+
+        Assertions.assertNotNull(headObjectResponse.metadata()); // Confirm that object actually exits in bucket
+        Assertions.assertNotNull(registeredUser.getAvatarUrl()); // Confirm that user avatar was saved to model
+    }
+
+    @Test
+    public void givenUser_whenGetFollowers_thenReturnFollowersArray() throws Exception {
+        var mainUser = userRepository.save(new User("amaka@gmail.com", "Amaka Uzodinma", "Designer", "password"));
+
+        var userToFollow = new User("john@gmail.com", "John Uzodinma", "Developer", "password");
+
+        userToFollow.getFollowers().add(mainUser);
+
+        userRepository.save(userToFollow);
+
+        mockMvc.perform(
+            get("/user/{id}/followers", userToFollow.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(status().isOk());
+
+    }
+
+    @Test
+    public void givenUser_whenGetFollowing_thenReturnFollowingArray() throws Exception {
+        var mainUser = userRepository.save(new User("amaka@gmail.com", "Amaka Uzodinma", "Designer", "password"));
+
+        var userToFollow = new User("john@gmail.com", "John Uzodinma", "Developer", "password");
+
+        userToFollow.getFollowers().add(mainUser);
+
+        userRepository.save(userToFollow);
+
+        mockMvc.perform(
+            get("/user/{id}/following", userToFollow.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(status().isOk());
+
+    }
+
+    @Test
+    public void givenUser_whenFollowAnotherUser_thenFollowUser() throws Exception {
+        registerUser();
+        var loggedInUser = userRepository.findAll().get(0);
+        var userToFollow = userRepository.save(new User("johnny@gmail.com", "Johnny Doe", "Designer", "password"));
+
+        mockMvc.perform(
+                post("/user/follow/{id}", userToFollow.getId())
+                    .header("Authorization", userToken)
+                    .contentType(MediaType.APPLICATION_JSON)
+            ).andExpect(status().isOk());
+
+        Assertions.assertEquals(loggedInUser.getFollowing().size(), 1);
+    }
+
+    @Test
+    public void givenUser_whenUnfollowAnotherUser_thenUnfollowUser() throws Exception {
+        registerUser();
+        var loggedInUser = userRepository.findAll().get(0);
+        var userToFollow = userRepository.save(new User("johnny@gmail.com", "Johnny Doe", "Designer", "password"));
+
+        mockMvc.perform(
+            post("/user/follow/{id}", userToFollow.getId())
+                .header("Authorization", userToken)
+                .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(status().isOk());
+
+        mockMvc.perform(
+            post("/user/unfollow/{id}", userToFollow.getId())
+                .header("Authorization", userToken)
+                .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(status().isOk());
+
+        Assertions.assertEquals(loggedInUser.getFollowing().size(), 0);
     }
 
     @Getter

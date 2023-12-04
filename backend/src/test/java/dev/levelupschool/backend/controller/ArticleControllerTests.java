@@ -15,11 +15,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
@@ -150,16 +155,43 @@ public class ArticleControllerTests {
 
         var createArticleRequest = new Article("LevelUp Article", "Luka is a great tutor", user);
 
-        var payload = objectMapper.writeValueAsString(createArticleRequest);
+        MockMultipartFile coverPhoto = new MockMultipartFile(
+            "cover", "photo.jpg", MediaType.IMAGE_JPEG_VALUE, "test_photo".getBytes());
 
         mockMvc.perform(
                 post("/articles")
-                    .contentType(MediaType.APPLICATION_JSON)
+                    .param("title", createArticleRequest.getTitle())
+                    .param("content", createArticleRequest.getContent())
                     .header("Authorization", firstUserToken)
-                    .content(payload)
             ).andExpect(status().isOk());
 
         Assertions.assertEquals(1, articleRepository.count()); // Confirm that article was actually stored in the DB
+    }
+
+    @Test
+    public void givenUser_whenPostArticleWithCoverPhoto_thenStoreCoverPhoto() throws Exception {
+        var user = userRepository.findAll().get(0); // Get saved User by registerFirstUser()
+
+        var createArticleRequest = new Article("LevelUp Article", "Luka is a great tutor", user);
+
+        MockMultipartFile coverPhoto = new MockMultipartFile(
+            "cover", "photo.jpg", MediaType.IMAGE_JPEG_VALUE, "test_photo".getBytes());
+
+        mockMvc.perform(
+            multipart("/articles")
+                .file(coverPhoto)
+                .param("title", createArticleRequest.getTitle())
+                .param("content", createArticleRequest.getContent())
+                .header("Authorization", firstUserToken)
+        ).andExpect(status().isOk());
+
+        var savedArticle = articleRepository.findAll().get(0);
+
+        String publicDirectory = "/Users/rrsoft/Desktop/levelup/levelup-2023-autumn/backend/public/";
+        Path filePath = Paths.get(publicDirectory, savedArticle.getCoverUrl());
+
+        Assertions.assertTrue(Files.exists(filePath)); // Confirm that the cover photo was actually saved to file
+        Assertions.assertNotNull(savedArticle.getCoverUrl()); // Confirm that article cover was saved to model
     }
 
     @Test
@@ -167,14 +199,14 @@ public class ArticleControllerTests {
         var user = userRepository.findAll().get(0); // Get saved User
 
         var createArticleRequest = new Article("LevelUp Article", "Luka is a great tutor", user);
-        var articlePayload = objectMapper.writeValueAsString(createArticleRequest);
 
         // Create article by first user
         mockMvc.perform(
             post("/articles")
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .param("title", createArticleRequest.getTitle())
+                .param("content", createArticleRequest.getContent())
                 .header("Authorization", firstUserToken)
-                .content(articlePayload)
         ).andExpect(status().isOk());
 
         // Get created article
@@ -204,14 +236,14 @@ public class ArticleControllerTests {
         var user = userRepository.findAll().get(0); // Get registered User
 
         var createArticleRequest = new Article("LevelUp Article", "Luka is a great tutor", user);
-        var createArticlePayload = objectMapper.writeValueAsString(createArticleRequest);
 
         // Create article by first user
         mockMvc.perform(
             post("/articles")
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.MULTIPART_FORM_DATA)
                 .header("Authorization", firstUserToken)
-                .content(createArticlePayload)
+                .param("title", createArticleRequest.getTitle())
+                .param("content", createArticleRequest.getContent())
         ).andExpect(status().isOk());
 
         // Get created article
@@ -237,14 +269,14 @@ public class ArticleControllerTests {
         var user = userRepository.findAll().get(0); // Get saved User by registerFirstUser()
 
         var createArticleRequest = new Article("LevelUp Article", "Luka is a great tutor", user);
-        var articlePayload = objectMapper.writeValueAsString(createArticleRequest);
 
         // Create Article
         mockMvc.perform(
             post("/articles")
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.MULTIPART_FORM_DATA)
                 .header("Authorization", firstUserToken)
-                .content(articlePayload)
+                .param("title", createArticleRequest.getTitle())
+                .param("content", createArticleRequest.getContent())
         ).andExpect(status().isOk());
 
         // Get created article
@@ -266,14 +298,14 @@ public class ArticleControllerTests {
         registerDifferentUser(); // Create a different User
 
         var createArticleRequest = new Article("LevelUp Article", "Luka is a great tutor", user);
-        var articlePayload = objectMapper.writeValueAsString(createArticleRequest);
 
         // Create Article by first User
         mockMvc.perform(
             post("/articles")
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.MULTIPART_FORM_DATA)
                 .header("Authorization", firstUserToken)
-                .content(articlePayload)
+                .param("title", createArticleRequest.getTitle())
+                .param("content", createArticleRequest.getContent())
         ).andExpect(status().isOk());
 
         // Get created article
@@ -293,13 +325,13 @@ public class ArticleControllerTests {
         var user = userRepository.findAll().get(0);
 
         var createArticleRequest = new Article("LevelUp Article", "Luka is a great tutor", user);
-        var articlePayload = objectMapper.writeValueAsString(createArticleRequest);
 
         mockMvc.perform(
             post("/articles")
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.MULTIPART_FORM_DATA)
                 .header("Authorization", firstUserToken)
-                .content(articlePayload)
+                .param("title", createArticleRequest.getTitle())
+                .param("content", createArticleRequest.getContent())
         ).andExpect(status().isOk());
 
         Assertions.assertEquals(1, articleRepository.count()); // Confirm article was created

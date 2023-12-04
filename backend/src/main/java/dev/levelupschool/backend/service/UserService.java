@@ -9,13 +9,17 @@ import dev.levelupschool.backend.model.Article;
 import dev.levelupschool.backend.model.User;
 import dev.levelupschool.backend.repository.UserRepository;
 import dev.levelupschool.backend.request.UpdateUserRequest;
+import dev.levelupschool.backend.storage.StorageService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.naming.OperationNotSupportedException;
 import java.nio.file.AccessDeniedException;
 import java.util.HashMap;
 import java.util.List;
@@ -25,6 +29,10 @@ import java.util.Map;
 public class UserService {
 
     private final UserRepository userRepository;
+
+    @Qualifier("AWSStorageService")
+    @Autowired
+    private StorageService storageService;
 
     @Autowired
     private PagedResourcesAssembler<UserDto> pagedResourcesAssembler;
@@ -51,6 +59,21 @@ public class UserService {
         }
 
         return userRepository.save(newUser);
+    }
+
+    public Map<String, String>  uploadAvatar(MultipartFile avatar) {
+        User loggedInUser = AuthenticationUtils.getLoggedInUser(userRepository);
+
+        Map<String, String> response = new HashMap<>();
+
+        if (avatar != null) {
+            var avatarUrl = storageService.store(avatar, "avatars/");
+            loggedInUser.setAvatarUrl(avatarUrl.toString());
+            response.put("url", avatarUrl.toString());
+            return response;
+        }
+        userRepository.save(loggedInUser);
+        return response;
     }
 
     public UserDto updateUser(UpdateUserRequest newUser, Long id) throws Exception {
@@ -132,4 +155,45 @@ public class UserService {
 
         return user.following.stream().map(UserDto::new).toList();
     }
+
+    public void followUser(Long userId) throws Exception {
+        var loggedInUser = AuthenticationUtils.getLoggedInUser(userRepository);
+
+        var user = userRepository
+            .findById(userId)
+            .orElseThrow(() -> new ModelNotFoundException(User.class, userId));
+
+        if (loggedInUser.getId().equals(userId)) {
+            throw new OperationNotSupportedException("You cannot follow yourself");
+        }
+
+        if (loggedInUser.following.contains(user)) {
+            throw new OperationNotSupportedException("You are already following user with id " + userId);
+        }
+
+        loggedInUser.following.add(user);
+
+        userRepository.save(loggedInUser);
+
+    }
+
+    public void unfollowUser(Long userId) throws Exception {
+        var loggedInUser = AuthenticationUtils.getLoggedInUser(userRepository);
+
+        System.out.println("Logged in user id -> " + loggedInUser.getId());
+
+        var user = userRepository
+            .findById(userId)
+            .orElseThrow(() -> new ModelNotFoundException(User.class, userId));
+
+        if (!loggedInUser.following.contains(user)) {
+            throw new OperationNotSupportedException("You are not following the user");
+        }
+
+        loggedInUser.following.remove(user);
+
+       userRepository.save(loggedInUser);
+
+    }
+
 }

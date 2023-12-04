@@ -22,6 +22,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
@@ -47,6 +48,16 @@ public class UserController {
     @GetMapping("/users/{id}")
     UserDto show(@PathVariable Long id) {
         return userService.getUser(id);
+    }
+
+    @PostMapping("/users/upload-avatar")
+    ResponseEntity<?> upload(@RequestParam(value = "avatar")MultipartFile avatar) {
+        try {
+            Map<String, String> response = userService.uploadAvatar(avatar);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
 
     @PutMapping("/users/{id}")
@@ -119,6 +130,26 @@ public class UserController {
     @GetMapping("/users/{id}/following")
     List<UserDto> following(@PathVariable Long id) {
         return userService.getFollowing(id);
+    }
+
+    @PostMapping("/user/follow/{id}")
+    ResponseEntity<?> follow(@PathVariable Long id) {
+        try {
+            userService.followUser(id);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.FORBIDDEN);
+        }
+    }
+
+    @PostMapping("/user/unfollow/{id}")
+    ResponseEntity<?> unfollow(@PathVariable Long id) {
+        try {
+            userService.unfollowUser(id);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
     }
 
 
