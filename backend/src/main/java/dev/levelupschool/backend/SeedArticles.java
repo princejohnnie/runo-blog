@@ -1,5 +1,6 @@
 package dev.levelupschool.backend;
 
+import com.github.javafaker.Faker;
 import dev.levelupschool.backend.model.Article;
 import dev.levelupschool.backend.model.Comment;
 import dev.levelupschool.backend.model.User;
@@ -30,13 +31,28 @@ public class SeedArticles {
                 if (articleRepository.count() == 0) {
                     log.info("Seeding articles");
 
-                    var user = userRepository.save(new User("john@gmail.com", "John Uzodinma", "slug", "password"));
+                    populateDatabase();
 
-                    var article1 = articleRepository.save(new Article("test title 1", "test content 1", user));
-                    articleRepository.save(new Article("test title 2", "test content 2", user));
+                }
+            }
 
-                    commentRepository.save(new Comment("test comment", user, article1));
+            private void populateDatabase() {
+                for (int i = 0; i < 12; i++) {
+                    Faker faker = new Faker();
+                    String name = faker.name().name();
 
+                    String articleTitle = "Richird Norton photorealistic rendering as real photos";
+
+                    String articleContent = faker.lorem().paragraph(50);
+
+                    var user = userRepository.save(new User(name));
+
+                    var article = articleRepository.save(new Article(articleTitle, articleContent, user));
+
+                    for (int j = 0; j < 3; j++) {
+                        String commentString = faker.lorem().paragraph(20);
+                        commentRepository.save(new Comment(commentString, user, article));
+                    }
                 }
             }
         };
