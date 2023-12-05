@@ -25,6 +25,11 @@
     margin: 0;
 }
 
+.mainHeader__logo-link {
+    color: $white;
+    text-decoration: none;
+}
+
 .mainHeader__nav-list {
     display: flex;
     padding: 0;
@@ -41,7 +46,7 @@
     }
 }
 
-.mainHeader__nav-link--active {
+li .mainHeader__nav-link--active {
     border-bottom: 3px solid $brandColor;
     padding-bottom: 5px;
 }
@@ -50,7 +55,6 @@
     color: $white;
     font-family: $secondaryFontFamily;
     font-size: 0.875rem;
-    line-height: normal;
     text-decoration: none;
     font-weight: $baseFontWeight;
 }
