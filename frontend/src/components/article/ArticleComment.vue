@@ -1,5 +1,6 @@
 <script setup>
-import { defineProps } from 'vue';
+import { computed, defineProps } from 'vue';
+import dateFormatter from '@/utils/date.js'
 
 const props = defineProps({
     comment: {
@@ -7,6 +8,15 @@ const props = defineProps({
         required: true,
     }
 })
+
+const formattedDate = computed(() => {
+    return dateFormatter.formatDate(props.comment.updatedAt)
+})
+
+const formattedTime = computed(() => {
+    return dateFormatter.formatTime(props.comment.updatedAt)
+})
+
 </script>
 
 <template>
@@ -17,9 +27,9 @@ const props = defineProps({
         <div class="article__comment-details">
             <h4 class="article__comment-author-name"> {{ comment.author?.name }}</h4>
             <p class="article__comment-date">
-                <time>08.08.2021</time>
+                <time>{{ formattedDate }}</time>
                 <span> - </span>
-                4 min ago
+                {{ formattedTime }}
             </p>
             <p class="article__comment-content"> {{ comment.content }} </p>
         </div>

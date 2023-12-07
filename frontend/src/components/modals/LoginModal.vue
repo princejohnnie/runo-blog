@@ -1,42 +1,63 @@
 <script setup>
 import Modal from '@/components/modals/Modal.vue';
+import Input from '@/components//form/Input.vue';
+import Form from '@/components/form/Form.vue';
+import Button from '@/components/form/Button.vue';
+import Auth from '@/requests/Auth.js';
+import Swal from 'sweetalert2';
 
 import { ref } from 'vue';
+import { useUserStore } from '@/stores/user.js'
 
-const emit = defineEmits(['closeModal'])
+
+const userStore = useUserStore();
+
+const isProcessing = ref(false)
 
 const data = ref({
     email: '',
     password: '',
 })
 
-const onCloseModal = () => {
-    emit('closeModal')
+const submitForm = async () => {
+    const response = await Auth.login(data.value)
+    localStorage.setItem('token', response.data);
+
+    await userStore.me()
+
+    showSuccessAlert()
+
 }
 
-const submit = () => {
-    onCloseModal()
+const showSuccessAlert = () => {
+    Swal.fire({
+        title: "Success!",
+        text: "You have logged in successfully!",
+        icon: "success"
+    });
 }
 
 </script>
 
 <template>
-    <Modal @closeModal="onCloseModal()">
+    <Modal>
         <div class="modal__form">
             <h2 class="modal__heading">Login</h2>
-            <form @submit.prevent="submit()">
+
+            <Form :handleLogic="submitForm" v-model:isProcessing="isProcessing">
+
+                <Input type="text" name="email" label="Email:" placeholder="johndoe@gmail.com" v-model:value="data.email"/>
+
+                <Input type="password" name="password" label="Password:" placeholder="***********" v-model:value="data.password" />
+
                 <div class="modal__inputWrapper">
-                    <label class="modal__inputLabel">Email: </label>
-                    <input class="modal__input" type="email" v-model="data.email" placeholder="johndoe@email.com">
+                    <Button type="submit" class="modal__inputButton" :isProcessing="isProcessing">
+                        Log in
+                    </Button>
                 </div>
-                <div class="modal__inputWrapper">
-                    <label class="modal__inputLabel">Password: </label>
-                    <input class="modal__input" type="password" v-model="data.password" placeholder="**********">
-                </div>
-                <div class="modal__inputWrapper">
-                    <button class="modal__inputButton">Log in</button>
-                </div>
-            </form>
+
+            </Form>
+
         </div>
     </Modal>
 </template>

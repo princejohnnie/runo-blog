@@ -8,4 +8,8 @@ function show(id) {
     return Http.get(`/articles/${id}`)
 }
 
-export default { index, show }
+function comments(id) {
+    return Http.get(`/articles/${id}/comments`)
+}
+
+export default { index, show, comments }

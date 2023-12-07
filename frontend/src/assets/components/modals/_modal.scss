@@ -107,3 +107,14 @@
         background: #343A40;
     }
 }
+
+.modal__inputError {
+    color: #FF0000;
+    font-family: $primaryFontFamily;
+    font-size: 12px;
+    margin-top: 5px;
+}
+
+.modal__inputWrapper--error .modal__input {
+    border: 1px solid red;
+}

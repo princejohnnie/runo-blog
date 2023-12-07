@@ -111,7 +111,7 @@ public class ArticleService {
         }
 
         Map<String, List<CommentDto>> response = new HashMap<>();
-        response.put("items", article.getComments().stream().map(CommentDto::new).toList());
+        response.put("items", article.getComments().stream().sorted((o1, o2) -> o2.getUpdatedAt().compareTo(o1.getUpdatedAt())).map(CommentDto::new).toList());
 
         return response;
     }

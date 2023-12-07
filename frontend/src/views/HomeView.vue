@@ -8,9 +8,11 @@ import Article from '@/requests/Article.js';
 import FeaturedArticle from '@/components/article/FeaturedArticle.vue';
 
 const articles = ref([])
+const loading = ref(true)
 
 Article.index().then((res) => {
-    articles.value = res.data;
+    articles.value = res.data._embedded.items;
+    loading.value = false
 })
 
 const featuredArticle = computed(() => {
@@ -25,6 +27,13 @@ const editorArticles = computed(() => {
 
 <template>
     <main>
+
+        <div v-if="loading" class="loader">
+            <div class="loader__inner">
+
+            </div>
+        </div>
+
         <FeaturedArticle v-if="articles.length" :article="featuredArticle"/>
 
         <section class="section__popularTopics">

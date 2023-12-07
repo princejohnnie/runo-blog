@@ -1,6 +1,7 @@
 <script setup>
 
 import { computed } from 'vue';
+import dateFormatter from '@/utils/date.js'
 
 const props = defineProps({
     article: {
@@ -16,6 +17,10 @@ const shortContent = computed(() => {
     } else {
         return props.article.content.slice(0, 199) + '...'
     }
+})
+
+const formattedDate = computed(() => {
+    return dateFormatter.formatDate(props.article.updatedAt)
 })
 
 </script>
@@ -38,7 +43,7 @@ const shortContent = computed(() => {
                 {{ article.title }}
             </h2>
             <p class="mainArticle__content">
-                <time class="mainArticle__time">08.08.2021</time>
+                <time class="mainArticle__time">{{ formattedDate }}</time>
                 <span class="mainArticle__divider"></span>
                 <span class="mainArticle__text">
                     {{ shortContent }}

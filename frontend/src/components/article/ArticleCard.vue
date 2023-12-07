@@ -1,5 +1,6 @@
 <script setup>
 import { defineProps, computed } from 'vue';
+import dateFormatter from '@/utils/date.js'
 
 const props = defineProps({
     article: {
@@ -14,6 +15,10 @@ const shortContent = computed(() => {
     } else {
         return props.article.content.slice(0, 200) + "...";
     }
+})
+
+const formattedDate = computed(() => {
+    return dateFormatter.formatDate(props.article.updatedAt)
 })
 
 
@@ -31,7 +36,7 @@ const shortContent = computed(() => {
         </div>
         <div class="article__content">
             <div class="article__content-inner">
-                <time class="article__time">08.02.2021</time>
+                <time class="article__time">{{ formattedDate }}</time>
                 <img class="article__premium-icon" src="/images/premium_icon2.png" v-if="article.isPremium">
             </div>
             <h3 class="article__heading">

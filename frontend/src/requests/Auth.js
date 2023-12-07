@@ -8,4 +8,12 @@ function register(data) {
     return Http.post(`/register`, data)
 }
 
-export default { login, register};
+function me() {
+    return Http.get(`/me`)
+}
+
+export default { 
+    login,
+    register,
+    me,
+};

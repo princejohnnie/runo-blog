@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
+import { useUserStore } from '@/stores/user.js'
 import HomeView from "../views/HomeView.vue";
 import ArticlesView from "../views/ArticlesView.vue";
 import ArticleDetail from "../views/ArticleDetail.vue";
@@ -24,5 +25,16 @@ const router = createRouter({
     ],
     linkActiveClass: 'mainHeader__nav-link--active'
 });
+
+router.beforeEach(async(to, from, next) => {
+    const userStore = useUserStore();
+
+    if (localStorage.getItem('token')) {
+        await userStore.me();
+    }
+
+    next();
+
+})
 
 export default router;

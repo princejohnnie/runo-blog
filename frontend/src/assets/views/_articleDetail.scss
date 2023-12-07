@@ -180,6 +180,7 @@
     right: 0;
     border: none;
     padding: 8px 20px;
+    cursor: pointer;
 
     @include for-phone {
         position: static;

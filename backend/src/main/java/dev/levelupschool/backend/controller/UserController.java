@@ -12,6 +12,10 @@ import dev.levelupschool.backend.request.UpdateUserRequest;
 import dev.levelupschool.backend.service.TokenService;
 import dev.levelupschool.backend.service.UserService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -85,12 +89,13 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    ResponseEntity<?> register(@RequestBody @Valid User newUser) {
+    ResponseEntity<?> register(@RequestBody @Valid RegisterDto registerDto) {
         try {
+            var newUser = new User(registerDto.email, registerDto.name, registerDto.slug, registerDto.password);
             var createdUser = userService.createUser(newUser);
             return ResponseEntity.ok(tokenService.generateToken(createdUser.getId()));
         } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.FORBIDDEN);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -181,7 +186,25 @@ public class UserController {
     @Getter
     @Setter
     private static class LoginDto {
+        @NotBlank
+        @Email
         private String email;
+        @NotEmpty
+        private String password;
+    }
+
+    @Getter
+    @Setter
+    private static class RegisterDto {
+        @NotBlank
+        @Email
+        private String email;
+        @Size(min = 1, max = 256)
+        private String name;
+        @NotBlank
+        private String slug;
+        @NotBlank
+        @Size(min = 3, max = 25)
         private String password;
     }
 }
