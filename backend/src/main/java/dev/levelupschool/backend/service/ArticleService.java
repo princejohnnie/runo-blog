@@ -1,6 +1,6 @@
 package dev.levelupschool.backend.service;
 
-import dev.levelupschool.backend.auth.AuthenticationUtils;
+import dev.levelupschool.backend.auth.AuthenticationProvider;
 import dev.levelupschool.backend.dtos.ArticleDto;
 import dev.levelupschool.backend.dtos.CommentDto;
 import dev.levelupschool.backend.dtos.UserDto;
@@ -40,6 +40,9 @@ public class ArticleService {
     private UserRepository userRepository;
 
     @Autowired
+    private AuthenticationProvider authProvider;
+
+    @Autowired
     private PagedResourcesAssembler<ArticleDto> pagedResourcesAssembler;
 
     public PagedModel<EntityModel<ArticleDto>> getAllArticles(Pageable paging) {
@@ -53,7 +56,7 @@ public class ArticleService {
     }
 
     public ArticleDto createArticle(Article article, MultipartFile cover) throws CustomValidationException {
-        User loggedInUser = AuthenticationUtils.getLoggedInUser(userRepository);
+        User loggedInUser = authProvider.getAuthenticatedUser();
         article.setAuthor(loggedInUser);
 
         if (cover != null) {
@@ -69,7 +72,7 @@ public class ArticleService {
     }
 
     public ArticleDto updateArticle(Article newArticle, Long id) throws AccessDeniedException {
-        var loggedInUser = AuthenticationUtils.getLoggedInUser(userRepository);
+        var loggedInUser = authProvider.getAuthenticatedUser();
 
         var article = articleRepository.findById(id)
             .orElseThrow(() -> new ModelNotFoundException(Article.class, id));
@@ -85,7 +88,7 @@ public class ArticleService {
     }
 
     public void deleteArticle(Long id) throws AccessDeniedException {
-        var loggedInUser = AuthenticationUtils.getLoggedInUser(userRepository);
+        var loggedInUser = authProvider.getAuthenticatedUser();
 
         var article = articleRepository
             .findById(id)
@@ -114,7 +117,7 @@ public class ArticleService {
     }
 
     public void bookmark(Long articleId) throws Exception {
-        var loggedInUser = AuthenticationUtils.getLoggedInUser(userRepository);
+        var loggedInUser = authProvider.getAuthenticatedUser();
 
         var article = articleRepository.findById(articleId).orElseThrow(() -> new ModelNotFoundException(Article.class, articleId));
 
@@ -129,7 +132,7 @@ public class ArticleService {
     }
 
     public List<UserDto> bookmarkers(Long id) throws Exception {
-        var loggedInUser = AuthenticationUtils.getLoggedInUser(userRepository);
+        var loggedInUser = authProvider.getAuthenticatedUser();
 
         var article = articleRepository.findById(id).orElseThrow(() -> new ModelNotFoundException(Article.class, id));
 

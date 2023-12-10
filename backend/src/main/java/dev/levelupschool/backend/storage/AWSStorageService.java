@@ -40,12 +40,12 @@ public class AWSStorageService implements StorageService {
     @Override
     public URL store(MultipartFile file, String path) {
         try {
-            if (file.isEmpty()) {
+            if (file.isEmpty() || file.getOriginalFilename() == null) {
                 throw new StorageException("Failed to store empty file.");
             }
 
-            String prefix = path +  new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-            String key = prefix + file.getOriginalFilename();
+            String prefix = path +  new SimpleDateFormat("yyyyMMdd_HHmm").format(new Date());
+            String key = prefix + file.getOriginalFilename().hashCode();
 
             s3Client.putObject(PutObjectRequest.builder()
                 .bucket(bucketName)

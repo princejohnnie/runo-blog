@@ -1,6 +1,7 @@
 package dev.levelupschool.backend.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import dev.levelupschool.backend.auth.AuthenticationProvider;
 import dev.levelupschool.backend.model.Article;
 import dev.levelupschool.backend.model.Comment;
 import dev.levelupschool.backend.model.User;
@@ -9,37 +10,34 @@ import dev.levelupschool.backend.repository.CommentRepository;
 import dev.levelupschool.backend.repository.UserRepository;
 import dev.levelupschool.backend.service.TokenService;
 import dev.levelupschool.backend.service.UserService;
+import dev.levelupschool.backend.storage.StorageService;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
-import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
-import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
-import software.amazon.awssdk.regions.Region;
-import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.HeadObjectRequest;
-import software.amazon.awssdk.services.s3.model.HeadObjectResponse;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.net.URI;
+import java.net.URL;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -70,46 +68,22 @@ public class UserControllerTests {
     @Autowired
     private TokenService tokenService;
 
-    @Value("${aws.access-key}")
-    private String accessKey;
+    @MockBean
+    private AuthenticationProvider authenticationProvider;
 
-    @Value("${aws.secret-key}")
-    private String secretKey;
+    @MockBean
+    private SecurityFilterChain securityFilterChain;
 
-    private String userToken;
-    private String differentUserToken;
+    @Qualifier("AWSStorageService")
+    @MockBean
+    private StorageService storageService;
+
 
     @Test
     void  contextLoads() {
 
     }
 
-
-    private void registerUser() throws Exception {
-        var firstUser = new User("john@gmail.com", "John Uzodinma", "slug", "password");
-
-        var payload = objectMapper.writeValueAsString(firstUser);
-
-        MvcResult result = mockMvc.perform(
-            post(("/register"))
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(payload)).andDo(print()).andReturn();
-
-        userToken = "Bearer " + result.getResponse().getContentAsString();
-    }
-
-    private void registerDifferentUser() throws Exception {
-        User secondUser = new User("luka@gmail.com", "Luka Papez", "slug", "password");
-
-        var payload = objectMapper.writeValueAsString(secondUser);
-
-        MvcResult result = mockMvc.perform(
-            post(("/register"))
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(payload)).andDo(print()).andReturn();
-
-        differentUserToken = "Bearer " + result.getResponse().getContentAsString();
-    }
 
     @Test
     public void givenUser_whenGetUsers_thenReturnJsonArray() throws Exception {
@@ -172,73 +146,68 @@ public class UserControllerTests {
     }
 
     @Test
-    public void givenOwnerUser_whenPutUser_thenUpdateUser() throws Exception {
-        registerUser(); // Register new user to get Token
+    public void givenAuthenticatedUser_whenPutUser_thenUpdateUser() throws Exception {
+        var authenticatedUser = userService.createUser(new User("johndoe@gmail.com", "John Uzodinma", "slug", "password2"));
+        Mockito.when(authenticationProvider.getAuthenticatedUser()).thenReturn(authenticatedUser);
 
-        var user = userRepository.findAll().get(0); // Get registered user
-
-        var updateUserRequest = new User("johndoe@gmail.com", "John Prince", "slug", "password2");
+        var updateUserRequest = new User("johnnydoe@gmail.com", "John Prince", "slug", "password2");
         var payload = objectMapper.writeValueAsString(updateUserRequest);
 
         mockMvc.perform(
-                put("/users/{id}", user.getId())
-                    .header("Authorization", userToken)
+                put("/users/{id}", authenticatedUser.getId())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(payload)
             ).andExpect(status().isOk())
             .andExpect(jsonPath("$.name", is("John Prince")));
 
-        Assertions.assertEquals("John Prince", userRepository.findById(user.getId()).get().getName()); // Confirm that user was actually updated in the DB
+        Assertions.assertEquals("John Prince", userRepository.findById(authenticatedUser.getId()).get().getName()); // Confirm that user was actually updated in the DB
     }
 
     @Test
-    public void givenDifferentUser_whenPutUser_thenReturnUnauthorized() throws Exception {
-        registerUser(); // Register new user to get token
-        registerDifferentUser(); // Register a different user to get second token
+    public void givenUnauthenticatedUser_whenPutUser_thenReturnUnauthorized() throws Exception {
+        var authenticatedUser = userService.createUser(new User("johndoe@gmail.com", "John Uzodinma", "slug", "password2"));
 
-        var user = userRepository.findAll().get(0); // Get registered user
+        var unAuthenticatedUser = userService.createUser(new User("johnnydoe@gmail.com", "John Prince", "slug", "password"));
 
-        var updateUserRequest = new User("john@gmail.com", "John Prince", "slug", "password2");
-        var payload = objectMapper.writeValueAsString(updateUserRequest);
+        Mockito.when(authenticationProvider.getAuthenticatedUser()).thenReturn(authenticatedUser);
+
+        var payload = objectMapper.writeValueAsString(authenticatedUser);
 
         mockMvc.perform(
-                put("/users/{id}", user.getId())
-                    .header("Authorization", differentUserToken) // NOTE: A different (second) User is trying to Update first user
+                put("/users/{id}", unAuthenticatedUser.getId()) // NOTE: Unauthenticated user is trying to update authenticated user
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(payload)
             ).andExpect(status().isForbidden());
 
-        Assertions.assertEquals("John Uzodinma", userRepository.findById(user.getId()).get().getName()); // Confirm that user was not updated in the DB
+        Assertions.assertEquals("John Uzodinma", userRepository.findById(authenticatedUser.getId()).get().getName()); // Confirm that user was not updated in the DB
     }
 
     @Test
-    public void givenOwnerUser_whenDeleteUser_thenDeleteUser() throws Exception {
-        registerUser();
+    public void givenAuthenticatedUser_whenDeleteUser_thenDeleteUser() throws Exception {
+        var authenticatedUser = userService.createUser(new User("johndoe@gmail.com", "John Uzodinma", "slug", "password2"));
 
-        var user = userRepository.findAll().get(0);
+        Mockito.when(authenticationProvider.getAuthenticatedUser()).thenReturn(authenticatedUser);
 
         mockMvc.perform(
-            delete("/users/{id}", user.getId())
-                .header("Authorization", userToken)
+            delete("/users/{id}", authenticatedUser.getId())
         ).andExpect(status().isOk());
 
         Assertions.assertEquals(0, userRepository.count()); // Confirm that user was actually deleted from the DB
     }
 
     @Test
-    public void givenDifferentUser_whenDeleteUser_thenReturnUnauthorized() throws Exception {
-        registerUser();
-        registerDifferentUser();
+    public void givenUnauthenticatedUser_whenDeleteUser_thenReturnUnauthorized() throws Exception {
+        var authenticatedUser = userService.createUser(new User("johndoe@gmail.com", "John Uzodinma", "slug", "password2"));
 
-        var user = userRepository.findAll().get(0);
+        Mockito.when(authenticationProvider.getAuthenticatedUser()).thenReturn(authenticatedUser);
 
-        // Try to update the user using a different User
+        var unAuthenticatedUser = userService.createUser(new User("johnnydoe@gmail.com", "John Prince", "slug", "password"));
+
         mockMvc.perform(
-            delete("/users/{id}", user.getId())
-                .header("Authorization", differentUserToken) // NOTE: A different (second) User is trying to Update First User
+            delete("/users/{id}", unAuthenticatedUser.getId()) // NOTE: Authenticated User is trying to delete unauthenticated User
         ).andExpect(status().isForbidden());
 
-        Assertions.assertEquals(2, userRepository.count()); // Confirm that user was not deleted from the DB. Count is 2 because we registered two users
+        Assertions.assertEquals(2, userRepository.count(), "Count is 2 because we created two users"); // Confirm that user was not deleted from the DB.
     }
 
     @Test
@@ -274,48 +243,33 @@ public class UserControllerTests {
     }
 
     @Test
-    public void givenUser_whenPostAvatar_thenUploadAvatar() throws Exception {
-        registerUser();
+    public void givenUser_whenPostAvatar_thenReturnAvatar() throws Exception {
+        var authenticatedUser = userService.createUser(new User("johnny@gmail.com", "Johnny Walker", "slug", "password"));
 
-        S3Client s3Client = S3Client.builder()
-            .region(Region.EU_CENTRAL_1)
-            .credentialsProvider(StaticCredentialsProvider.create(AwsBasicCredentials.create(accessKey, secretKey)))
-            .build();
+        URL url = URI.create("http://mocked-avatar-url").toURL();
+
+        Mockito.when(authenticationProvider.getAuthenticatedUser()).thenReturn(authenticatedUser);
+        Mockito.when(storageService.store(Mockito.any(MultipartFile.class), Mockito.any(String.class))).thenReturn(url);
 
         MockMultipartFile avatar = new MockMultipartFile(
             "avatar", "photo.jpg", MediaType.IMAGE_JPEG_VALUE, "photo.jpg".getBytes());
 
-        String bucketName = "john-levelup-bucket";
-        String directoryPath = "avatars/" +  new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-
-        String objectKey = directoryPath + avatar.getOriginalFilename();
-
         mockMvc.perform(
-            multipart("/user/upload-avatar")
-                .file(avatar)
-                .header("Authorization", userToken)
-        ).andExpect(status().isOk());
+                multipart("/user/upload-avatar")
+                    .file(avatar)
+            ).andExpect(status().isOk())
+            .andExpect(jsonPath("$.avatarUrl", is("http://mocked-avatar-url")));
 
-        var registeredUser = userRepository.findAll().get(0);
-
-        HeadObjectRequest headObjectRequest = HeadObjectRequest.builder()
-            .bucket(bucketName)
-            .key(objectKey)
-            .build();
-
-        HeadObjectResponse headObjectResponse = s3Client.headObject(headObjectRequest);
-
-        Assertions.assertNotNull(headObjectResponse.metadata()); // Confirm that object actually exists in bucket
-        Assertions.assertNotNull(registeredUser.getAvatarUrl()); // Confirm that user avatar was saved to model
+        Assertions.assertEquals(authenticatedUser.getAvatarUrl(), "http://mocked-avatar-url");
     }
 
     @Test
     public void givenUser_whenGetFollowers_thenReturnFollowersArray() throws Exception {
         var loggedInUser = userRepository.save(new User("amaka@gmail.com", "Amaka Uzodinma", "Designer", "password"));
 
-        var follower = userRepository.save(new User("john@gmail.com", "John Uzodinma", "Developer", "password"));
+        var followee = userRepository.save(new User("john@gmail.com", "John Uzodinma", "Developer", "password"));
 
-        loggedInUser.getFollowers().add(follower);
+        loggedInUser.getFollowers().add(followee);
 
         userRepository.save(loggedInUser);
 
@@ -347,54 +301,47 @@ public class UserControllerTests {
 
     @Test
     @Transactional
-    public void givenUser_whenFollowAnotherUser_thenFollowUser() throws Exception {
-        registerUser();
-        var loggedInUser = userRepository.findAll().get(0);
-        var followee = userRepository.save(new User("johnny@gmail.com", "Johnny Doe", "Designer", "password"));
+    public void givenAuthenticatedUser_whenFollowAnotherUser_thenFollowUser() throws Exception {
+        var follower = userRepository.save(new User("john@gmail.com", "Johnny Doe", "Designer", "password"));
+
+        Mockito.when(authenticationProvider.getAuthenticatedUser()).thenReturn(follower);
+
+        var followee = userRepository.save(new User("john@gmail.com", "Johnny Doe", "Designer", "password"));
 
         mockMvc.perform(
-                post("/users/{id}/follow", followee.getId())
-                    .header("Authorization", userToken)
-                    .contentType(MediaType.APPLICATION_JSON)
-            ).andExpect(status().isOk());
+            post("/users/{id}/follow", followee.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(status().isOk());
 
-        var updatedLoggedInUser = userRepository.findById(loggedInUser.getId()).get();
-        Assertions.assertEquals(updatedLoggedInUser.getFollowing().size(), 1);
+        Assertions.assertEquals(follower.getFollowing().size(), 1); // Confirm that User was followed
+
     }
 
     @Test
     @Transactional
-    public void givenUser_whenUnfollowAnotherUser_thenUnfollowUser() throws Exception {
-        registerUser();
-        var loggedInUser = userRepository.findAll().get(0);
+    public void givenAuthenticatedUser_whenUnfollowAnotherUser_thenUnfollowUser() throws Exception {
+        var follower = userRepository.save(new User("john@gmail.com", "Johnny Doe", "Designer", "password"));
+        Mockito.when(authenticationProvider.getAuthenticatedUser()).thenReturn(follower);
+
         var followee = userRepository.save(new User("johnny@gmail.com", "Johnny Doe", "Designer", "password"));
 
-        mockMvc.perform(
-            post("/users/{id}/follow", followee.getId())
-                .header("Authorization", userToken)
-                .contentType(MediaType.APPLICATION_JSON)
-        ).andExpect(status().isOk());
+        userService.followUser(followee.getId());
 
-        var updatedUseAfterFollow = userRepository.findById(loggedInUser.getId()).get();
-
-        Assertions.assertEquals(updatedUseAfterFollow.getFollowing().size(), 1); // Confirm that User was followed
+        Assertions.assertEquals(follower.getFollowing().size(), 1, "Count is 1 because followee was followed by follower");
 
         mockMvc.perform(
             post("/users/{id}/unfollow", followee.getId())
-                .header("Authorization", userToken)
                 .contentType(MediaType.APPLICATION_JSON)
         ).andExpect(status().isOk());
 
-        var updatedUseAfterUnfollow = userRepository.findById(loggedInUser.getId()).get();
-
-        Assertions.assertEquals(updatedUseAfterUnfollow.getFollowing().size(), 0); // Confirm that User was unfollowed
+        Assertions.assertEquals(follower.getFollowing().size(), 0, "Count is 0 because followee waS unfollowed by follower");
     }
 
     @Test
     @Transactional
     public void givenUser_whenGetBookmarks_thenReturnBookmarksArray() throws Exception {
-        registerUser();
-        var loggedInUser = userRepository.findAll().get(0);
+        var loggedInUser = userRepository.save(new User("john@gmail.com", "Johnny Doe", "Designer", "password"));
+        Mockito.when(authenticationProvider.getAuthenticatedUser()).thenReturn(loggedInUser);
 
         var article = articleRepository.save(new Article("Test title", "Test content", loggedInUser));
         loggedInUser.bookmarks.add(article);
@@ -404,7 +351,6 @@ public class UserControllerTests {
         mockMvc.perform(
                 get("/user/bookmarks")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .header("Authorization", userToken)
             ).andExpect(status().isOk())
             .andExpect(jsonPath("$", hasSize(1)));
     }

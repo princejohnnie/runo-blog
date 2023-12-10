@@ -1,6 +1,6 @@
 package dev.levelupschool.backend.service;
 
-import dev.levelupschool.backend.auth.AuthenticationUtils;
+import dev.levelupschool.backend.auth.AuthenticationProvider;
 import dev.levelupschool.backend.dtos.ArticleDto;
 import dev.levelupschool.backend.dtos.BookmarkDto;
 import dev.levelupschool.backend.dtos.CommentDto;
@@ -36,6 +36,9 @@ public class UserService {
     private StorageService storageService;
 
     @Autowired
+    private AuthenticationProvider authProvider;
+
+    @Autowired
     private PagedResourcesAssembler<UserDto> pagedResourcesAssembler;
 
     UserService(UserRepository userRepository) {
@@ -63,7 +66,7 @@ public class UserService {
     }
 
     public Map<String, String>  uploadAvatar(MultipartFile avatar) {
-        User loggedInUser = AuthenticationUtils.getLoggedInUser(userRepository);
+        User loggedInUser = authProvider.getAuthenticatedUser();
 
         Map<String, String> response = new HashMap<>();
 
@@ -79,7 +82,7 @@ public class UserService {
     }
 
     public UserDto updateUser(UpdateUserRequest newUser, Long id) throws Exception {
-        var loggedInUser = AuthenticationUtils.getLoggedInUser(userRepository);
+        var loggedInUser = authProvider.getAuthenticatedUser();
 
         var checkUser = userRepository.findByEmail(newUser.getEmail());
         if (checkUser != null) {
@@ -101,7 +104,7 @@ public class UserService {
     }
 
     public void deleteUser(Long id) throws AccessDeniedException {
-        var loggedInUser = AuthenticationUtils.getLoggedInUser(userRepository);
+        var loggedInUser = authProvider.getAuthenticatedUser();
 
         var user = userRepository.findById(id)
             .orElseThrow(() -> new ModelNotFoundException(User.class, id));
@@ -159,7 +162,7 @@ public class UserService {
     }
 
     public void followUser(Long userId) throws Exception {
-        var loggedInUser = AuthenticationUtils.getLoggedInUser(userRepository);
+        var loggedInUser = authProvider.getAuthenticatedUser();
 
         var user = userRepository
             .findById(userId)
@@ -180,7 +183,7 @@ public class UserService {
     }
 
     public void unfollowUser(Long userId) throws Exception {
-        var loggedInUser = AuthenticationUtils.getLoggedInUser(userRepository);
+        var loggedInUser = authProvider.getAuthenticatedUser();
 
         var user = userRepository
             .findById(userId)
@@ -197,7 +200,7 @@ public class UserService {
     }
 
     public List<BookmarkDto> getBookmarks() {
-        var loggedInUser = AuthenticationUtils.getLoggedInUser(userRepository);
+        var loggedInUser = authProvider.getAuthenticatedUser();
 
         return loggedInUser.bookmarks.stream().map(BookmarkDto::new).toList();
     }

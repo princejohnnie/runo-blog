@@ -1,6 +1,6 @@
 package dev.levelupschool.backend.controller;
 
-import dev.levelupschool.backend.auth.AuthenticationUtils;
+import dev.levelupschool.backend.auth.AuthenticationProvider;
 import dev.levelupschool.backend.dtos.ArticleDto;
 import dev.levelupschool.backend.dtos.BookmarkDto;
 import dev.levelupschool.backend.dtos.CommentDto;
@@ -39,6 +39,9 @@ public class UserController {
 
     @Autowired
     private TokenService tokenService;
+
+    @Autowired
+    private AuthenticationProvider authenticationProvider;
 
     @GetMapping("/users")
     PagedModel<EntityModel<UserDto>> index(
@@ -109,8 +112,9 @@ public class UserController {
     }
 
     @GetMapping("/me")
-    User me() {
-        return AuthenticationUtils.getLoggedInUser(userRepository);
+    UserDto me() {
+        var loggedInUser = authenticationProvider.getAuthenticatedUser();
+        return new UserDto(loggedInUser);
     }
 
     @GetMapping("/users/{id}/articles")
