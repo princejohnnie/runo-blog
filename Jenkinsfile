@@ -57,21 +57,56 @@ pipeline {
             }
         }
 
-        stage('Check MR Branch name and Author Email') {
+        stage('Conventional commits check') {
             when {
-                expression { env.CHANGE_ID != null }
+                expression { env.CHANGE_TARGET }
+            }
 
-            }
-            agent {
-                kubernetes {
-                    yaml createTestingEnvironment()
+            parallel {
+
+                stage('Check Author Email') {
+                    agent {
+                        kubernetes {
+                            yaml createTestingEnvironment()
+                        }
+                    }
+                    post {
+                        success {
+                            updateGitlabCommitStatus name: 'backend-tests', state: 'success'
+                        }
+                        failure {
+                            updateGitlabCommitStatus name: 'backend-tests', state: 'failed'
+                        }
+                    }
+                    steps {
+                        container('main') {
+                            sh './ci/check-author-email.sh'
+                        }
+                    }
+                }
+
+                stage('Check MR Branch Name') {
+                    agent {
+                        kubernetes {
+                            yaml createTestingEnvironment()
+                        }
+                    }
+                    post {
+                        success {
+                            updateGitlabCommitStatus name: 'backend-tests', state: 'success'
+                        }
+                        failure {
+                            updateGitlabCommitStatus name: 'backend-tests', state: 'failed'
+                        }
+                    }
+                    steps {
+                        container('main') {
+                            sh './ci/check-branch-name.sh'
+                        }
+                    }
                 }
             }
-            steps {
-                script {
-                    checkMRBranchName()
-                }
-            }
+
         }
 
         stage('Run backend tests') {
@@ -96,17 +131,4 @@ pipeline {
         }
     }
 
-}
-
-def checkMRBranchName() {
-    echo 'Hello World!'
-    echo "Branch $BRANCH_NAME"
-
-    echo "CHANGE_AUTHOR ${env.CHANGE_AUTHOR}"
-    echo "CHANGE_TARGET ${env.CHANGE_TARGET}"
-   
-    return {
-        print("MR Branch Name -> ${BRANCH_NAME}")
-        print("MR Author Email -> ${CHANGE_AUTHOR}")
-    }
 }
