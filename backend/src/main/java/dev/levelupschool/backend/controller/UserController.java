@@ -172,17 +172,6 @@ public class UserController {
         }
     }
 
-
-
-    @Getter
-    @Setter
-    private static class RegisterDto {
-        private String email;
-        private String name;
-        private String slug;
-        private String password;
-    }
-
     @Getter
     @Setter
     private static class LoginDto {
@@ -203,7 +192,6 @@ public class UserController {
         private String name;
         @NotBlank
         private String slug;
-        @NotBlank
         @Size(min = 3, max = 25)
         private String password;
     }

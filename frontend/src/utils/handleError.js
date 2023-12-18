@@ -5,8 +5,9 @@ export default (error, errorStore) => {
     console.log(error)
 
     const responseText = {
+        '400': error?.response?.data,
         '401': error?.response?.data,
-        '403': error?.response?.data?.description,
+        '403': error?.response?.data,
         '404': error?.response?.data?.description,
         '422': error?.response?.data?.description,
         '500': 'Internal Server Error. Please try again later.',

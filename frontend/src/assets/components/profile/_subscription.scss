@@ -1,0 +1,81 @@
+.subscription {
+    width: 100%;
+}
+
+.subscription__inner {
+    display: flex;
+    flex-direction: column;
+    padding: 30px 70px;
+    max-height: 377px;
+    background: rgba(229, 229, 229, 0.30);
+
+    @include for-phone {
+        padding: 15px 20px;
+    }
+}
+
+.subscription__heading {
+    color: #495057;
+    font-family: $primaryFontFamily;
+    font-size: 2.25rem;
+    font-weight: $baseFontWeight;
+}
+
+.subscription__addSub {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    @include for-phone {
+        flex-direction: column;
+    }
+}
+
+.subscription__add-text {
+    color: $brandColor;
+    text-align: right;
+    font-family: $primaryFontFamily;
+    font-size: 1.125rem;
+    font-weight: $baseFontWeight;
+    line-height: 20px;
+}
+
+.subscription__active {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 40px;
+    border: 1px dashed #495057;
+    background: $white;
+
+    @include for-phone {
+        flex-direction: column;
+        padding: 20px 10px;
+    }
+}
+
+.subscription__active-text {
+    color: $headingColor;
+    font-family: $primaryFontFamily;
+    font-size: 1.125rem;
+    font-weight: $baseFontWeight;
+    line-height: 25px;
+
+    @include for-phone {
+        text-align: center;
+    }
+}
+
+.subscription__premiumButton {
+  padding: 10px 80px;
+  text-align: center;
+  background: $brandColor;
+  border: none;
+  color: $white;
+
+    @include for-tablet {
+        padding: 10px 25px;
+    }
+
+}

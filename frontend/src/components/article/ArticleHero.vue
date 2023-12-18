@@ -9,11 +9,16 @@ const props = defineProps({
     }
 })
 
+function removeHtmlTags(htmlString) {
+    var doc = new DOMParser().parseFromString(htmlString, 'text/html');
+    return doc.body.textContent || "";
+}
+
 const shortContent = computed(() => {
     if (props.article.content?.length < 200 ) {
-        return props.article.content
+        return removeHtmlTags(props.article.content)
     } else {
-        return props.article.content?.slice(0, 200) + '...'
+        return removeHtmlTags(props.article.content?.slice(0, 200) + '...')
     }
 })
 
@@ -21,8 +26,13 @@ const shortContent = computed(() => {
 
 <template>
 
-    <div class="mainArticle mainArticle__header">
-        <div class="mainArticle__inner mainArticle__header-inner">
+    <div class="mainArticle mainArticle__header" 
+        :style="{
+            background: article.coverUrl ? 
+            `url(${article.coverUrl}) no-repeat center / cover` : 
+            `url(${'https://picsum.photos/400/400'}) no-repeat center / cover`}">
+
+        <div class="mainArticle__inner mainArticle__header-inner" >
 
             <h2 class="mainArticle__heading articleDetail__heading">
                 {{ article.title }}

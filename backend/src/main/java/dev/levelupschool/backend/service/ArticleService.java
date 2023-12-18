@@ -10,6 +10,7 @@ import dev.levelupschool.backend.model.Article;
 import dev.levelupschool.backend.model.User;
 import dev.levelupschool.backend.repository.ArticleRepository;
 import dev.levelupschool.backend.repository.UserRepository;
+import dev.levelupschool.backend.request.UpdateArticleRequest;
 import dev.levelupschool.backend.storage.StorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -29,7 +30,7 @@ import java.util.Map;
 @Service
 public class ArticleService {
 
-    @Qualifier("fileSystemStorageService")
+    @Qualifier("AWSStorageService")
     @Autowired
     private StorageService storageService;
 
@@ -60,7 +61,7 @@ public class ArticleService {
         article.setAuthor(loggedInUser);
 
         if (cover != null) {
-            var coverUrl = storageService.store(cover);
+            var coverUrl = storageService.store(cover, "covers/");
             article.setCoverUrl(coverUrl.toString());
         }
 
@@ -71,7 +72,7 @@ public class ArticleService {
         return new ArticleDto(articleRepository.save(article));
     }
 
-    public ArticleDto updateArticle(Article newArticle, Long id) throws AccessDeniedException {
+    public ArticleDto updateArticle(UpdateArticleRequest newArticle, MultipartFile cover, Long id) throws AccessDeniedException {
         var loggedInUser = authProvider.getAuthenticatedUser();
 
         var article = articleRepository.findById(id)
@@ -79,6 +80,11 @@ public class ArticleService {
 
         if (!article.getAuthor().getId().equals(loggedInUser.getId())) {
             throw new AccessDeniedException("You cannot edit an article not created by you!");
+        }
+
+        if (cover != null) {
+            var coverUrl = storageService.store(cover, "covers/");
+            article.setCoverUrl(coverUrl.toString());
         }
 
         article.setTitle(newArticle.getTitle());

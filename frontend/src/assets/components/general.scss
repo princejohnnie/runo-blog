@@ -3,6 +3,9 @@ html {
     width: 100%;
 }
 
+* {
+    box-sizing: border-box;
+}
 
 main {
     padding-bottom: 60px;
@@ -19,7 +22,7 @@ main {
 
 
 .section__inner {
-    margin: 70px;
+   margin: 70px;
 
     @include for-tablet {
         margin: 30px;
@@ -28,4 +31,9 @@ main {
     @include for-phone {
         margin: 0 30px;
     }
+}
+
+.ql-editor {
+    min-height: 200px;
+    background: $white;
 }

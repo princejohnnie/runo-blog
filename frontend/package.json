@@ -10,12 +10,16 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "@vueform/multiselect": "^2.6.6",
+    "@vueup/vue-quill": "^1.2.0",
     "axios": "^1.6.2",
     "dayjs": "^1.11.10",
     "normalize.css": "^8.0.1",
     "pinia": "^2.1.7",
     "sweetalert2": "^11.10.1",
     "vue": "^3.3.4",
+    "vue-image-crop-upload": "^3.0.3",
+    "vue-multiselect": "^3.0.0-beta.2",
     "vue-router": "^4.2.5",
     "vue-sweetalert2": "^5.0.5"
   },

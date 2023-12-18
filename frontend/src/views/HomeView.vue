@@ -2,10 +2,10 @@
 import { ref, computed } from 'vue';
 
 import ArticlesList from '@/components/article/ArticlesList.vue';
-import ArticleEditorCard from '@/components/article/ArticleEditorCard.vue';
+import FeaturedArticle from '@/components/article/FeaturedArticle.vue';
+import ArticleCardBig from '../components/article/ArticleCardBig.vue';
 
 import Article from '@/requests/Article.js';
-import FeaturedArticle from '@/components/article/FeaturedArticle.vue';
 
 const articles = ref([])
 const loading = ref(true)
@@ -52,7 +52,7 @@ const editorArticles = computed(() => {
                 
                 <h2 class="section__heading">Editor's Pick</h2>
                 <div class="editorArticles">
-                    <ArticleEditorCard v-for="(editorArticle, index) in editorArticles" :key="index" :article="editorArticle" />
+                    <ArticleCardBig v-for="(editorArticle, index) in editorArticles" :key="index" :article="editorArticle" :showCreateIcon="false"/>
                 </div>
             </div>
         </section>

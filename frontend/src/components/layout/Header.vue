@@ -3,9 +3,11 @@ import LoginModal from "@/components/modals/LoginModal.vue";
 import RegisterModal from "@/components/modals/RegisterModal.vue";
 import { useModalStore } from '@/stores/modal'
 import { useUserStore } from '@/stores/user'
+import { useRouter } from 'vue-router';
 
 const modalStore = useModalStore();
 const userStore = useUserStore();
+const router = useRouter();
 
 
 const openLoginModal = () => {
@@ -18,6 +20,7 @@ const openRegisterModal = () => {
 
 const logoutUser = () => {
   userStore.logout()
+  router.push({name:"home"})
 }
 
 </script>
@@ -44,6 +47,11 @@ const logoutUser = () => {
           <li class="mainHeader__nav-item">
             <router-link to="/articles" class="mainHeader__nav-link">
               Articles
+            </router-link>
+          </li>
+          <li v-if="userStore.isLoggedIn" class="mainHeader__nav-item">
+            <router-link :to="{ name: 'my-profile' }" class="mainHeader__nav-link">
+              My Profile
             </router-link>
           </li>
           <li v-if="userStore.isGuest" class="mainHeader__nav-item">

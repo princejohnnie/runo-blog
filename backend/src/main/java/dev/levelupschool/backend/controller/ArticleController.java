@@ -5,6 +5,7 @@ import dev.levelupschool.backend.dtos.CommentDto;
 import dev.levelupschool.backend.dtos.UserDto;
 import dev.levelupschool.backend.exception.CustomValidationException;
 import dev.levelupschool.backend.model.Article;
+import dev.levelupschool.backend.request.UpdateArticleRequest;
 import dev.levelupschool.backend.service.ArticleService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,9 +53,12 @@ public class ArticleController {
     }
 
     @PutMapping("/articles/{id}")
-    ResponseEntity<Object> update(@RequestBody @Valid Article newArticle, @PathVariable Long id) {
+    ResponseEntity<Object> update(
+        @ModelAttribute @Valid UpdateArticleRequest newArticle,
+        @RequestParam(value = "cover", required = false) MultipartFile cover,
+        @PathVariable Long id) {
         try {
-            var article = articleService.updateArticle(newArticle, id);
+            var article = articleService.updateArticle(newArticle, cover, id);
             return new ResponseEntity<>(article, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.FORBIDDEN);

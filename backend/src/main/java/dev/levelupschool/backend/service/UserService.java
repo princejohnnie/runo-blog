@@ -85,7 +85,8 @@ public class UserService {
         var loggedInUser = authProvider.getAuthenticatedUser();
 
         var checkUser = userRepository.findByEmail(newUser.getEmail());
-        if (checkUser != null) {
+
+        if (checkUser != null && !loggedInUser.getEmail().equals(checkUser.getEmail())) {
             throw new Exception("user with email already exists");
         }
 
@@ -96,9 +97,12 @@ public class UserService {
             throw new AccessDeniedException("You cannot update another user's profile!");
         }
 
+        if (newUser.getPassword() != null && !newUser.getPassword().isBlank()) {
+            user.setPassword(newUser.getPassword());
+        }
+
         user.setEmail(newUser.getEmail() == null ? user.getEmail() : newUser.getEmail());
         user.setName(newUser.getName() == null ? user.getName() : newUser.getName());
-        user.setPassword(newUser.getPassword() == null ? user.getPassword() : newUser.getPassword());
 
         return new UserDto(userRepository.save(user));
     }

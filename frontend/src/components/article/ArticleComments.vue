@@ -8,8 +8,6 @@ import Article from '@/requests/Article.js';
 
 const userStore = useUserStore();
 
-const articleComments = ref([])
-
 const props = defineProps({
     article: {
         type: Object,
@@ -22,6 +20,14 @@ const data = ref({
     articleId: props.article.id,
 })
 
+const articleComments = ref([])
+
+const firstName = userStore.user?.name.split(" ")[0];
+const lastName = userStore.user?.name.split(" ")[1];
+
+const defaultAvatar = computed(() => {
+    return `https://eu.ui-avatars.com/api/?name=${firstName}+${lastName}&size=250`
+})
 
 Article.comments(props.article.id).then((res) => {
     articleComments.value = res.data?.items
@@ -50,7 +56,7 @@ const disableButton = computed(() => {
 
                 <div v-if="userStore.isLoggedIn" class="section__comments-edit">
                     <div class="section__author-image-container">
-                        <img class="section__author-image" src="/images/public_article_author_image1.jpeg">
+                        <img class="section__author-image" :src="userStore.user.avatarUrl || defaultAvatar">
                     </div>
                     <div class="section__comments-inputWrapper">
                         <textarea class="section__comments-input" v-model="data.content" type="text" placeholder="Write a comment..."></textarea>
