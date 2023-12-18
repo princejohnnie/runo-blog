@@ -9,11 +9,16 @@
 @import './components/article/featuredArticle';
 @import './components/article/articleItem';
 @import './components/article/articleComment';
-@import './components/article/articleEditorItem';
+@import './components/article/articleCardBig';
 
 @import './components/homepage/homeCategories';
 
 @import './views/articleDetail';
 
 @import './components/modals/modal';
+@import './components/general/headers';
+@import './components/profile/editProfile';
+@import './components/profile/myProfile';
+@import './components/profile/subscription';
 
+@import './components/imageUpload.scss';

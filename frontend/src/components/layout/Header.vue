@@ -1,12 +1,27 @@
 <script setup>
 import LoginModal from "@/components/modals/LoginModal.vue";
 import RegisterModal from "@/components/modals/RegisterModal.vue";
+import { useModalStore } from '@/stores/modal'
+import { useUserStore } from '@/stores/user'
+import { useRouter } from 'vue-router';
 
-import { ref } from 'vue';
+const modalStore = useModalStore();
+const userStore = useUserStore();
+const router = useRouter();
 
-const openLoginModal = ref(false)
-const openRegisterModal = ref(false)
 
+const openLoginModal = () => {
+  modalStore.openModal('login')
+}
+
+const openRegisterModal = () => {
+  modalStore.openModal('register')
+}
+
+const logoutUser = () => {
+  userStore.logout()
+  router.push({name:"home"})
+}
 
 </script>
 
@@ -34,20 +49,30 @@ const openRegisterModal = ref(false)
               Articles
             </router-link>
           </li>
-          <li class="mainHeader__nav-item">
-            <a href="#" @click.prevent="openLoginModal = true" class="mainHeader__nav-link">Login</a>
+          <li v-if="userStore.isLoggedIn" class="mainHeader__nav-item">
+            <router-link :to="{ name: 'my-profile' }" class="mainHeader__nav-link">
+              My Profile
+            </router-link>
           </li>
-          <li class="mainHeader__nav-item">
-            <a href="#" @click.prevent="openRegisterModal = true" class="mainHeader__nav-link">Register</a>
+          <li v-if="userStore.isGuest" class="mainHeader__nav-item">
+            <a href="#" @click.prevent="openLoginModal()" class="mainHeader__nav-link">Login</a>
+          </li>
+          <li v-if="userStore.isGuest" class="mainHeader__nav-item">
+            <a href="#" @click.prevent="openRegisterModal()" class="mainHeader__nav-link">Register</a>
+          </li>
+          <li v-if="userStore.isLoggedIn" class="mainHeader__nav-item">
+            <a href="#" @click.prevent="logoutUser()" class="mainHeader__nav-link">Logout</a>
           </li>
         </ul>
       </nav>
     </div>
+
     <Teleport to="body">
-      <LoginModal v-if="openLoginModal" @closeModal="openLoginModal = false"/>
+      <LoginModal v-if="modalStore.showLoginModal"  />
     </Teleport>
     <Teleport to="body">
-      <RegisterModal v-if="openRegisterModal" @closeModal="openRegisterModal = false"/>
+      <RegisterModal v-if="modalStore.showRegisterModal" />
     </Teleport>
+
   </header>
 </template>

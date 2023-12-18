@@ -1,6 +1,7 @@
 <script setup>
 
 import { computed } from 'vue';
+import dateFormatter from '@/utils/date.js'
 
 const props = defineProps({
     article: {
@@ -9,13 +10,21 @@ const props = defineProps({
     }
 })
 
+function removeHtmlTags(htmlString) {
+    var doc = new DOMParser().parseFromString(htmlString, 'text/html');
+    return doc.body.textContent || "";
+}
 
 const shortContent = computed(() => {
     if (props.article.content.length < 100 ) {
-        return props.article.content
+        return removeHtmlTags(props.article.content)
     } else {
-        return props.article.content.slice(0, 199) + '...'
+        return removeHtmlTags(props.article.content.slice(0, 199) + '...')
     }
+})
+
+const formattedDate = computed(() => {
+    return dateFormatter.formatDate(props.article.updatedAt)
 })
 
 </script>
@@ -23,7 +32,11 @@ const shortContent = computed(() => {
 
 <template>
 
-    <div class="mainArticle">
+    <div class="mainArticle" 
+    :style="{
+        background: article.coverUrl ? 
+        `url(${article.coverUrl}) no-repeat center / cover` : 
+        'url(/images/article_detail_bg.jpg) no-repeat center / cover'}">
         <div class="mainArticle__inner">
 
             <ul class="mainArticle__categories">
@@ -38,7 +51,7 @@ const shortContent = computed(() => {
                 {{ article.title }}
             </h2>
             <p class="mainArticle__content">
-                <time class="mainArticle__time">08.08.2021</time>
+                <time class="mainArticle__time">{{ formattedDate }}</time>
                 <span class="mainArticle__divider"></span>
                 <span class="mainArticle__text">
                     {{ shortContent }}

@@ -1,7 +1,6 @@
 <script setup>
 import { ref, computed } from 'vue';
 
-import ArticleMain from '@/components/article/ArticleMain.vue';
 import ArticlesList from '@/components/article/ArticlesList.vue';
 
 import Article from '@/requests/Article.js';
@@ -10,7 +9,7 @@ import FeaturedArticle from '@/components/article/FeaturedArticle.vue';
 const articles = ref([])
 
 Article.index().then((res) => {
-    articles.value = res.data;
+    articles.value = res.data?._embedded?.items;
 })
 
 const latestArticle = computed(() => {

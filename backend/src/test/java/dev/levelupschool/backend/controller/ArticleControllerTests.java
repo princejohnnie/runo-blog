@@ -1,6 +1,7 @@
 package dev.levelupschool.backend.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import dev.levelupschool.backend.auth.AuthenticationProvider;
 import dev.levelupschool.backend.model.Article;
 import dev.levelupschool.backend.model.Comment;
 import dev.levelupschool.backend.model.User;
@@ -8,23 +9,30 @@ import dev.levelupschool.backend.repository.ArticleRepository;
 import dev.levelupschool.backend.repository.CommentRepository;
 import dev.levelupschool.backend.repository.UserRepository;
 import dev.levelupschool.backend.request.UpdateArticleRequest;
+import dev.levelupschool.backend.service.ArticleService;
+import dev.levelupschool.backend.service.UserService;
+import dev.levelupschool.backend.storage.StorageService;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.nio.file.Path;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -49,63 +57,46 @@ public class ArticleControllerTests {
     @Autowired
     private MockMvc mockMvc;
 
-    private String firstUserToken;
-    private String differentUserToken;
+    @MockBean
+    private AuthenticationProvider authenticationProvider;
+
+    @MockBean
+    private SecurityFilterChain securityFilterChain;
+
+    @Autowired
+    private UserService userService;
+
+    @Qualifier("fileSystemStorageService")
+    @MockBean
+    private StorageService storageService;
+
+    @Autowired
+    private ArticleService articleService;
+
 
     @Test
     void  contextLoads() {
 
     }
 
-    @BeforeEach
-    public void setup() throws Exception {
-        registerUser();
-    }
-
-
-    private void registerUser() throws Exception {
-        var firstUser = new User("john@gmail.com", "John Uzodinma", "slug", "password");
-
-        var payload = objectMapper.writeValueAsString(firstUser);
-
-        MvcResult result = mockMvc.perform(
-            post(("/register"))
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(payload)).andDo(print()).andReturn();
-
-        firstUserToken = "Bearer " + result.getResponse().getContentAsString();
-    }
-
-    private void registerDifferentUser() throws Exception {
-        User secondUser = new User("luka@gmail.com", "Luka Papez", "slug", "password");
-
-        var payload = objectMapper.writeValueAsString(secondUser);
-
-        MvcResult result = mockMvc.perform(
-            post(("/register"))
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(payload)).andDo(print()).andReturn();
-
-        differentUserToken = "Bearer " + result.getResponse().getContentAsString();
-    }
 
     @Test
     public void givenArticle_whenGetArticles_thenReturnJsonArray() throws Exception {
-        var user = userRepository.findAll().get(0);
+        var user = userRepository.save(new User("johndoe@gmail.com", "John Uzodinma", "slug", "password2"));
 
         articleRepository.save(new Article( "LevelUp Article", "Luka is a great tutor", user));
 
         mockMvc.perform(
                 get("/articles")
             ).andExpect(status().isOk())
-            .andExpect(jsonPath("$", hasSize(1)))
-            .andExpect(jsonPath("$[0].title", is("LevelUp Article")))
-            .andExpect(jsonPath("$[0].content", is("Luka is a great tutor")));
+            .andExpect(jsonPath("$._embedded.items", hasSize(1)))
+            .andExpect(jsonPath("$._embedded.items[0].title", is("LevelUp Article")))
+            .andExpect(jsonPath("$._embedded.items[0].content", is("Luka is a great tutor")));
     }
 
     @Test
     public void givenArticle_whenGetArticle_thenReturnJson() throws Exception {
-        User user = userRepository.findAll().get(0);
+        var user = userRepository.save(new User("johndoe@gmail.com", "John Uzodinma", "slug", "password2"));
 
         var article = articleRepository.save(new Article("LevelUp Article", "Luka is a great tutor", user));
 
@@ -119,7 +110,7 @@ public class ArticleControllerTests {
 
     @Test
     public void givenArticle_whenGetArticle_thenReturnAuthorJson() throws Exception {
-        User user = userRepository.findAll().get(0);
+        var user = userRepository.save(new User("johndoe@gmail.com", "John Uzodinma", "slug", "password2"));
 
         var article = articleRepository.save(new Article( "LevelUp Article", "Luka is a great tutor", user));
 
@@ -131,7 +122,7 @@ public class ArticleControllerTests {
 
     @Test
     public void givenArticle_whenGetArticle_thenReturnCommentsArray() throws Exception {
-        User user = userRepository.findAll().get(0);
+        var user = userRepository.save(new User("johndoe@gmail.com", "John Uzodinma", "slug", "password2"));
 
         var article = articleRepository.save(new Article( "LevelUp Article", "Luka is a great tutor", user));
 
@@ -146,39 +137,52 @@ public class ArticleControllerTests {
 
     @Test
     public void givenUser_whenPostArticle_thenStoreArticle() throws Exception {
-        var user = userRepository.findAll().get(0); // Get saved User by registerFirstUser()
+        var user = userService.createUser(new User("johnndoe@gmail.com", "John Uzodinma", "slug", "password2"));
+        Mockito.when(authenticationProvider.getAuthenticatedUser()).thenReturn(user);
 
         var createArticleRequest = new Article("LevelUp Article", "Luka is a great tutor", user);
 
-        var payload = objectMapper.writeValueAsString(createArticleRequest);
-
         mockMvc.perform(
                 post("/articles")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .header("Authorization", firstUserToken)
-                    .content(payload)
+                    .param("title", createArticleRequest.getTitle())
+                    .param("content", createArticleRequest.getContent())
             ).andExpect(status().isOk());
 
         Assertions.assertEquals(1, articleRepository.count()); // Confirm that article was actually stored in the DB
     }
 
     @Test
-    public void givenOwnerUser_whenPutArticle_thenUpdateArticle() throws Exception {
-        var user = userRepository.findAll().get(0); // Get saved User
+    public void givenUser_whenPostArticleWithCoverPhoto_thenStoreCoverPhoto() throws Exception {
+        var user = userService.createUser(new User("johnndoe@gmail.com", "John Uzodinma", "slug", "password2"));
+
+        Mockito.when(authenticationProvider.getAuthenticatedUser()).thenReturn(user);
+        Mockito.when(storageService.store(Mockito.any(MultipartFile.class))).thenReturn(Path.of("/mocked-storage-path"));
 
         var createArticleRequest = new Article("LevelUp Article", "Luka is a great tutor", user);
-        var articlePayload = objectMapper.writeValueAsString(createArticleRequest);
 
-        // Create article by first user
+        MockMultipartFile coverPhoto = new MockMultipartFile(
+            "cover", "photo.jpg", MediaType.IMAGE_JPEG_VALUE, "test_photo".getBytes());
+
         mockMvc.perform(
-            post("/articles")
-                .contentType(MediaType.APPLICATION_JSON)
-                .header("Authorization", firstUserToken)
-                .content(articlePayload)
-        ).andExpect(status().isOk());
+            multipart("/articles")
+                .file(coverPhoto)
+                .param("title", createArticleRequest.getTitle())
+                .param("content", createArticleRequest.getContent())
+        ).andExpect(status().isOk())
+            .andExpect(jsonPath("$.coverUrl", is("/mocked-storage-path")));
 
-        // Get created article
-        Article article = articleRepository.findAll().get(0);
+        var savedArticle = articleRepository.findAll().get(0);
+
+        Assertions.assertNotNull(savedArticle.getCoverUrl());// Confirm that article cover was saved to model
+        Assertions.assertEquals(savedArticle.getCoverUrl(), "/mocked-storage-path"); // Confirm that article cover was saved to db
+    }
+
+    @Test
+    public void givenOwnerUser_whenPutArticle_thenUpdateArticle() throws Exception {
+        var user = userService.createUser(new User("johnndoe@gmail.com", "John Uzodinma", "slug", "password2"));
+        Mockito.when(authenticationProvider.getAuthenticatedUser()).thenReturn(user);
+
+        var article = articleRepository.save(new Article("LevelUp Article", "Luka is a great tutor", user));
 
         var updateArticleRequest = new UpdateArticleRequest("LevelUp Article updated", "Luka is a great tutor. A fact which cannot be debated");
         var updateArticlePayload = objectMapper.writeValueAsString(updateArticleRequest);
@@ -187,7 +191,6 @@ public class ArticleControllerTests {
         mockMvc.perform(
                 put("/articles/{id}", article.getId())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .header("Authorization", firstUserToken)
                     .content(updateArticlePayload)
             ).andExpect(status().isOk())
             .andExpect(jsonPath("$.title", is("LevelUp Article updated")))
@@ -199,32 +202,16 @@ public class ArticleControllerTests {
 
     @Test
     public void giveDifferentUser_whenPutArticle_thenReturnUnauthorized() throws Exception {
-        registerDifferentUser();
+        var user = userService.createUser(new User("johnndoe@gmail.com", "John Uzodinma", "slug", "password2"));
 
-        var user = userRepository.findAll().get(0); // Get registered User
-
-        var createArticleRequest = new Article("LevelUp Article", "Luka is a great tutor", user);
-        var createArticlePayload = objectMapper.writeValueAsString(createArticleRequest);
-
-        // Create article by first user
-        mockMvc.perform(
-            post("/articles")
-                .contentType(MediaType.APPLICATION_JSON)
-                .header("Authorization", firstUserToken)
-                .content(createArticlePayload)
-        ).andExpect(status().isOk());
-
-        // Get created article
-        Article article = articleRepository.findAll().get(0);
+        var article = articleRepository.save(new Article("LevelUp Article", "Luka is a great tutor", user));
 
         var updateArticleRequest = new UpdateArticleRequest("LevelUp Article updated", "Luka is a great tutor. A fact which cannot be debated");
         var updateArticlePayload = objectMapper.writeValueAsString(updateArticleRequest);
 
-        // Try to update the article by a different User
         mockMvc.perform(
                 put("/articles/{id}", article.getId())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .header("Authorization", differentUserToken) // NOTE: A different (second) User is trying to Update Article
                     .content(updateArticlePayload)
             ).andExpect(status().isForbidden());
 
@@ -234,82 +221,88 @@ public class ArticleControllerTests {
 
     @Test
     public void givenOwnerUser_whenDeleteArticle_thenDeleteArticle() throws Exception {
-        var user = userRepository.findAll().get(0); // Get saved User by registerFirstUser()
+        var user = userService.createUser(new User("johnndoe@gmail.com", "John Uzodinma", "slug", "password2"));
+        Mockito.when(authenticationProvider.getAuthenticatedUser()).thenReturn(user);
 
-        var createArticleRequest = new Article("LevelUp Article", "Luka is a great tutor", user);
-        var articlePayload = objectMapper.writeValueAsString(createArticleRequest);
+        var article = articleRepository.save(new Article("LevelUp Article", "Luka is a great tutor", user));
 
-        // Create Article
-        mockMvc.perform(
-            post("/articles")
-                .contentType(MediaType.APPLICATION_JSON)
-                .header("Authorization", firstUserToken)
-                .content(articlePayload)
-        ).andExpect(status().isOk());
-
-        // Get created article
-        Article article = articleRepository.findAll().get(0);
-
-        // Delete article by user
         mockMvc.perform(
             delete("/articles/{id}", article.getId())
-                .header("Authorization", firstUserToken)
         ).andExpect(status().isOk());
 
-        Assertions.assertEquals(0, articleRepository.count()); // Confirm that article was actually deleted
+        Assertions.assertEquals(0, articleRepository.count(), "Count is 0 because article was actually deleted from DB");
     }
 
     @Test
     public void givenAnotherUser_whenDeleteArticle_thenReturnUnauthorized() throws Exception {
-        var user = userRepository.findAll().get(0); // Get created User by registerUser()
+        var user = userService.createUser(new User("johnndoe@gmail.com", "John Uzodinma", "slug", "password2"));
 
-        registerDifferentUser(); // Create a different User
+        var article = articleRepository.save(new Article("LevelUp Article", "Luka is a great tutor", user));
 
-        var createArticleRequest = new Article("LevelUp Article", "Luka is a great tutor", user);
-        var articlePayload = objectMapper.writeValueAsString(createArticleRequest);
-
-        // Create Article by first User
-        mockMvc.perform(
-            post("/articles")
-                .contentType(MediaType.APPLICATION_JSON)
-                .header("Authorization", firstUserToken)
-                .content(articlePayload)
-        ).andExpect(status().isOk());
-
-        // Get created article
-        Article article = articleRepository.findAll().get(0);
-
-        // Try to delete the article by a different User
         mockMvc.perform(
             delete("/articles/{id}", article.getId())
-                .header("Authorization", differentUserToken) // NOTE: A different User is trying to delete Article
         ).andExpect(status().isForbidden());
 
-        Assertions.assertEquals(1, articleRepository.count()); // Confirm that the Article was not deleted from the DB
+        Assertions.assertEquals(1, articleRepository.count(), "Count is 1 because the Article should not be deleted by unauthenticated user");
     }
 
     @Test
     public void givenUser_whenDeleteUser_thenDeleteUserArticles() throws Exception {
-        var user = userRepository.findAll().get(0);
+        var user = userService.createUser(new User("johnndoe@gmail.com", "John Uzodinma", "slug", "password2"));
+        Mockito.when(authenticationProvider.getAuthenticatedUser()).thenReturn(user);
 
-        var createArticleRequest = new Article("LevelUp Article", "Luka is a great tutor", user);
-        var articlePayload = objectMapper.writeValueAsString(createArticleRequest);
-
-        mockMvc.perform(
-            post("/articles")
-                .contentType(MediaType.APPLICATION_JSON)
-                .header("Authorization", firstUserToken)
-                .content(articlePayload)
-        ).andExpect(status().isOk());
-
-        Assertions.assertEquals(1, articleRepository.count()); // Confirm article was created
+        articleRepository.save(new Article("LevelUp Article", "Luka is a great tutor", user));
 
         mockMvc.perform(
             delete("/users/{id}", user.getId())
-                .header("Authorization", firstUserToken)
         ).andExpect(status().isOk());
 
-        Assertions.assertEquals(0, articleRepository.count()); // Confirm that user's articles were actually deleted from the DB
+        Assertions.assertEquals(0, articleRepository.count(), "Count is 0 because user's articles were actually deleted from the DB");
+    }
+
+    @Test
+    public void givenArticle_whenGetComments_thenReturnArticleCommentsArray() throws Exception {
+        var user = userRepository.save(new User("john@gmail.com", "John Uzodinma", "Software Developer", "password"));
+
+        var article = articleRepository.save(new Article("Test Article", "Test Article content", user));
+
+        commentRepository.save(new Comment("Test content", user, article));
+
+        mockMvc.perform(
+                get("/articles/{id}/comments", article.getId())
+                    .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.items", hasSize(1)));
+    }
+
+    @Test
+    public void givenArticle_whenBookmarkArticle_thenSaveBookmark() throws Exception {
+        var user = userService.createUser(new User("johnndoe@gmail.com", "John Uzodinma", "slug", "password2"));
+        Mockito.when(authenticationProvider.getAuthenticatedUser()).thenReturn(user);
+
+        var article = articleRepository.save(new Article("Test title", "Test content", user));
+
+        mockMvc.perform(
+            post("/articles/{id}/bookmark", article.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(status().isOk());
+
+        Assertions.assertEquals(1, user.getBookmarks().size());
+    }
+
+    @Test
+    public void givenArticle_whenGetBookmarkers_thenReturnBookmarkersArray() throws Exception {
+        var user = userService.createUser(new User("johnndoe@gmail.com", "John Uzodinma", "slug", "password2"));
+        Mockito.when(authenticationProvider.getAuthenticatedUser()).thenReturn(user);
+
+        var article = articleRepository.save(new Article("Test title", "Test content", user));
+        articleService.bookmark(article.getId());
+
+        mockMvc.perform(
+            get("/articles/{id}/bookmarkers", article.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(status().isOk())
+            .andExpect(jsonPath("$", hasSize(1)));
     }
 
 }

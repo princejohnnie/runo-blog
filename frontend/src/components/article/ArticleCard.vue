@@ -1,5 +1,6 @@
 <script setup>
-import { defineProps, computed } from 'vue';
+import { ref, defineProps, computed } from 'vue';
+import dateFormatter from '@/utils/date.js'
 
 const props = defineProps({
     article: {
@@ -8,12 +9,30 @@ const props = defineProps({
     }
 })
 
+const defaultCover = ref('https://picsum.photos/400/400')
+
+const firstName = props.article.author?.name.split(" ")[0];
+const lastName = props.article.author?.name.split(" ")[1];
+
+const defaultAvatar = computed(() => {
+    return `https://eu.ui-avatars.com/api/?name=${firstName}+${lastName}&size=250`
+})
+
+function removeHtmlTags(htmlString) {
+    var doc = new DOMParser().parseFromString(htmlString, 'text/html');
+    return doc.body.textContent || "";
+}
+
 const shortContent = computed(() => {
     if (props.article.content.length < 200) {
-        return props.article.content;
+        return removeHtmlTags(props.article.content);
     } else {
-        return props.article.content.slice(0, 200) + "...";
+        return removeHtmlTags(props.article.content.slice(0, 200) + "...");
     }
+})
+
+const formattedDate = computed(() => {
+    return dateFormatter.formatDate(props.article.updatedAt)
 })
 
 
@@ -23,7 +42,7 @@ const shortContent = computed(() => {
     <div class="article">
         <div class="article__image-container">
             <router-link :to="`/articles/${article.id}`">
-                <img class="article__image" src="/images/public_article_image1.jpeg">
+                <img class="article__image" :src="article.coverUrl || defaultCover">
                 <div class="article__categories">
                     <span class="article__category">FASHION</span>
                 </div>
@@ -31,7 +50,7 @@ const shortContent = computed(() => {
         </div>
         <div class="article__content">
             <div class="article__content-inner">
-                <time class="article__time">08.02.2021</time>
+                <time class="article__time">{{ formattedDate }}</time>
                 <img class="article__premium-icon" src="/images/premium_icon2.png" v-if="article.isPremium">
             </div>
             <h3 class="article__heading">
@@ -44,7 +63,7 @@ const shortContent = computed(() => {
             </p>
             <p class="article__content-divider"></p>
             <div class="article__content-author-container">
-                <img class="article__content-author-image" src="/images/public_article_author_image1.jpeg">
+                <img class="article__content-author-image" :src="article.author.avatarUrl || defaultAvatar">
                 <div>
                     <h4 class="article__content-author-name"> By {{ article.author.name }}</h4>
                     <p class="article__content-author-title">Software Developer</p>
