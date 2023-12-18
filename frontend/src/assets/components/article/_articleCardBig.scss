@@ -13,8 +13,6 @@
 }
 
 .editorArticle {
-    display: flex;
-    align-items: end;
     position: relative;
 }
 
@@ -23,6 +21,7 @@
     height: 350px;
     border-radius: 5px;
     object-fit: cover;
+    cursor: pointer;
 }
 
 .editorArticle__category {
@@ -42,9 +41,17 @@
     line-height: normal;
 }
 
+.editorArticle__edit-icon {
+    position: absolute;
+    top: 20px;
+    left: 40px;
+    cursor: pointer;
+}
+
 .editorArticle__inner {
     @include flex-column;
     position: absolute;
+    bottom: 0;
     padding: 40px;
     left: 0;
     right: 0;

@@ -1,0 +1,58 @@
+.imageupload {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 10px;
+    position: relative;
+}
+
+.imageupload__inner {
+    border: 1px solid $headingColor;
+    background-color: $white;
+    height: 350px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.imageupload__icon {
+    display: flex;
+    width: auto;
+    height: 150px;
+    color: $brandColor;
+    cursor: pointer;
+}
+
+.imageupload__text {
+    font-family: $primaryFontFamily;
+    font-size: 1rem;
+    font-weight: $baseFontWeight;
+    color: $headingColor;
+}
+
+.imageupload__text {
+    font-family: $primaryFontFamily;
+    font-size: 1rem;
+    color: $paragraphColor;
+    margin-top: 5px;
+}
+
+.imageupload__cancel {
+    position: absolute;
+    top: -10px;
+    right: -5px;
+    color: $brandColor;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+
+    &:hover {
+        transform: rotate(180deg);
+    }
+}
+
+.imageupload__preview {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}

@@ -45,7 +45,7 @@ public class SeedArticles {
 
                     String articleContent = faker.lorem().paragraph(50);
 
-                    var user = userRepository.save(new User(name));
+                    var user = userRepository.save(new User("john@gmail.com", name, "slug", "password"));
 
                     var article = articleRepository.save(new Article(articleTitle, articleContent, user));
 

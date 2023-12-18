@@ -1,23 +1,34 @@
 package dev.levelupschool.backend.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import dev.levelupschool.backend.auth.AuthenticationProvider;
 import dev.levelupschool.backend.model.Article;
+import dev.levelupschool.backend.model.Comment;
 import dev.levelupschool.backend.model.User;
 import dev.levelupschool.backend.repository.ArticleRepository;
-import dev.levelupschool.backend.request.CreateArticleRequest;
-import dev.levelupschool.backend.request.CreateCommentRequest;
+import dev.levelupschool.backend.repository.CommentRepository;
+import dev.levelupschool.backend.repository.UserRepository;
+import dev.levelupschool.backend.request.UpdateArticleRequest;
 import dev.levelupschool.backend.service.ArticleService;
-import dev.levelupschool.backend.service.CommentService;
 import dev.levelupschool.backend.service.UserService;
+import dev.levelupschool.backend.storage.StorageService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.nio.file.Path;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
@@ -32,47 +43,62 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class ArticleControllerTests {
 
     @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private UserService userService;
+    private UserRepository userRepository;
 
     @Autowired
     private ArticleRepository articleRepository;
 
     @Autowired
-    private ArticleService articleService;
-
-    @Autowired
-    private CommentService commentService;
+    private CommentRepository commentRepository;
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @MockBean
+    private AuthenticationProvider authenticationProvider;
+
+    @MockBean
+    private SecurityFilterChain securityFilterChain;
+
+    @Autowired
+    private UserService userService;
+
+    @Qualifier("fileSystemStorageService")
+    @MockBean
+    private StorageService storageService;
+
+    @Autowired
+    private ArticleService articleService;
+
 
     @Test
     void  contextLoads() {
 
     }
 
+
     @Test
     public void givenArticle_whenGetArticles_thenReturnJsonArray() throws Exception {
-        var user = userService.createUser(new User("John Uzodinma"));
+        var user = userRepository.save(new User("johndoe@gmail.com", "John Uzodinma", "slug", "password2"));
 
-        articleService.createArticle(new CreateArticleRequest(user.getId(), "LevelUp Article", "Luka is a great tutor"));
+        articleRepository.save(new Article( "LevelUp Article", "Luka is a great tutor", user));
 
         mockMvc.perform(
                 get("/articles")
             ).andExpect(status().isOk())
-            .andExpect(jsonPath("$", hasSize(1)))
-            .andExpect(jsonPath("$[0].title", is("LevelUp Article")))
-            .andExpect(jsonPath("$[0].content", is("Luka is a great tutor")));
+            .andExpect(jsonPath("$._embedded.items", hasSize(1)))
+            .andExpect(jsonPath("$._embedded.items[0].title", is("LevelUp Article")))
+            .andExpect(jsonPath("$._embedded.items[0].content", is("Luka is a great tutor")));
     }
 
     @Test
     public void givenArticle_whenGetArticle_thenReturnJson() throws Exception {
-        var user = userService.createUser(new User("John Uzodinma"));
+        var user = userRepository.save(new User("johndoe@gmail.com", "John Uzodinma", "slug", "password2"));
 
-        var article = articleService.createArticle(new CreateArticleRequest(user.getId(), "LevelUp Article", "Luka is a great tutor"));
+        var article = articleRepository.save(new Article("LevelUp Article", "Luka is a great tutor", user));
 
         mockMvc.perform(
                 get("/articles/{id}", article.getId())
@@ -84,9 +110,9 @@ public class ArticleControllerTests {
 
     @Test
     public void givenArticle_whenGetArticle_thenReturnAuthorJson() throws Exception {
-        var user = userService.createUser(new User("John Uzodinma"));
+        var user = userRepository.save(new User("johndoe@gmail.com", "John Uzodinma", "slug", "password2"));
 
-        var article = articleService.createArticle(new CreateArticleRequest(user.getId(), "LevelUp Article", "Luka is a great tutor"));
+        var article = articleRepository.save(new Article( "LevelUp Article", "Luka is a great tutor", user));
 
         mockMvc.perform(
                 get("/articles/{id}", article.getId())
@@ -96,51 +122,76 @@ public class ArticleControllerTests {
 
     @Test
     public void givenArticle_whenGetArticle_thenReturnCommentsArray() throws Exception {
-        var user = userService.createUser(new User("John Uzodinma"));
+        var user = userRepository.save(new User("johndoe@gmail.com", "John Uzodinma", "slug", "password2"));
 
-        var article = articleService.createArticle(new CreateArticleRequest(user.getId(), "LevelUp Article", "Luka is a great tutor"));
+        var article = articleRepository.save(new Article( "LevelUp Article", "Luka is a great tutor", user));
 
-        commentService.createComment(new CreateCommentRequest(user.getId(), article.getId(), "This is my first comment"));
+        commentRepository.save(new Comment("This is my first comment", user, article));
 
         mockMvc.perform(
                 get("/articles/{id}", article.getId())
             ).andExpect(status().isOk())
             .andExpect(jsonPath("$.comments", hasSize(1)))
             .andExpect(jsonPath("$.comments[0].content", is("This is my first comment")));
-
     }
 
     @Test
     public void givenUser_whenPostArticle_thenStoreArticle() throws Exception {
-        var user = userService.createUser(new User("John Uzodinma"));
+        var user = userService.createUser(new User("johnndoe@gmail.com", "John Uzodinma", "slug", "password2"));
+        Mockito.when(authenticationProvider.getAuthenticatedUser()).thenReturn(user);
 
-        var createArticleRequest = new CreateArticleRequest(user.getId(),"LevelUp Article", "Luka is a great tutor");
-
-        var payload = objectMapper.writeValueAsString(createArticleRequest);
+        var createArticleRequest = new Article("LevelUp Article", "Luka is a great tutor", user);
 
         mockMvc.perform(
                 post("/articles")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(payload)
+                    .param("title", createArticleRequest.getTitle())
+                    .param("content", createArticleRequest.getContent())
             ).andExpect(status().isOk());
 
         Assertions.assertEquals(1, articleRepository.count()); // Confirm that article was actually stored in the DB
     }
 
     @Test
-    public void givenArticle_whenPutArticle_thenUpdateArticle() throws Exception {
-        var user = userService.createUser(new User("John Uzodinma"));
+    public void givenUser_whenPostArticleWithCoverPhoto_thenStoreCoverPhoto() throws Exception {
+        var user = userService.createUser(new User("johnndoe@gmail.com", "John Uzodinma", "slug", "password2"));
 
-        var article = articleService.createArticle(new CreateArticleRequest(user.getId(),"LevelUp Article", "Luka is a great tutor"));
+        Mockito.when(authenticationProvider.getAuthenticatedUser()).thenReturn(user);
+        Mockito.when(storageService.store(Mockito.any(MultipartFile.class))).thenReturn(Path.of("/mocked-storage-path"));
 
-        var updateArticleRequest = new Article("LevelUp Article updated", "Luka is a great tutor. A fact which cannot be debated", user);
+        var createArticleRequest = new Article("LevelUp Article", "Luka is a great tutor", user);
 
-        var payload = objectMapper.writeValueAsString(updateArticleRequest);
+        MockMultipartFile coverPhoto = new MockMultipartFile(
+            "cover", "photo.jpg", MediaType.IMAGE_JPEG_VALUE, "test_photo".getBytes());
 
+        mockMvc.perform(
+            multipart("/articles")
+                .file(coverPhoto)
+                .param("title", createArticleRequest.getTitle())
+                .param("content", createArticleRequest.getContent())
+        ).andExpect(status().isOk())
+            .andExpect(jsonPath("$.coverUrl", is("/mocked-storage-path")));
+
+        var savedArticle = articleRepository.findAll().get(0);
+
+        Assertions.assertNotNull(savedArticle.getCoverUrl());// Confirm that article cover was saved to model
+        Assertions.assertEquals(savedArticle.getCoverUrl(), "/mocked-storage-path"); // Confirm that article cover was saved to db
+    }
+
+    @Test
+    public void givenOwnerUser_whenPutArticle_thenUpdateArticle() throws Exception {
+        var user = userService.createUser(new User("johnndoe@gmail.com", "John Uzodinma", "slug", "password2"));
+        Mockito.when(authenticationProvider.getAuthenticatedUser()).thenReturn(user);
+
+        var article = articleRepository.save(new Article("LevelUp Article", "Luka is a great tutor", user));
+
+        var updateArticleRequest = new UpdateArticleRequest("LevelUp Article updated", "Luka is a great tutor. A fact which cannot be debated");
+        var updateArticlePayload = objectMapper.writeValueAsString(updateArticleRequest);
+
+        // Update created article by first user
         mockMvc.perform(
                 put("/articles/{id}", article.getId())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(payload)
+                    .content(updateArticlePayload)
             ).andExpect(status().isOk())
             .andExpect(jsonPath("$.title", is("LevelUp Article updated")))
             .andExpect(jsonPath("$.content", is("Luka is a great tutor. A fact which cannot be debated")));
@@ -150,29 +201,108 @@ public class ArticleControllerTests {
     }
 
     @Test
-    public void givenArticle_whenDeleteArticle_thenDeleteArticle() throws Exception {
-        var user = userService.createUser(new User("John Uzodinma"));
+    public void giveDifferentUser_whenPutArticle_thenReturnUnauthorized() throws Exception {
+        var user = userService.createUser(new User("johnndoe@gmail.com", "John Uzodinma", "slug", "password2"));
 
-        var article = articleService.createArticle(new CreateArticleRequest(user.getId(),"LevelUp Article", "Luka is a great tutor"));
+        var article = articleRepository.save(new Article("LevelUp Article", "Luka is a great tutor", user));
+
+        var updateArticleRequest = new UpdateArticleRequest("LevelUp Article updated", "Luka is a great tutor. A fact which cannot be debated");
+        var updateArticlePayload = objectMapper.writeValueAsString(updateArticleRequest);
+
+        mockMvc.perform(
+                put("/articles/{id}", article.getId())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(updateArticlePayload)
+            ).andExpect(status().isForbidden());
+
+        Assertions.assertEquals("LevelUp Article", articleRepository.findById(article.getId()).get().getTitle()); // Confirm that article was not updated in the DB
+        Assertions.assertEquals("Luka is a great tutor", articleRepository.findById(article.getId()).get().getContent());
+    }
+
+    @Test
+    public void givenOwnerUser_whenDeleteArticle_thenDeleteArticle() throws Exception {
+        var user = userService.createUser(new User("johnndoe@gmail.com", "John Uzodinma", "slug", "password2"));
+        Mockito.when(authenticationProvider.getAuthenticatedUser()).thenReturn(user);
+
+        var article = articleRepository.save(new Article("LevelUp Article", "Luka is a great tutor", user));
 
         mockMvc.perform(
             delete("/articles/{id}", article.getId())
         ).andExpect(status().isOk());
 
-        Assertions.assertEquals(0, articleRepository.count());
+        Assertions.assertEquals(0, articleRepository.count(), "Count is 0 because article was actually deleted from DB");
+    }
+
+    @Test
+    public void givenAnotherUser_whenDeleteArticle_thenReturnUnauthorized() throws Exception {
+        var user = userService.createUser(new User("johnndoe@gmail.com", "John Uzodinma", "slug", "password2"));
+
+        var article = articleRepository.save(new Article("LevelUp Article", "Luka is a great tutor", user));
+
+        mockMvc.perform(
+            delete("/articles/{id}", article.getId())
+        ).andExpect(status().isForbidden());
+
+        Assertions.assertEquals(1, articleRepository.count(), "Count is 1 because the Article should not be deleted by unauthenticated user");
     }
 
     @Test
     public void givenUser_whenDeleteUser_thenDeleteUserArticles() throws Exception {
-        var user = userService.createUser(new User("John Uzodinma"));
+        var user = userService.createUser(new User("johnndoe@gmail.com", "John Uzodinma", "slug", "password2"));
+        Mockito.when(authenticationProvider.getAuthenticatedUser()).thenReturn(user);
 
-        articleService.createArticle(new CreateArticleRequest(user.getId(),"LevelUp Article", "Luka is a great tutor"));
+        articleRepository.save(new Article("LevelUp Article", "Luka is a great tutor", user));
 
         mockMvc.perform(
             delete("/users/{id}", user.getId())
         ).andExpect(status().isOk());
 
-        Assertions.assertEquals(0, articleRepository.count()); // Confirm that user's articles were actually deleted from the DB
+        Assertions.assertEquals(0, articleRepository.count(), "Count is 0 because user's articles were actually deleted from the DB");
+    }
+
+    @Test
+    public void givenArticle_whenGetComments_thenReturnArticleCommentsArray() throws Exception {
+        var user = userRepository.save(new User("john@gmail.com", "John Uzodinma", "Software Developer", "password"));
+
+        var article = articleRepository.save(new Article("Test Article", "Test Article content", user));
+
+        commentRepository.save(new Comment("Test content", user, article));
+
+        mockMvc.perform(
+                get("/articles/{id}/comments", article.getId())
+                    .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.items", hasSize(1)));
+    }
+
+    @Test
+    public void givenArticle_whenBookmarkArticle_thenSaveBookmark() throws Exception {
+        var user = userService.createUser(new User("johnndoe@gmail.com", "John Uzodinma", "slug", "password2"));
+        Mockito.when(authenticationProvider.getAuthenticatedUser()).thenReturn(user);
+
+        var article = articleRepository.save(new Article("Test title", "Test content", user));
+
+        mockMvc.perform(
+            post("/articles/{id}/bookmark", article.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(status().isOk());
+
+        Assertions.assertEquals(1, user.getBookmarks().size());
+    }
+
+    @Test
+    public void givenArticle_whenGetBookmarkers_thenReturnBookmarkersArray() throws Exception {
+        var user = userService.createUser(new User("johnndoe@gmail.com", "John Uzodinma", "slug", "password2"));
+        Mockito.when(authenticationProvider.getAuthenticatedUser()).thenReturn(user);
+
+        var article = articleRepository.save(new Article("Test title", "Test content", user));
+        articleService.bookmark(article.getId());
+
+        mockMvc.perform(
+            get("/articles/{id}/bookmarkers", article.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(status().isOk())
+            .andExpect(jsonPath("$", hasSize(1)));
     }
 
 }

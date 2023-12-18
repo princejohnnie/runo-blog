@@ -8,4 +8,17 @@ function register(data) {
     return Http.post(`/register`, data)
 }
 
-export default { login, register};
+function me() {
+    return Http.get(`/me`)
+}
+
+function editProfile(id, data) {
+    return Http.put(`/users/${id}`, data)
+}
+
+export default { 
+    login,
+    register,
+    me,
+    editProfile,
+};

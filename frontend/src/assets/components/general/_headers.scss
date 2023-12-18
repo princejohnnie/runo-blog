@@ -1,0 +1,91 @@
+.generalHeader {
+    background: #3E3E3E;
+    color: $white;
+    padding-top: 130px;
+    padding-bottom: 40px;
+}
+
+.profileHeader {
+    @extend .generalHeader;
+    
+}
+
+.profileHeader__inner  {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+
+    @include for-tablet {
+        margin: 30px;
+    }
+
+    @include for-phone {
+        margin: 0 30px;
+    }
+}
+
+.profileHeader__image {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    margin-bottom: 10px;
+    pointer-events: none;
+}
+
+.profileHeader__image--edit {
+    cursor: pointer;
+    pointer-events: auto;
+}
+
+.profileHeader__name {
+    color: $white;
+    text-align: center;
+    font-family: $primaryFontFamily;
+    font-size: 36px;
+    font-weight: $baseFontWeight;
+    margin: 25px 0;
+}
+
+.editArticleHeader__title {
+    color: $white;
+    text-align: center;
+    font-family: $primaryFontFamily;
+    font-size: 2.25rem;
+    font-weight: $baseFontWeight;
+    margin: 25px 0;
+}
+
+.profileHeader__email {
+    color: $white;
+    text-align: center;
+    font-family: $primaryFontFamily;
+    font-size: 0.75rem;
+    font-weight: $baseFontWeight;
+}
+
+.profileHeader__actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin-top: 35px;
+
+    &::before {
+        content: ' ';
+        display: block;
+        width: 31px;
+        height: 2px;
+        background: $brandColor;
+        margin-bottom: 30px;
+    }
+}
+
+.profileHeader__action {
+    color: $brandColor;
+    text-align: center;
+    font-family: $primaryFontFamily;
+    font-size: 0.75rem;
+    font-weight: $baseFontWeight;
+    text-decoration: none;
+}

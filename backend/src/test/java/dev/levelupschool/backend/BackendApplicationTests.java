@@ -16,11 +16,13 @@ import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -51,7 +53,7 @@ class BackendApplicationTests {
 
     @Test
     public void givenArticle_whenGetArticles_thenReturnJsonArray() throws Exception {
-        var user = new User("John Uzodinma");
+        var user = new User("john@gmail.com", "John Uzodinma", "slug", "password");
         userRepository.save(user);
 
         var article = new Article("test title 1", "test content 1", user);
@@ -62,13 +64,13 @@ class BackendApplicationTests {
                 get("/articles")
                     .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$", hasSize(1)))
-            .andExpect(jsonPath("$[0].title", is("test title 1")));
+            .andExpect(jsonPath("$._embedded.items", hasSize(1)))
+            .andExpect(jsonPath("$._embedded.items[0].title", is("test title 1")));
     }
 
     @Test
     public void givenComment_whenGetArticle_thenReturnCommentsArray() throws Exception {
-        var user = new User("John Uzodinma");
+        var user = new User("john@gmail.com", "John Uzodinma", "slug", "password");
         userRepository.save(user);
 
         var article = articleRepository.save(new Article("test title", "test content 1", user));
@@ -85,9 +87,20 @@ class BackendApplicationTests {
 
     @Test
     public void givenArticle_whenPostComment_thenStoreComment() throws Exception {
-        var user = userRepository.save(new User("John Uzodinma"));
+        User user = new User("john@gmail.com", "John Uzodinma", "slug", "password");
 
-        var article = articleRepository.save(new Article("test title", "test content 1", user));
+        var userPayload = objectMapper.writeValueAsString(user);
+
+        MvcResult result = mvc.perform(
+            post(("/register"))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(userPayload)).andDo(print()).andReturn();
+
+        var registeredUser = userRepository.findAll().get(0);
+
+        String token = "Bearer " + result.getResponse().getContentAsString();
+
+        var article = articleRepository.save(new Article("test title", "test content 1", registeredUser));
 
         var payloadDto = new CommentCreationDto();
         payloadDto.setUserId(user.getId());
@@ -99,6 +112,7 @@ class BackendApplicationTests {
 
         mvc.perform(
                 post("/comments")
+                    .header("Authorization", token)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(payload)
             )
