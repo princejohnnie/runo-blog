@@ -24,7 +24,7 @@ export const useUserStore = defineStore('user', () => {
         try {
             const response = await Auth.login(data)
             localStorage.setItem('token', response.data);
-            
+
             Swal.fire({
                 title: "Success!",
                 text: "You have logged in successfully!",
@@ -40,7 +40,7 @@ export const useUserStore = defineStore('user', () => {
             const response = await Auth.register(data)
             console.log("Got token after register ", response.data)
             localStorage.setItem('token', response.data);
-            
+
             Swal.fire({
                 title: "Success!",
                 text: "You have registered successfully!",
@@ -49,13 +49,20 @@ export const useUserStore = defineStore('user', () => {
         } catch(error) {
             user.value = null
         }
-        
+
     }
 
     async function logout() {
         localStorage.removeItem('token')
         user.value = null
     }
+
+    const premium = ref(false);
+    const wantsPremium = computed(() => premium.value === true)
+
+    const successNotification = ref(false);
+    const notificationClosed = computed(() => successNotification.value === false)
+
 
     return {
         user,
@@ -65,5 +72,10 @@ export const useUserStore = defineStore('user', () => {
         login,
         register,
         logout,
+        premium,
+        wantsPremium,
+        successNotification,
+        notificationClosed
+
     }
 })
