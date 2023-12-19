@@ -52,6 +52,13 @@
     font-size: 0.857rem;
     font-weight: 700;
     line-height: 25px;
+    transition: .5s all;
+
+    &:hover{
+        cursor: pointer;
+        background: #343A40;
+        color: white;
+    }
   }
 
   .editSubscription__radio:checked + .editSubscription__typeLabel {
@@ -147,18 +154,13 @@
     text-align: right;
   }
 
-  .subscription__active {
+  .subscription__statusActive {
     color: #d4a373;
   }
 
-  //.dp__input_wrap {
-  //  border: 1px solid #495057 !important;
-  //  margin-top: 2px !important;
-  //}
-
   .dp__pointer {
-    padding: 7.3px !important;
-    margin-top: 2px !important;
+    padding: 6.5px !important;
+    margin-top: 8px !important;
     border-radius: 0 !important;
     border: 1px solid #495057 !important;
 
@@ -167,4 +169,10 @@
     font-size: 0.857rem !important;
     font-weight: 500 !important;
     line-height: 25px !important;
+  }
+
+
+  .section-editSubscription{
+    display: flex;
+    justify-content: center;
   }

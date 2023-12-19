@@ -24,7 +24,7 @@ currentUser.value = userStore.user
 const firstName = currentUser.value?.name.split(" ")[0];
 const lastName = currentUser.value?.name.split(" ")[1];
 
-if(currentUser.value.avatarUrl === null) {
+if (currentUser.value.avatarUrl === null) {
     avatarUrl.value = `https://eu.ui-avatars.com/api/?name=${firstName}+${lastName}&size=250`
 } else {
     avatarUrl.value = currentUser.value.avatarUrl
@@ -40,27 +40,18 @@ const cropUploadSuccess = (jsonData) => {
 </script>
 
 <template>
-
     <div class="profileHeader">
         <div class="profileHeader__inner">
-            <img :src="avatarUrl" 
-                :class="editProfile ? 'profileHeader__image profileHeader__image--edit' : 'profileHeader__image'" 
-                @click="showUploadDialog=true">
+            <img :src="avatarUrl"
+                :class="editProfile ? 'profileHeader__image profileHeader__image--edit' : 'profileHeader__image'"
+                @click="showUploadDialog = true">
 
-                <my-upload
-                    langType="en"
-                    @crop-upload-success="cropUploadSuccess"
-                    v-model="showUploadDialog"
-                    :width="300"
-                    :height="300"
-                    field="avatar"
-                    url="http://localhost:8080/user/upload-avatar"
-                    :headers="{
-                        Authorization: `Bearer ${token}`,
-                        Accept: 'application/json'
-                    }"
-                    img-format="png">
-                </my-upload>
+            <my-upload langType="en" @crop-upload-success="cropUploadSuccess" v-model="showUploadDialog" :width="300"
+                :height="300" field="avatar" url="http://localhost:8080/user/upload-avatar" :headers="{
+                    Authorization: `Bearer ${token}`,
+                    Accept: 'application/json'
+                }" img-format="png">
+            </my-upload>
 
             <h2 class="profileHeader__name">
                 {{ userStore.user?.name }}
@@ -73,9 +64,9 @@ const cropUploadSuccess = (jsonData) => {
                 <router-link v-for="link in links" :to="link.to" class="profileHeader__action" v-if="links.length">
                     {{ link.text }}
                 </router-link>
-                <router-link to="/" class="profileHeader__action">Manage subscription</router-link>
+                <router-link :to="{ name: 'edit-subscription' }" class="profileHeader__action">Manage
+                    subscription</router-link>
             </div>
         </div>
     </div>
-
 </template>

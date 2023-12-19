@@ -6,30 +6,27 @@ import Input from '@/components/form/Input.vue';
 import Form from '@/components/form/Form.vue';
 import Button from '@/components/form/Button.vue';
 import VueDatePicker from '@vuepic/vue-datepicker';
-import '@vuepic/vue-datepicker/dist/main.css'
+import '@vuepic/vue-datepicker/dist/main.css';
+import ChevronDownIcon from '@/components/icons/ChevronDownIcon.vue'
 
 const userStore = useUserStore();
 const links = [
     {
-        text: "Edit profile",
-        to: { name: "edit-profile" }
-    },
-    {
-        text: "Manage subscriptions",
-        to: { name: "home" }
-    },
+        text: "Back to profile",
+        to: { name: "my-profile" }
+    }
 ]
 
 
 const subscriptionData = ref({
     cardNumber: '',
-    cardCcv: '',
-    cardExpiryMonth: '',
-    cardExpiryYear: '',
+    cardCvv: '',
+    cardExpiryDate: '',
     name: '',
     surname: '',
     address: '',
-    subscriptionType: '',
+    subscriptionType: 'monthly',
+    email: '',
 
 });
 
@@ -50,13 +47,15 @@ const history = [
     }
 ]
 
+const monthlyCost = ref(20);
+
 const toggleTable = () => {
     isVisible.value = !isVisible.value;
 
 };
 
 const submitForm = async () => {
-
+    //change to data
     const formData = new FormData();
     for (const key in subscriptionData.value) {
         formData.append(key, subscriptionData.value[key]);
@@ -68,12 +67,26 @@ const submitForm = async () => {
     //await userStore.me();
 };
 
+const subscriptionTotalCost = computed(() => {
+    if (subscriptionData.value.subscriptionType === 'monthly') {
+        return monthlyCost.value;
+    } else {
+        return (monthlyCost.value * 0.75) * 12;
+    }
+})
+
+const subscriptionMonthlyCost = computed(() => {
+    if (subscriptionData.value.subscriptionType === 'monthly') {
+        return monthlyCost.value;
+    } else {
+        return monthlyCost.value * 0.75;
+    }
+})
 
 </script>
 <template>
     <ProfileHeader :links="links" />
-
-    <div class="section">
+    <div class="section section-editSubscription">
         <div class="editSubscription__form">
             <h2 class="editSubscription__heading">Edit subscription</h2>
             <Form :handleLogic="submitForm" v-model:is-processing="isProcessing">
@@ -92,34 +105,28 @@ const submitForm = async () => {
 
                 <div class="editSubscription__costs">
                     <div class="editSubscription__cost">
-                        <highlight>20€</highlight> per month
+                        <highlight>{{ subscriptionMonthlyCost }}€</highlight> per month
                     </div>
-                    <div class="editSubscription__cost">Total: <highlight>20€</highlight>
+                    <div class="editSubscription__cost">Total: <highlight>{{ subscriptionTotalCost }}€</highlight>
                     </div>
                 </div>
-
-
                 <Input type="text" name="number" label="Card number" placeholder=""
                     v-model:value="subscriptionData.cardNumber" />
-
-
-                <!--*****************TO DO************************************-->
                 <div class="editSubscription__gridOptions">
-                    <Input type="text" name="cvv" label="CVV" placeholder="" v-model:value="subscriptionData.cardCcv"
+                    <Input type="text" name="cvv" label="CVV" placeholder="" v-model:value="subscriptionData.cardCvv"
                         style="width:100%" />
 
                     <div class="editSubscription__gridOption">
                         <label class="modal__inputLabel">Expiry date</label>
-                        <VueDatePicker class="editSubscription__date" v-model="subscriptionData.cardExpiryMonth" monthPicker
+                        <VueDatePicker class="editSubscription__date" v-model="subscriptionData.cardExpiryDate" monthPicker
                             required hideInputIcon placeholder="12/2023"></VueDatePicker>
                     </div>
                 </div>
-
-
                 <Input type="text" name="name" label="Name" placeholder="Your name" v-model:value="subscriptionData.name" />
                 <Input type="text" name="surname" label="Surname" placeholder="Your surname"
                     v-model:value="subscriptionData.surname" />
-                <Input type="text" name="address" label="Adress" placeholder="" v-model:value="subscriptionData.address" />
+                <Input type="text" name="address" label="Address" placeholder="" v-model:value="subscriptionData.address" />
+                <Input type="email" name="email" label="Email" placeholder="" v-model:value="subscriptionData.email" />
 
                 <div class="editSubscription__inputWrapper">
                     <Button type="submit" class="editProfile__inputButton" :isProcessing="isProcessing">Go Premium</Button>
@@ -127,10 +134,13 @@ const submitForm = async () => {
             </Form>
         </div>
     </div>
-    <div class="section">
+    <div class="section section-editSubscription">
         <div class="subscription__history">
             <div class="subscriptionHistory__content">
-                <h3 class="subscriptionHistory__heading" @click="toggleTable">Purchase history</h3>
+                <div class="subscriptionHistory__header" @click="toggleTable">
+                    <h3 class="subscriptionHistory__heading">Purchase history</h3>
+                    <ChevronDownIcon />
+                </div>
                 <table class="table" v-show="isVisible">
                     <thead>
                         <tr>
@@ -146,7 +156,7 @@ const submitForm = async () => {
                                 <td>{{ transaction.transactionId }}</td>
                                 <td>{{ transaction.start }}</td>
                                 <td>{{ transaction.end }}</td>
-                                <td :class="{ 'subscription__active': transaction.status === 'Active' }">
+                                <td :class="{ 'subscription__statusActive': transaction.status === 'Active' }">
                                     {{ transaction.status }}
                                 </td>
                             </tr>
@@ -158,4 +168,16 @@ const submitForm = async () => {
     </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.subscriptionHistory__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    transition: .5s all;
+
+    &:hover {
+        cursor: pointer;
+    }
+}
+</style>
