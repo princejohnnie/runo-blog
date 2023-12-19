@@ -14,12 +14,14 @@ export const useModalStore = defineStore('modal', () => {
 
     const showLoginModal = computed(() => modal.value === 'login')
     const showRegisterModal = computed(() => modal.value === 'register')
+    const showSubscribeModal = computed(() => modal.value === 'subscribe')
 
     return {
         modal,
         openModal,
         closeModal,
         showLoginModal,
-        showRegisterModal
+        showRegisterModal,
+        showSubscribeModal
     }
 })
