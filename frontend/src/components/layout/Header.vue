@@ -30,9 +30,7 @@ const logoutUser = () => {
 }
 
 watch(() => [userStore.premium, userStore.successNotification], function () {
-    console.log("ANTES AQUI");
     if (userStore.wantsPremium && userStore.isLoggedIn && userStore.notificationClosed) {
-        console.log("AQUI");
         openSubscribeModal();
     }
 });

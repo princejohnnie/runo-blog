@@ -21,13 +21,12 @@ const data = ref({
     name: '',
     slug: '',
     password: '',
-    //premium: false,
+    premium: false,
 })
 
-const premium = ref(false);
-
+//TODO confirm after premium is accepted in backend
 const submitForm = async () => {
-    userStore.premium = premium.value;
+    userStore.premium = data.value.premium;
     userStore.successNotification = true;
     const response = await Auth.register(data.value)
     localStorage.setItem('token', response.data);
@@ -48,7 +47,6 @@ const showSuccessAlert = () => {
 }
 
 const onCloseNotification = () => {
-    console.log("willClose");
     userStore.successNotification = false;
 }
 
@@ -70,7 +68,7 @@ const onCloseNotification = () => {
                 <Input type="password" name="password" label="Password:" placeholder="***********"
                     v-model:value="data.password" />
 
-                <input class="modal__checkbox" v-model="premium" type="checkbox">
+                <input class="modal__checkbox" v-model="data.premium" type="checkbox">
                 <label class="modal__checkLabel" for="checkbox">I want Premium </label>
 
                 <div class="modal__inputWrapper">
