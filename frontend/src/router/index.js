@@ -7,6 +7,7 @@ import MyProfileView from "@/views/MyProfileView.vue";
 import EditProfileView from "@/views/EditProfileView.vue";
 import CreateArticleView from "@/views/CreateArticleView.vue";
 import EditArticleView from "@/views/EditArticleView.vue";
+import EditSubscriptionView from '@/views/EditSubscriptionView.vue'
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -63,7 +64,15 @@ const router = createRouter({
             meta: {
                 requiresAuth: true,
             },
-        }
+        },
+        {
+            path: '/edit-subscription',
+            name: 'edit-subscription',
+            component: EditSubscriptionView,
+            meta: {
+              requiresAuth: true
+            }
+          }
     ],
     linkActiveClass: 'mainHeader__nav-link--active'
 });
