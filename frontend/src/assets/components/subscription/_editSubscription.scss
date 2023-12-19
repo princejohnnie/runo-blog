@@ -1,0 +1,170 @@
+.editSubscription__form {
+    max-width: 511px;
+    width: 100%;
+    padding: 55px 0 80px 0;
+  }
+
+  .editSubscription__heading {
+    color: #495057;
+    text-align: center;
+    font-family: $primaryFontFamily;
+    font-size: 2.571rem;
+    font-weight: 700;
+    margin: 0 0 50px 0;
+  }
+
+  .editSubscription__inputButton {
+    width: 100%;
+    margin-top: 10px;
+  }
+
+  .editSubscription__gridOptions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  .editSubscription__Types {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 22px;
+  }
+
+  .editSubscription__Type {
+    margin: 0;
+    display: inline-block;
+    width: 100%;
+  }
+
+  .editSubscription__radio {
+    display: none;
+  }
+
+  .editSubscription__typeLabel {
+    display: block;
+    padding: 10px 20px;
+    background: #d9d9d9;
+    color: #818181;
+    cursor: pointer;
+    text-align: center;
+    text-align: center;
+    font-family: $primaryFontFamily;
+    font-size: 0.857rem;
+    font-weight: 700;
+    line-height: 25px;
+  }
+
+  .editSubscription__radio:checked + .editSubscription__typeLabel {
+    background-color: #d4a373;
+    color: white;
+  }
+
+  .editSubscription__costs {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+
+  .editSubscription__cost highlight {
+    color: #d4a373;
+    font-size: 1.143rem;
+  }
+
+  .editSubscription__cost {
+    color: #888;
+    font-family: $primaryFontFamily;
+    font-size: 0.929rem;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 25px;
+  }
+
+  .subscription__history {
+    max-width: 511px;
+    width: 100%;
+    margin-bottom: 150px;
+  }
+
+  .subscriptionHistory__content {
+    background: #efefef;
+    padding: 0 20px;
+  }
+
+  .subscriptionHistory__heading {
+    margin: 0;
+    padding: 20px 0;
+    color: #818181;
+    font-family: $primaryFontFamily;
+    font-size: 1.143rem;
+    font-weight: 700;
+    line-height: 25px;
+  }
+
+  .table {
+    border-collapse: collapse;
+    margin: 0;
+    font-size: 0.9em;
+    font-family: $primaryFontFamily;
+    width: 100%;
+  }
+
+  .table thead tr {
+    text-align: left;
+    color: #818181;
+    font-family: $primaryFontFamily;
+    font-size: 0.857rem;
+    font-weight: 700;
+    line-height: 25px;
+  }
+
+  .table th,
+  .table td {
+    padding: 12px 0;
+  }
+
+  .table tbody tr {
+    border-top: 1px solid #d2d2d2;
+    color: #818181;
+    font-family: $primaryFontFamily;
+    font-size: 0.857rem;
+    font-weight: 400;
+    line-height: 25px;
+  }
+
+  tr td:first-child {
+    text-align: left;
+  }
+
+  tr td:nth-child(n + 2) {
+    text-align: right;
+  }
+
+  tr th:first-child {
+    text-align: left;
+  }
+
+  tr th:nth-child(n + 2) {
+    text-align: right;
+  }
+
+  .subscription__active {
+    color: #d4a373;
+  }
+
+  //.dp__input_wrap {
+  //  border: 1px solid #495057 !important;
+  //  margin-top: 2px !important;
+  //}
+
+  .dp__pointer {
+    padding: 7.3px !important;
+    margin-top: 2px !important;
+    border-radius: 0 !important;
+    border: 1px solid #495057 !important;
+
+    color: #818181 !important;
+    font-family: $primaryFontFamily !important;
+    font-size: 0.857rem !important;
+    font-weight: 500 !important;
+    line-height: 25px !important;
+  }

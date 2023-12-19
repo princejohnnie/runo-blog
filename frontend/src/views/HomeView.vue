@@ -34,14 +34,14 @@ const editorArticles = computed(() => {
             </div>
         </div>
 
-        <FeaturedArticle v-if="articles.length" :article="featuredArticle"/>
+        <FeaturedArticle v-if="articles.length" :article="featuredArticle" />
 
         <section class="section__popularTopics">
             <div class="section__inner">
 
                 <h2 class="section__heading">Popular topics</h2>
-                
-                <ArticlesList v-if="articles.length" :articleList="articles" :showAllArticles="false"/>
+
+                <ArticlesList v-if="articles.length" :articleList="articles" :showAllArticles="false" />
 
             </div>
 
@@ -49,10 +49,11 @@ const editorArticles = computed(() => {
 
         <section class="section__editorPicks">
             <div class="section__inner">
-                
+
                 <h2 class="section__heading">Editor's Pick</h2>
                 <div class="editorArticles">
-                    <ArticleCardBig v-for="(editorArticle, index) in editorArticles" :key="index" :article="editorArticle" :showCreateIcon="false"/>
+                    <ArticleCardBig v-for="(editorArticle, index) in editorArticles" :key="index" :article="editorArticle"
+                        :showCreateIcon="false" />
                 </div>
             </div>
         </section>

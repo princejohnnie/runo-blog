@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@vueform/multiselect": "^2.6.6",
+    "@vuepic/vue-datepicker": "^7.4.0",
     "@vueup/vue-quill": "^1.2.0",
     "axios": "^1.6.2",
     "dayjs": "^1.11.10",
