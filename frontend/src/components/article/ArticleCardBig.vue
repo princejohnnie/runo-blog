@@ -4,6 +4,7 @@ import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import dateFormatter from '@/utils/date.js'
 import EditArticleIcon from '../icons/EditArticleIcon.vue';
+import PremiumIcon from '@/components/icons/PremiumIcon.vue';
 
 const router = useRouter()
 
@@ -15,7 +16,7 @@ const props = defineProps({
     showCreateIcon: {
         type: Boolean,
         required: true,
-    }
+    },
 })
 
 const defaultCover = ref('https://picsum.photos/400/400')
@@ -49,18 +50,20 @@ const formattedDate = computed(() => {
 
 <template>
     <div class="editorArticle">
-        <RouterLink :to="`/articles/${article.id}`">
+        <router-link :to="`/articles/${article.id}`">
             <img class="editorArticle__image" :src="article.coverUrl || defaultCover">
-        </RouterLink>
-        <RouterLink :to="`/articles/${article.id}/edit`">
+            <div class="editorArticle__image--dullBackground"></div>
+        <router-link :to="`/articles/${article.id}/edit`">
             <EditArticleIcon v-if="showCreateIcon" class="editorArticle__edit-icon"/>
-        </RouterLink>
-        <div class="editorArticle__category">FASHION</div>
-        <div class="editorArticle__inner">
-            <img src="/images/premium-icon.png" v-if="props.article.isPremium" class="editorArticle__premium-icon">
-            <time class="editorArticle__time">{{ formattedDate }}</time>
-            <p class="editorArticle__heading">{{ shortTitle }}</p>
-            <p class="editorArticle__text">{{ shortContent }}</p>
-        </div>
+        </router-link>
+            <div class="editorArticle__category">FASHION</div>
+            <div class="editorArticle__inner">
+                <img src="/images/premium-icon.png" v-if="props.article.isPremium" class="editorArticle__premium-icon">
+                <PremiumIcon class="editorArticle__premium-icon"/>
+                <time class="editorArticle__time">{{ formattedDate }}</time>
+                <p class="editorArticle__heading">{{ shortTitle }}</p>
+                <p class="editorArticle__text">{{ shortContent }}</p>
+            </div>
+        </router-link>
     </div>
 </template>

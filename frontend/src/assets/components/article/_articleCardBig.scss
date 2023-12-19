@@ -23,7 +23,16 @@
     object-fit: cover;
     cursor: pointer;
 }
-
+.editorArticle__image--dullBackground {
+  width: 100%;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+}
 .editorArticle__category {
     position: absolute;
     top: 20px;
@@ -86,4 +95,5 @@
 .editorArticle__premium-icon {
     width: 18px;
     height: 18px;
+    fill: white;
 }
