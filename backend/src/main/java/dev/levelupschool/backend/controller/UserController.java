@@ -91,7 +91,7 @@ public class UserController {
     @PostMapping("/register")
     ResponseEntity<?> register(@RequestBody @Valid RegisterDto registerDto) {
         try {
-            var newUser = new User(registerDto.email, registerDto.name, registerDto.slug, registerDto.password);
+            var newUser = new User(registerDto.email, registerDto.name, registerDto.password);
             var createdUser = userService.createUser(newUser);
             return ResponseEntity.ok(tokenService.generateToken(createdUser.getId()));
         } catch (Exception e) {
@@ -190,8 +190,6 @@ public class UserController {
         private String email;
         @Size(min = 1, max = 256)
         private String name;
-        @NotBlank
-        private String slug;
         @Size(min = 3, max = 25)
         private String password;
     }

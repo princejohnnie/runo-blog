@@ -23,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.naming.OperationNotSupportedException;
 import java.nio.file.AccessDeniedException;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,6 +40,9 @@ public class ArticleService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private SlugService slugService;
 
     @Autowired
     private AuthenticationProvider authProvider;
@@ -65,6 +69,9 @@ public class ArticleService {
             article.setCoverUrl(coverUrl.toString());
         }
 
+        article.setSlug(slugService.makeSlug(article.getTitle()));
+
+
         if (article.getContent().contains("Hate")) {
             throw new CustomValidationException("content", "Sorry, we do not support hate speech on our platform");
         }
@@ -81,14 +88,19 @@ public class ArticleService {
         if (!article.getAuthor().getId().equals(loggedInUser.getId())) {
             throw new AccessDeniedException("You cannot edit an article not created by you!");
         }
+        if (newArticle.getTitle() != null) {
+        article.setTitle(newArticle.getTitle());
+            article.setSlug(slugService.makeSlug(newArticle.getTitle()));
 
+        }
+        if (newArticle.getContent() != null) {
+            article.setContent(newArticle.getContent());
+        }
+        article.setUpdatedAt(LocalDateTime.now());
         if (cover != null) {
             var coverUrl = storageService.store(cover, "covers/");
             article.setCoverUrl(coverUrl.toString());
         }
-
-        article.setTitle(newArticle.getTitle());
-        article.setContent(newArticle.getContent());
 
         return new ArticleDto(articleRepository.save(article));
     }

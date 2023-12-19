@@ -53,7 +53,7 @@ class BackendApplicationTests {
 
     @Test
     public void givenArticle_whenGetArticles_thenReturnJsonArray() throws Exception {
-        var user = new User("john@gmail.com", "John Uzodinma", "slug", "password");
+        var user = new User("john@gmail.com", "John Uzodinma",  "password");
         userRepository.save(user);
 
         var article = new Article("test title 1", "test content 1", user);
@@ -70,7 +70,7 @@ class BackendApplicationTests {
 
     @Test
     public void givenComment_whenGetArticle_thenReturnCommentsArray() throws Exception {
-        var user = new User("john@gmail.com", "John Uzodinma", "slug", "password");
+        var user = new User("john@gmail.com", "John Uzodinma", "password");
         userRepository.save(user);
 
         var article = articleRepository.save(new Article("test title", "test content 1", user));
@@ -87,7 +87,7 @@ class BackendApplicationTests {
 
     @Test
     public void givenArticle_whenPostComment_thenStoreComment() throws Exception {
-        User user = new User("john@gmail.com", "John Uzodinma", "slug", "password");
+        User user = new User("john@gmail.com", "John Uzodinma",  "password");
 
         var userPayload = objectMapper.writeValueAsString(user);
 

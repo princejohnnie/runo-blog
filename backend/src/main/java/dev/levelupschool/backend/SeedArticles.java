@@ -7,6 +7,7 @@ import dev.levelupschool.backend.model.User;
 import dev.levelupschool.backend.repository.ArticleRepository;
 import dev.levelupschool.backend.repository.CommentRepository;
 import dev.levelupschool.backend.repository.UserRepository;
+import dev.levelupschool.backend.service.SlugService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
@@ -39,15 +40,21 @@ public class SeedArticles {
             private void populateDatabase() {
                 for (int i = 0; i < 12; i++) {
                     Faker faker = new Faker();
+                    SlugService slug = new SlugService();
                     String name = faker.name().name();
-
+                    String email = faker.internet().emailAddress();
                     String articleTitle = "Richird Norton photorealistic rendering as real photos";
+                    String articleSlug = slug.makeSlug(articleTitle);
 
                     String articleContent = faker.lorem().paragraph(50);
 
-                    var user = userRepository.save(new User("john@gmail.com", name, "slug", "password"));
+                    var user = new User(email, name, "password");
+                    user.setSlug(slug.makeSlug(name));
+                    userRepository.save(user);
 
-                    var article = articleRepository.save(new Article(articleTitle, articleContent, user));
+                    var article = new Article(articleTitle, articleContent, user);
+                    article.setSlug(articleSlug);
+                    articleRepository.save(article);
 
                     for (int j = 0; j < 3; j++) {
                         String commentString = faker.lorem().paragraph(20);

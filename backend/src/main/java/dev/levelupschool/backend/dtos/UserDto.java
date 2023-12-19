@@ -10,10 +10,12 @@ public class UserDto {
     public String email;
     public String avatarUrl;
 
+    public String slug;
     public UserDto(User user) {
         this.id = user.getId();
         this.name = user.getName();
         this.email = user.getEmail();
         this.avatarUrl = user.getAvatarUrl();
+        this.slug = user.getSlug();
     }
 }
