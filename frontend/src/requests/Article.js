@@ -18,6 +18,7 @@ function store(data) {
     Object.keys(data).forEach((key) => {
         formData.append(key, data[key]);
     })
+    console.log(formData);
 
     return Http.post(`/articles`, formData)
 }
