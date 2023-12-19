@@ -56,6 +56,14 @@
     padding: 20px;
 }
 
+.article__premium {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    margin-right: 5px; 
+    fill: #D4A373;
+}
+
 .article__time {
     color: $paragraphColor;
     font-family: $primaryFontFamily;

@@ -1,6 +1,7 @@
 <script setup>
 import { ref, defineProps, computed } from 'vue';
 import dateFormatter from '@/utils/date.js'
+import PremiumIcon from '../icons/PremiumIcon.vue';
 
 const props = defineProps({
     article: {
@@ -51,6 +52,7 @@ const formattedDate = computed(() => {
         <div class="article__content">
             <div class="article__content-inner">
                 <time class="article__time">{{ formattedDate }}</time>
+                <PremiumIcon class="article__premium"/>
                 <img class="article__premium-icon" src="/images/premium_icon2.png" v-if="article.isPremium">
             </div>
             <h3 class="article__heading">
