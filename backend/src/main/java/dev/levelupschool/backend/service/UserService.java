@@ -39,6 +39,9 @@ public class UserService {
     private AuthenticationProvider authProvider;
 
     @Autowired
+    private SlugService slugService;
+
+    @Autowired
     private PagedResourcesAssembler<UserDto> pagedResourcesAssembler;
 
     UserService(UserRepository userRepository) {
@@ -58,9 +61,14 @@ public class UserService {
     public User createUser(User newUser) throws Exception {
         var user = userRepository.findByEmail(newUser.getEmail());
 
+
         if (user != null) {
             throw new Exception("user with email already exists");
         }
+        if (newUser.getName() != null && !newUser.getName().isEmpty()) {
+            newUser.setSlug(slugService.makeSlug(newUser.getName()));
+        }
+
 
         return userRepository.save(newUser);
     }
@@ -97,12 +105,16 @@ public class UserService {
             throw new AccessDeniedException("You cannot update another user's profile!");
         }
 
+        user.setEmail(newUser.getEmail() == null ? user.getEmail() : newUser.getEmail());
+        user.setName(newUser.getName() == null ? user.getName() : newUser.getName());
+
         if (newUser.getPassword() != null && !newUser.getPassword().isBlank()) {
             user.setPassword(newUser.getPassword());
         }
-
-        user.setEmail(newUser.getEmail() == null ? user.getEmail() : newUser.getEmail());
-        user.setName(newUser.getName() == null ? user.getName() : newUser.getName());
+        if (newUser.getName() != null && !newUser.getName().equals(user.getName())) {
+            user.setSlug(slugService.makeSlug(newUser.getName()));
+            System.out.println("My user" + user.getSlug());
+        }
 
         return new UserDto(userRepository.save(user));
     }

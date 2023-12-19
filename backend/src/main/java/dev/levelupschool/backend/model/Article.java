@@ -32,11 +32,15 @@ public class Article {
     @Nullable
     private String coverUrl;
 
+    private String slug;
+
     @CreationTimestamp
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
     private LocalDateTime updatedAt;
+
+    private boolean isPremium;
 
     @ManyToOne
     @JoinColumn(name = "author_id")

@@ -67,7 +67,7 @@ public class CommentControllerTests {
 
     @Test
     public void givenComment_whenGetComments_thenReturnJsonArray() throws Exception {
-        var user = userService.createUser(new User("johnndoe@gmail.com", "John Uzodinma", "slug", "password2"));
+        var user = userService.createUser(new User("johnndoe@gmail.com", "John Uzodinma",  "password2"));
 
         var article = articleRepository.save(new Article("LevelUp Article", "Luka is a great tutor", user));
 
@@ -82,7 +82,7 @@ public class CommentControllerTests {
 
     @Test
     public void givenComment_whenGetComment_thenReturnJson() throws Exception {
-        var user = userService.createUser(new User("johnndoe@gmail.com", "John Uzodinma", "slug", "password2"));
+        var user = userService.createUser(new User("johnndoe@gmail.com", "John Uzodinma",  "password2"));
 
         var article = articleRepository.save(new Article("LevelUp Article", "Luka is a great tutor", user));
 
@@ -97,7 +97,7 @@ public class CommentControllerTests {
 
     @Test
     public void givenComment_whenGetComment_thenReturnAuthorJson() throws Exception {
-        var user = userService.createUser(new User("johnndoe@gmail.com", "John Uzodinma", "slug", "password2"));
+        var user = userService.createUser(new User("johnndoe@gmail.com", "John Uzodinma",  "password2"));
 
         var article = articleRepository.save(new Article("LevelUp Article", "Luka is a great tutor", user));
 
@@ -112,7 +112,7 @@ public class CommentControllerTests {
 
     @Test
     public void givenUser_whenPostComment_thenStoreComment() throws Exception {
-        var user = userService.createUser(new User("johnndoe@gmail.com", "John Uzodinma", "slug", "password2"));
+        var user = userService.createUser(new User("johnndoe@gmail.com", "John Uzodinma",  "password2"));
         Mockito.when(authenticationProvider.getAuthenticatedUser()).thenReturn(user);
 
         var article = articleRepository.save(new Article("LevelUp Article", "Luka is a great tutor", user));
@@ -132,7 +132,7 @@ public class CommentControllerTests {
 
     @Test
     public void givenOwnerUser_whenPutComment_thenUpdateComment() throws Exception {
-        var user = userService.createUser(new User("johnndoe@gmail.com", "John Uzodinma", "slug", "password2"));
+        var user = userService.createUser(new User("johnndoe@gmail.com", "John Uzodinma",  "password2"));
         Mockito.when(authenticationProvider.getAuthenticatedUser()).thenReturn(user);
 
         var article = articleRepository.save(new Article("LevelUp Article", "Luka is a great tutor", user));
@@ -154,7 +154,7 @@ public class CommentControllerTests {
 
     @Test
     public void givenDifferentUser_whenPutComment_thenReturnUnauthorized() throws Exception {
-        var user = userService.createUser(new User("johnndoe@gmail.com", "John Uzodinma", "slug", "password2"));
+        var user = userService.createUser(new User("johnndoe@gmail.com", "John Uzodinma",  "password2"));
 
         var article = articleRepository.save(new Article("LevelUp Article", "Luka is a great tutor", user));
 
@@ -174,7 +174,7 @@ public class CommentControllerTests {
 
     @Test
     public void givenOwnerUser_whenDeleteComment_thenDeleteComment() throws Exception {
-        var user = userService.createUser(new User("johnndoe@gmail.com", "John Uzodinma", "slug", "password2"));
+        var user = userService.createUser(new User("johnndoe@gmail.com", "John Uzodinma",  "password2"));
         Mockito.when(authenticationProvider.getAuthenticatedUser()).thenReturn(user);
 
         var article = articleRepository.save(new Article("LevelUp Article", "Luka is a great tutor", user));
@@ -191,7 +191,7 @@ public class CommentControllerTests {
 
     @Test
     public void givenAnotherUser_whenDeleteComment_thenReturnUnauthorized() throws Exception {
-        var user = userService.createUser(new User("johnndoe@gmail.com", "John Uzodinma", "slug", "password2"));
+        var user = userService.createUser(new User("johnndoe@gmail.com", "John Uzodinma",  "password2"));
 
         var article = articleRepository.save(new Article("LevelUp Article", "Luka is a great tutor", user));
 
@@ -207,7 +207,7 @@ public class CommentControllerTests {
 
     @Test
     public void givenUser_whenDeleteUser_thenDeleteUserComments() throws Exception {
-        var user = userService.createUser(new User("johnndoe@gmail.com", "John Uzodinma", "slug", "password2"));
+        var user = userService.createUser(new User("johnndoe@gmail.com", "John Uzodinma",  "password2"));
         Mockito.when(authenticationProvider.getAuthenticatedUser()).thenReturn(user);
 
         var article = articleRepository.save(new Article("LevelUp Article", "Luka is a great tutor", user));
@@ -223,7 +223,7 @@ public class CommentControllerTests {
 
     @Test
     public void givenArticle_whenDeleteArticle_thenDeleteArticleComments() throws Exception {
-        var user = userService.createUser(new User("johnndoe@gmail.com", "John Uzodinma", "slug", "password2"));
+        var user = userService.createUser(new User("johnndoe@gmail.com", "John Uzodinma",  "password2"));
         Mockito.when(authenticationProvider.getAuthenticatedUser()).thenReturn(user);
 
         var article = articleRepository.save(new Article("LevelUp Article", "Luka is a great tutor", user));

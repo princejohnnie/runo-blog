@@ -87,7 +87,7 @@ public class UserControllerTests {
 
     @Test
     public void givenUser_whenGetUsers_thenReturnJsonArray() throws Exception {
-        userService.createUser(new User("john@gmail.com", "John Uzodinma", "slug", "password"));
+        userService.createUser(new User("john@gmail.com", "John Uzodinma",  "password"));
 
         mockMvc.perform(
             get("/users")
@@ -99,7 +99,7 @@ public class UserControllerTests {
 
     @Test
     public void givenUser_whenGetUser_thenReturnJson() throws Exception {
-        var user = userService.createUser(new User("john@gmail.com", "John Uzodinma", "slug", "password"));
+        var user = userService.createUser(new User("john@gmail.com", "John Uzodinma",  "password"));
 
         mockMvc.perform(
                 get("/users/{id}", user.getId())
@@ -111,7 +111,7 @@ public class UserControllerTests {
 
     @Test
     public void givenUser_whenRegisterUser_thenStoreUser() throws Exception {
-        var user = new User("john@gmail.com", "John Uzodinma", "slug", "password");
+        var user = new User("john@gmail.com", "John Uzodinma",  "password");
         var payload = objectMapper.writeValueAsString(user);
 
         mockMvc.perform(
@@ -125,7 +125,7 @@ public class UserControllerTests {
 
     @Test
     public void givenUser_whenLoginUser_thenReturnToken() throws Exception {
-        var user = userService.createUser(new User("john@gmail.com", "John Uzodinma", "slug", "password"));
+        var user = userService.createUser(new User("john@gmail.com", "John Uzodinma",  "password"));
 
         var loginUserRequest = new LoginDto(user.getEmail(), "password"); // Login with created user credentials
         var payload = objectMapper.writeValueAsString(loginUserRequest);
@@ -147,10 +147,10 @@ public class UserControllerTests {
 
     @Test
     public void givenAuthenticatedUser_whenPutUser_thenUpdateUser() throws Exception {
-        var authenticatedUser = userService.createUser(new User("johndoe@gmail.com", "John Uzodinma", "slug", "password2"));
+        var authenticatedUser = userService.createUser(new User("johndoe@gmail.com", "John Uzodinma",  "password2"));
         Mockito.when(authenticationProvider.getAuthenticatedUser()).thenReturn(authenticatedUser);
 
-        var updateUserRequest = new User("johnnydoe@gmail.com", "John Prince", "slug", "password2");
+        var updateUserRequest = new User("johnnydoe@gmail.com", "John Prince",  "password2");
         var payload = objectMapper.writeValueAsString(updateUserRequest);
 
         mockMvc.perform(
@@ -165,9 +165,9 @@ public class UserControllerTests {
 
     @Test
     public void givenUnauthenticatedUser_whenPutUser_thenReturnUnauthorized() throws Exception {
-        var authenticatedUser = userService.createUser(new User("johndoe@gmail.com", "John Uzodinma", "slug", "password2"));
+        var authenticatedUser = userService.createUser(new User("johndoe@gmail.com", "John Uzodinma",  "password2"));
 
-        var unAuthenticatedUser = userService.createUser(new User("johnnydoe@gmail.com", "John Prince", "slug", "password"));
+        var unAuthenticatedUser = userService.createUser(new User("johnnydoe@gmail.com", "John Prince",  "password"));
 
         Mockito.when(authenticationProvider.getAuthenticatedUser()).thenReturn(authenticatedUser);
 
@@ -184,7 +184,7 @@ public class UserControllerTests {
 
     @Test
     public void givenAuthenticatedUser_whenDeleteUser_thenDeleteUser() throws Exception {
-        var authenticatedUser = userService.createUser(new User("johndoe@gmail.com", "John Uzodinma", "slug", "password2"));
+        var authenticatedUser = userService.createUser(new User("johndoe@gmail.com", "John Uzodinma",  "password2"));
 
         Mockito.when(authenticationProvider.getAuthenticatedUser()).thenReturn(authenticatedUser);
 
@@ -197,11 +197,11 @@ public class UserControllerTests {
 
     @Test
     public void givenUnauthenticatedUser_whenDeleteUser_thenReturnUnauthorized() throws Exception {
-        var authenticatedUser = userService.createUser(new User("johndoe@gmail.com", "John Uzodinma", "slug", "password2"));
+        var authenticatedUser = userService.createUser(new User("johndoe@gmail.com", "John Uzodinma",  "password2"));
 
         Mockito.when(authenticationProvider.getAuthenticatedUser()).thenReturn(authenticatedUser);
 
-        var unAuthenticatedUser = userService.createUser(new User("johnnydoe@gmail.com", "John Prince", "slug", "password"));
+        var unAuthenticatedUser = userService.createUser(new User("johnnydoe@gmail.com", "John Prince",  "password"));
 
         mockMvc.perform(
             delete("/users/{id}", unAuthenticatedUser.getId()) // NOTE: Authenticated User is trying to delete unauthenticated User
@@ -212,7 +212,7 @@ public class UserControllerTests {
 
     @Test
     public void givenUser_whenGetArticles_thenReturnUserArticlesArray() throws Exception {
-        var user = userRepository.save(new User("john@gmail.com", "John Uzodinma", "Software Developer", "password"));
+        var user = userRepository.save(new User("john@gmail.com", "John Uzodinma",  "password"));
 
         articleRepository.save(new Article("Levelup Article", "Levelup is a wonderful internship", user));
 
@@ -227,7 +227,7 @@ public class UserControllerTests {
 
     @Test
     public void givenUser_whenGetComments_thenReturnUserCommentsArray() throws Exception {
-        var user = userRepository.save(new User("john@gmail.com", "John Uzodinma", "slug", "password"));
+        var user = userRepository.save(new User("john@gmail.com", "John Uzodinma",  "password"));
 
         var article = articleRepository.save(new Article( "LevelUp Article", "Luka is a great tutor", user));
 
@@ -244,7 +244,7 @@ public class UserControllerTests {
 
     @Test
     public void givenUser_whenPostAvatar_thenReturnAvatar() throws Exception {
-        var authenticatedUser = userService.createUser(new User("johnny@gmail.com", "Johnny Walker", "slug", "password"));
+        var authenticatedUser = userService.createUser(new User("johnny@gmail.com", "Johnny Walker",  "password"));
 
         URL url = URI.create("http://mocked-avatar-url").toURL();
 
@@ -265,9 +265,9 @@ public class UserControllerTests {
 
     @Test
     public void givenUser_whenGetFollowers_thenReturnFollowersArray() throws Exception {
-        var loggedInUser = userRepository.save(new User("amaka@gmail.com", "Amaka Uzodinma", "Designer", "password"));
+        var loggedInUser = userRepository.save(new User("amaka@gmail.com", "Amaka Uzodinma", "password"));
 
-        var followee = userRepository.save(new User("john@gmail.com", "John Uzodinma", "Developer", "password"));
+        var followee = userRepository.save(new User("john@gmail.com", "John Uzodinma",  "password"));
 
         loggedInUser.getFollowers().add(followee);
 
@@ -283,9 +283,9 @@ public class UserControllerTests {
 
     @Test
     public void givenUser_whenGetFollowing_thenReturnFollowingArray() throws Exception {
-        var mainUser = userRepository.save(new User("amaka@gmail.com", "Amaka Uzodinma", "Designer", "password"));
+        var mainUser = userRepository.save(new User("amaka@gmail.com", "Amaka Uzodinma", "password"));
 
-        var followee = userRepository.save(new User("john@gmail.com", "John Uzodinma", "Developer", "password"));
+        var followee = userRepository.save(new User("john@gmail.com", "John Uzodinma", "password"));
 
         mainUser.getFollowing().add(followee);
 
@@ -302,11 +302,11 @@ public class UserControllerTests {
     @Test
     @Transactional
     public void givenAuthenticatedUser_whenFollowAnotherUser_thenFollowUser() throws Exception {
-        var follower = userRepository.save(new User("john@gmail.com", "Johnny Doe", "Designer", "password"));
+        var follower = userRepository.save(new User("john@gmail.com", "Johnny Doe",  "password"));
 
         Mockito.when(authenticationProvider.getAuthenticatedUser()).thenReturn(follower);
 
-        var followee = userRepository.save(new User("john@gmail.com", "Johnny Doe", "Designer", "password"));
+        var followee = userRepository.save(new User("john@gmail.com", "Johnny Doe",  "password"));
 
         mockMvc.perform(
             post("/users/{id}/follow", followee.getId())
@@ -320,10 +320,10 @@ public class UserControllerTests {
     @Test
     @Transactional
     public void givenAuthenticatedUser_whenUnfollowAnotherUser_thenUnfollowUser() throws Exception {
-        var follower = userRepository.save(new User("john@gmail.com", "Johnny Doe", "Designer", "password"));
+        var follower = userRepository.save(new User("john@gmail.com", "Johnny Doe",  "password"));
         Mockito.when(authenticationProvider.getAuthenticatedUser()).thenReturn(follower);
 
-        var followee = userRepository.save(new User("johnny@gmail.com", "Johnny Doe", "Designer", "password"));
+        var followee = userRepository.save(new User("johnny@gmail.com", "Johnny Doe", "password"));
 
         userService.followUser(followee.getId());
 
@@ -340,7 +340,7 @@ public class UserControllerTests {
     @Test
     @Transactional
     public void givenUser_whenGetBookmarks_thenReturnBookmarksArray() throws Exception {
-        var loggedInUser = userRepository.save(new User("john@gmail.com", "Johnny Doe", "Designer", "password"));
+        var loggedInUser = userRepository.save(new User("john@gmail.com", "Johnny Doe",  "password"));
         Mockito.when(authenticationProvider.getAuthenticatedUser()).thenReturn(loggedInUser);
 
         var article = articleRepository.save(new Article("Test title", "Test content", loggedInUser));

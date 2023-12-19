@@ -12,6 +12,9 @@ public class ArticleDto {
     public String title;
     public String content;
     public String coverUrl;
+
+    public String slug;
+    public boolean isPremium;
     public AuthorDto author;
     public List<CommentDto> comments;
     public LocalDateTime createdAt;
@@ -25,7 +28,8 @@ public class ArticleDto {
         this.author = new AuthorDto(article.getAuthor());
         this.createdAt = article.getCreatedAt();
         this.updatedAt = article.getUpdatedAt();
-
+        this.isPremium = article.isPremium();
+        this.slug = article.getSlug();
         if (article.getComments() != null) {
             this.comments = article.getComments().stream().map(CommentDto::new).toList();
         }

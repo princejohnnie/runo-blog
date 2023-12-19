@@ -15,4 +15,6 @@ public class UpdateArticleRequest {
     private String title;
     @Valid
     private String content;
+
+    private String slug;
 }

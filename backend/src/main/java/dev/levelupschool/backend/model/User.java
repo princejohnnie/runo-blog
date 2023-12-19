@@ -63,10 +63,9 @@ public class User {
     )
     public List<Article> bookmarks = new ArrayList<>();
 
-    public User(String email, String name, String slug, String password) {
+    public User(String email, String name, String password) {
         this.email = email;
         this.name = name;
-        this.slug = slug;
         this.setPassword(password);
     }
 
