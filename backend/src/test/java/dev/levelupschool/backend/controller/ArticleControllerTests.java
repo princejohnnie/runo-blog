@@ -189,7 +189,7 @@ public class ArticleControllerTests {
 
         var article = articleRepository.save(new Article("LevelUp Article", "Luka is a great tutor", user));
 
-        var updateArticleRequest = new UpdateArticleRequest("LevelUp Article updated", "Luka is a great tutor. A fact which cannot be debated");
+        var updateArticleRequest = new UpdateArticleRequest("LevelUp Article updated", "Luka is a great tutor. A fact which cannot be debated", "slug");
         var updateArticlePayload = objectMapper.writeValueAsString(updateArticleRequest);
         MockMultipartFile coverPhoto = new MockMultipartFile(
             "cover", "photo.jpg", MediaType.IMAGE_JPEG_VALUE, "photo.jpg".getBytes());
@@ -214,7 +214,7 @@ public class ArticleControllerTests {
 
         var article = articleRepository.save(new Article("LevelUp Article", "Luka is a great tutor", user));
 
-        var updateArticleRequest = new UpdateArticleRequest("LevelUp Article updated", "Luka is a great tutor. A fact which cannot be debated");
+        var updateArticleRequest = new UpdateArticleRequest("LevelUp Article updated", "Luka is a great tutor. A fact which cannot be debated", "slug");
         var updateArticlePayload = objectMapper.writeValueAsString(updateArticleRequest);
 
         mockMvc.perform(

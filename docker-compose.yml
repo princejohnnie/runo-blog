@@ -13,6 +13,16 @@ services:
             - "127.0.0.1:${FRONTEND_PORT:-80}:8080"
         networks:
             - levelup
+    payment-gateway:
+        build:
+            context: ./backend/payment-gateway
+            dockerfile: Dockerfile
+        extra_hosts:
+            - 'host.docker.internal:host-gateway'
+        ports:
+            - '${FORWARD_PAYMENT_GATEWAY_PORT:-8042}:8000'
+        networks:
+            - levelup
     pgsql:
         image: 'postgres:15'
         ports:

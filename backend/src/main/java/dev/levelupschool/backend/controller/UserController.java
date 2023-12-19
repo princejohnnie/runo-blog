@@ -7,6 +7,8 @@ import dev.levelupschool.backend.dtos.CommentDto;
 import dev.levelupschool.backend.dtos.UserDto;
 import dev.levelupschool.backend.exception.ModelNotFoundException;
 import dev.levelupschool.backend.model.User;
+import dev.levelupschool.backend.payment.PaymentDetailsDto;
+import dev.levelupschool.backend.payment.PaymentService;
 import dev.levelupschool.backend.repository.UserRepository;
 import dev.levelupschool.backend.request.UpdateUserRequest;
 import dev.levelupschool.backend.service.TokenService;
@@ -46,6 +48,9 @@ public class UserController {
 
     @Autowired
     private AuthenticationProvider authenticationProvider;
+
+    @Autowired
+    private PaymentService paymentService;
 
     @GetMapping("/users")
     PagedModel<EntityModel<UserDto>> index(
@@ -167,6 +172,20 @@ public class UserController {
         try {
             List<BookmarkDto> bookmarks = userService.getBookmarks();
             return new ResponseEntity<>(bookmarks, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PostMapping("/users/become-premium")
+    ResponseEntity<?> becomePremium(@RequestBody @Valid PaymentDetailsDto paymentDetailsDto) {
+
+        try {
+            var response = paymentService.processPayment(paymentDetailsDto);
+            // TODO: this will be one of the possible group projects next week
+            // var loggedInUser = authenticationProvider.getAuthenticatedUser();
+            // loggedInUser.setPremiumActivatedAt(now());
+            return response;
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
