@@ -1,0 +1,49 @@
+.premiumHeader__logoBackground{
+    width: 156px;
+    height: 156px;
+    background: #495057;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+}
+
+
+.premiumHeader {
+    @extend .generalHeader;
+
+}
+
+.premiumHeader__inner  {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+
+    @include for-tablet {
+        margin: 30px;
+    }
+
+    @include for-phone {
+        margin: 0 30px;
+    }
+}
+
+.premiumHeader__title {
+    color: $white;
+    text-align: center;
+    font-family: $primaryFontFamily;
+    font-size: 2.571rem;
+    font-weight: $baseFontWeight;
+    margin: 25px 0;
+}
+
+.premiumHeader__message {
+    color: $white;
+    text-align: center;
+    font-family: $primaryFontFamily;
+    font-weight: $baseFontWeight;
+    font-size: 0.857rem;
+    max-width: 420px;
+    line-height: 20px;
+}

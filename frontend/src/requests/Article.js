@@ -18,6 +18,7 @@ function store(data) {
     Object.keys(data).forEach((key) => {
         formData.append(key, data[key]);
     })
+    console.log(formData);
 
     return Http.post(`/articles`, formData)
 }
@@ -36,4 +37,9 @@ function comments(id) {
     return Http.get(`/articles/${id}/comments`)
 }
 
-export default { index, show, comments, store, userArticles, update, }
+//TODO correct endpoint after backend makes ir available
+function premiumIndex() {
+    return Http.get(`/articles`)
+}
+
+export default { index, show, comments, store, userArticles, update, premiumIndex }

@@ -30,11 +30,12 @@ const data = ref({
     title: props?.article?.title,
     slug: '',
     content: props?.article?.content,
-    cover: null
+    cover: null,
+    isPremium: false
 })
 
 const currentDate = computed(() => {
-    if(props.isNew) {
+    if (props.isNew) {
         return dateFormatter.formatDate(new Date())
     } else {
         return dateFormatter.formatDate(props.article.updatedAt)
@@ -46,7 +47,7 @@ const createArticle = async () => {
 
     showSuccessAlert()
 
-    router.push({name: 'my-profile'})
+    router.push({ name: 'my-profile' })
 }
 
 const updateArticle = async () => {
@@ -54,7 +55,7 @@ const updateArticle = async () => {
 
     showSuccessAlert()
 
-    router.push({name: 'my-profile'})
+    router.push({ name: 'my-profile' })
 }
 
 const setArticleCover = (cover) => {
@@ -78,25 +79,27 @@ const showSuccessAlert = () => {
 
             <h2 class="editProfile__heading">{{ isNew ? "Add content" : "Edit content" }}</h2>
 
-            <Form class="form-column" :handleLogic="isNew ? createArticle : updateArticle" v-model:isProcessing="isProcessing">
+            <Form class="form-column" :handleLogic="isNew ? createArticle : updateArticle"
+                v-model:isProcessing="isProcessing">
 
                 <Input type="text" name="title" label="Title" placeholder="Set Title" v-model:value="data.title" />
 
-                <Input type="text" name="date" label="Date" placeholder="DD-MM-YYYY" v-model:value="currentDate"/>
+                <Input type="text" name="date" label="Date" placeholder="DD-MM-YYYY" v-model:value="currentDate" />
 
-                <Input type="text" name="slug" label="Slug" placeholder="Set slug" v-model:value="data.slug"/>
+                <Input type="text" name="slug" label="Slug" placeholder="Set slug" v-model:value="data.slug" />
 
                 <MultiSelectTags></MultiSelectTags>
 
                 <div class="modal__inputWrapper">
                     <label class="modal__inputLabel"> Content </label>
-                    <QuillEditor theme="snow" v-model:content="data.content" contentType="html"/>
+                    <QuillEditor theme="snow" v-model:content="data.content" contentType="html" />
                 </div>
 
-                <ImageUpload label="Article Image" name="Cover" :url="article?.coverUrl" @setCover="(cover) => setArticleCover(cover)"></ImageUpload>
+                <ImageUpload label="Article Image" name="Cover" :url="article?.coverUrl"
+                    @setCover="(cover) => setArticleCover(cover)"></ImageUpload>
 
                 <div class="editArticle__premium">
-                    <input class="modal__checkbox" type="checkbox">
+                    <input class="modal__checkbox" type="checkbox" v-model="data.isPremium">
                     <label class="modal__checkLabel" for="checkbox"> Premium article </label>
                 </div>
 
