@@ -1,7 +1,5 @@
 package dev.levelupschool.backend.controller;
 
-import dev.levelupschool.backend.auth.AuthenticationProvider;
-import dev.levelupschool.backend.dtos.*;
 import dev.levelupschool.backend.security.auth.AuthenticationProvider;
 import dev.levelupschool.backend.dtos.ArticleDto;
 import dev.levelupschool.backend.dtos.BookmarkDto;
