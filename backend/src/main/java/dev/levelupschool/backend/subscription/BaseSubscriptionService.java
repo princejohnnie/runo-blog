@@ -1,5 +1,7 @@
 package dev.levelupschool.backend.subscription;
 
+import dev.levelupschool.backend.auth.AuthenticationProvider;
+import dev.levelupschool.backend.exception.ModelNotFoundException;
 import dev.levelupschool.backend.model.Subscription;
 import dev.levelupschool.backend.model.User;
 import dev.levelupschool.backend.repository.SubscriptionRepository;
@@ -27,7 +29,7 @@ public class BaseSubscriptionService implements SubscriptionService {
             String transactionId = jsonObject.getString("txRef");
 
             if (status.equals("success")) {
-                subscriptionRepository.save(new Subscription(transactionId, subscriptionType, "active", user));
+                subscriptionRepository.save(new Subscription(transactionId, subscriptionType, true, user));
 
                 List<Subscription> subscriptions = subscriptionRepository.findByUserId(user.getId());
 
@@ -45,5 +47,19 @@ public class BaseSubscriptionService implements SubscriptionService {
     @Override
     public List<SubscriptionDto> getSubscriptions(User user) {
         return subscriptionRepository.findByUserId(user.getId()).stream().map(SubscriptionDto::new).toList();
+    }
+
+    @Override
+    public boolean cancelSubscription(Long subscriptionId, User user) {
+        var subscriptions = subscriptionRepository.findByUserId(user.getId());
+
+        for (Subscription subscription : subscriptions) {
+            if (subscription.getId().equals(subscriptionId)) {
+                subscription.setActive(false);
+                var canceledSubscription = subscriptionRepository.save(subscription);
+                return !canceledSubscription.isActive();
+            }
+        }
+        return false;
     }
 }

@@ -35,6 +35,12 @@ public class ArticleController {
         return articleService.getAllArticles(paging);
     }
 
+    @GetMapping("/articles-premium")
+    List<ArticleDto> indexPremium(
+        @PageableDefault(page = 0, size = Integer.MAX_VALUE, sort = {"title", "author"}) Pageable paging) {
+        return articleService.getPremiumArticles(paging);
+    }
+
     @GetMapping("/articles/{id}")
     ArticleDto show(@PathVariable Long id) {
         return articleService.getArticle(id);
@@ -48,7 +54,7 @@ public class ArticleController {
             var articleDto = articleService.createArticle(article, cover);
             return new ResponseEntity<>(articleDto, HttpStatus.OK);
         } catch (CustomValidationException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
+            return new ResponseEntity<>(e.reason, HttpStatus.UNPROCESSABLE_ENTITY);
         }
     }
 

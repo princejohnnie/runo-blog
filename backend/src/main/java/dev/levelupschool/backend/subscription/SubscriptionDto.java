@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 
 @Relation(collectionRelation = "items")
 public class SubscriptionDto {
+    public Long id;
     public String transactionId;
     public String subscriptionType;
     public LocalDateTime startDate;
@@ -15,6 +16,7 @@ public class SubscriptionDto {
     public boolean isActive;
     public String status;
     public SubscriptionDto(Subscription subscription) {
+        this.id = subscription.getId();
         this.transactionId = subscription.getTransactionId();
         this.subscriptionType = subscription.getSubscriptionType();
         this.startDate = subscription.getStartDate();

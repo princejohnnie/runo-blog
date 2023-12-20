@@ -32,19 +32,6 @@ class PaymentDetails(BaseModel):
 
 CardType = str
 
-mockPayload = {
-  "cardno": "4751763236699647",
-  "cvv": "470",
-  "expirymonth": "09",
-  "expiryyear": "35",
-  'pin': "3310",
-  "amount": 10,
-  "email": "princechinecherem@gmail.com",
-  "phonenumber": "08109514619",
-  "firstname": "temi",
-  "lastname": "desola",
-}
-
 
 @app.post("/execute-payment")
 async def execute_payment(payment_details: PaymentDetails):
@@ -56,7 +43,7 @@ async def execute_payment(payment_details: PaymentDetails):
         return process_payment(payment_details)
     
     except Exception as e:
-        return JSONResponse({"message": str(e)}, status.HTTP_422_UNPROCESSABLE_ENTITY)
+        return JSONResponse(content={"message": str(e)}, status_code=status.HTTP_422_UNPROCESSABLE_ENTITY)
 
 
 def process_payment(payment_details: PaymentDetails) -> dict:
@@ -87,29 +74,20 @@ def process_payment(payment_details: PaymentDetails) -> dict:
         res = rave.Card.charge(payload)
 
         if res["validationRequired"]:
-            print("Validating Payment!")
             rave.Card.validate(res["flwRef"], "12345")
 
         transactionStatus = rave.Card.verify(res["txRef"])
 
-        print("Transaction Status -> ", transactionStatus["transactionComplete"])
-
         return JSONResponse(res, status_code=status.HTTP_200_OK)
 
     except RaveExceptions.CardChargeError as e:
-        print(e.err["errMsg"])
-        print(e.err["flwRef"])
+        raise ValueError(e.err["errMsg"])
 
     except RaveExceptions.TransactionValidationError as e:
-        print(e.err)
-        print(e.err["flwRef"])
+        raise ValueError(e.err["errMsg"])
 
     except RaveExceptions.TransactionVerificationError as e:
-        print(e.err["errMsg"])
-        print(e.err["txRef"])
-
-
-    return JSONResponse(e.err, status_code=status.HTTP_404_NOT_FOUND)
+        raise ValueError(e.err["errMsg"])
 
 
 def validate_card_number(payment_details: PaymentDetails) -> CardType:
@@ -167,14 +145,9 @@ def validate_cvv(payment_details: PaymentDetails, card_type: CardType) -> None:
 def validate_card_expiry(payment_details: PaymentDetails) -> None:
     month = payment_details.card_expiry_month
     year = payment_details.card_expiry_year
-    print("Expiry Month -> ", month)
-    print("Expiry Year -> ", year)
 
     currentMonth = datetime.now().month
     currentYear = datetime.now().year
-
-    print("currentMonth -> ", currentMonth)
-    print("currentYear -> ", currentYear)
 
     if currentYear > year:
         raise ValueError("Invalid expiry date")

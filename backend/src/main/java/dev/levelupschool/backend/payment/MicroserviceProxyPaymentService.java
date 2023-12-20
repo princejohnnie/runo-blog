@@ -39,10 +39,8 @@ public class MicroserviceProxyPaymentService implements PaymentService {
 
         try {
             ResponseEntity<String> response = new RestTemplate().postForEntity(url, request, String.class);
-            System.out.println("Microservice response -> " + response.getBody());
             return response;
         } catch (HttpClientErrorException e) {
-            // TODO: report the error to the user informing them what went wrong
             return new ResponseEntity<>(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
         }
     }

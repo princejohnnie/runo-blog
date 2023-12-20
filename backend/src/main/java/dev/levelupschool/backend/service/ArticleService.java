@@ -12,8 +12,10 @@ import dev.levelupschool.backend.repository.ArticleRepository;
 import dev.levelupschool.backend.repository.UserRepository;
 import dev.levelupschool.backend.request.UpdateArticleRequest;
 import dev.levelupschool.backend.storage.StorageService;
+import dev.levelupschool.backend.utils.StringCutter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.EntityModel;
@@ -51,26 +53,55 @@ public class ArticleService {
     private PagedResourcesAssembler<ArticleDto> pagedResourcesAssembler;
 
     public PagedModel<EntityModel<ArticleDto>> getAllArticles(Pageable paging) {
-        var result = articleRepository.findAll(paging).map(ArticleDto::new);
-        return pagedResourcesAssembler.toModel(result);
+        var loggedInUser = authProvider.getAuthenticatedUser();
+        Page<Article> result = articleRepository.findAll(paging);
+
+        if (loggedInUser == null || !loggedInUser.isPremium()) {
+            result.forEach(article -> {
+                if (article.isPremium()) {
+                    article.setContent(StringCutter.truncate(article.getContent()));
+                }
+            });
+
+            return pagedResourcesAssembler.toModel(result.map(ArticleDto::new));
+
+        }
+
+        return pagedResourcesAssembler.toModel(result.map(ArticleDto::new));
+    }
+
+    public List<ArticleDto> getPremiumArticles(Pageable paging) {
+        return articleRepository.findAll(paging).stream().filter(Article::isPremium).map(ArticleDto::new).toList();
+
     }
 
     public ArticleDto getArticle(Long id) {
-        return new ArticleDto(articleRepository.findById(id)
+        var article = new ArticleDto(articleRepository.findById(id)
             .orElseThrow(() -> new ModelNotFoundException(Article.class, id)));
+
+        var loggedInUser = authProvider.getAuthenticatedUser();
+
+        if (loggedInUser == null || !loggedInUser.isPremium()) {
+            article.content = article.content.substring(0, 10);
+        }
+
+        return article;
+
     }
 
     public ArticleDto createArticle(Article article, MultipartFile cover) throws CustomValidationException {
         User loggedInUser = authProvider.getAuthenticatedUser();
         article.setAuthor(loggedInUser);
+        article.setSlug(slugService.makeSlug(article.getTitle()));
 
         if (cover != null) {
             var coverUrl = storageService.store(cover, "covers/");
             article.setCoverUrl(coverUrl.toString());
         }
 
-        article.setSlug(slugService.makeSlug(article.getTitle()));
-
+        if (!loggedInUser.isPremium() && article.isPremium()) {
+            throw new CustomValidationException("content", "Sorry, you cannot create a Premium Article");
+        }
 
         if (article.getContent().contains("Hate")) {
             throw new CustomValidationException("content", "Sorry, we do not support hate speech on our platform");
