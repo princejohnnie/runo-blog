@@ -16,9 +16,19 @@ function editProfile(id, data) {
     return Http.put(`/users/${id}`, data)
 }
 
-export default { 
+function subscribe(data) {
+    return Http.post(`/users/subscribe`, data)
+}
+
+function subscriptions() {
+    return Http.get(`/users/subscriptions`)
+}
+
+export default {
     login,
     register,
     me,
     editProfile,
+    subscribe,
+    subscriptions
 };
