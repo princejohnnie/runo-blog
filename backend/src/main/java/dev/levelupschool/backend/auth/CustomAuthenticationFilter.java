@@ -1,4 +1,4 @@
-package dev.levelupschool.backend.security.auth;
+package dev.levelupschool.backend.auth;
 
 import dev.levelupschool.backend.service.TokenService;
 import jakarta.servlet.FilterChain;

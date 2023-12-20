@@ -1,7 +1,7 @@
 package dev.levelupschool.backend.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dev.levelupschool.backend.security.auth.AuthenticationProvider;
+import dev.levelupschool.backend.auth.AuthenticationProvider;
 import dev.levelupschool.backend.model.Article;
 import dev.levelupschool.backend.model.CardExpiryDate;
 import dev.levelupschool.backend.model.Comment;

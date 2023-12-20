@@ -1,6 +1,5 @@
 package dev.levelupschool.backend.subscription;
 
-import dev.levelupschool.backend.auth.AuthenticationProvider;
 import dev.levelupschool.backend.model.Subscription;
 import dev.levelupschool.backend.model.User;
 import dev.levelupschool.backend.repository.SubscriptionRepository;

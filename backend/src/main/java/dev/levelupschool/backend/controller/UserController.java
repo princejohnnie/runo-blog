@@ -1,10 +1,7 @@
 package dev.levelupschool.backend.controller;
 
-import dev.levelupschool.backend.security.auth.AuthenticationProvider;
-import dev.levelupschool.backend.dtos.ArticleDto;
-import dev.levelupschool.backend.dtos.BookmarkDto;
-import dev.levelupschool.backend.dtos.CommentDto;
-import dev.levelupschool.backend.dtos.UserDto;
+import dev.levelupschool.backend.dtos.*;
+import dev.levelupschool.backend.auth.AuthenticationProvider;
 import dev.levelupschool.backend.exception.ModelNotFoundException;
 import dev.levelupschool.backend.model.User;
 import dev.levelupschool.backend.payment.PaymentDetailsDto;
@@ -18,7 +15,6 @@ import dev.levelupschool.backend.subscription.SubscriptionService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
@@ -102,7 +98,7 @@ public class UserController {
     @PostMapping("/register")
     ResponseEntity<?> register(@RequestBody @Valid RegisterDto registerDto) {
         try {
-            var newUser = new User(registerDto.email, registerDto.name, registerDto.password);
+            var newUser = new User(registerDto.getEmail(), registerDto.getName(), registerDto.getPassword());
             var createdUser = userService.createUser(newUser);
             return ResponseEntity.ok(tokenService.generateToken(createdUser.getId()));
         } catch (Exception e) {
@@ -116,7 +112,7 @@ public class UserController {
         var user = userRepository.findByEmail(loginDto.getEmail());
 
         if (user == null) {
-            throw new ModelNotFoundException(User.class, loginDto.email);
+            throw new ModelNotFoundException(User.class, loginDto.getEmail());
         }
 
         if (BCrypt.checkpw(loginDto.getPassword(), user.getPassword())) {
@@ -215,27 +211,5 @@ public class UserController {
 
         return subscriptionService.getSubscriptions(loggedInUser);
 
-    }
-
-    @Getter
-    @Setter
-    private static class LoginDto {
-        @NotBlank
-        @Email
-        private String email;
-        @NotEmpty
-        private String password;
-    }
-
-    @Getter
-    @Setter
-    public static class RegisterDto {
-        @NotBlank
-        @Email
-        private String email;
-        @Size(min = 1, max = 256)
-        private String name;
-        @Size(min = 3, max = 25)
-        private String password;
     }
 }
