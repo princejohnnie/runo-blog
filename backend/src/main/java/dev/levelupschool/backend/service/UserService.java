@@ -41,6 +41,8 @@ public class UserService {
     @Autowired
     private SlugService slugService;
 
+
+
     @Autowired
     private PagedResourcesAssembler<UserDto> pagedResourcesAssembler;
 

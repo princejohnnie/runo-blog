@@ -1,5 +1,6 @@
 package dev.levelupschool.backend.configuration;
 
+
 import dev.levelupschool.backend.auth.CustomAuthenticationFilter;
 import dev.levelupschool.backend.service.TokenService;
 import org.springframework.context.annotation.Bean;
@@ -19,7 +20,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests((authorization) -> authorization
-            .requestMatchers(HttpMethod.POST, "/login", "/register")
+            .requestMatchers(HttpMethod.POST, "/login", "/register", "/google-auth")
             .permitAll()
             .requestMatchers(HttpMethod.DELETE, "/**")
             .authenticated()

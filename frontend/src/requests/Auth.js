@@ -12,6 +12,10 @@ function me() {
     return Http.get(`/me`)
 }
 
+function googleAuth(data) {
+    return Http.post(`/google-auth`, data)
+}
+
 function editProfile(id, data) {
     return Http.put(`/users/${id}`, data)
 }
@@ -28,6 +32,7 @@ export default {
     login,
     register,
     me,
+    googleAuth,
     editProfile,
     subscribe,
     subscriptions

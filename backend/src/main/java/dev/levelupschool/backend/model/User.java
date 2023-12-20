@@ -1,10 +1,12 @@
 package dev.levelupschool.backend.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import dev.levelupschool.backend.enums.Provider;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.hateoas.server.core.Relation;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 
@@ -13,6 +15,7 @@ import java.util.List;
 
 @Getter
 @NoArgsConstructor
+@Setter
 @Entity
 @Table(name = "users", schema = "public")
 @Relation(collectionRelation = "items", itemRelation = "item")
@@ -101,6 +104,20 @@ public class User {
 
     @Override
     public String toString() {
-        return String.format("User[id=%d, name='%s', avatar='%s']", id, name, avatarUrl);
+        return "User{" +
+            "id=" + id +
+            ", email='" + email + '\'' +
+            ", name='" + name + '\'' +
+            ", slug='" + slug + '\'' +
+            ", password='" + password + '\'' +
+            ", avatarUrl='" + avatarUrl + '\'' +
+            ", isPremium=" + isPremium +
+            ", articles=" + articles +
+            ", comments=" + comments +
+            ", subscriptions=" + subscriptions +
+            ", followers=" + followers +
+            ", following=" + following +
+            ", bookmarks=" + bookmarks +
+            '}';
     }
 }

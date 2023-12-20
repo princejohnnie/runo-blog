@@ -1,16 +1,18 @@
 package dev.levelupschool.backend.dtos;
 
 import dev.levelupschool.backend.model.User;
+import lombok.Data;
 import org.springframework.hateoas.server.core.Relation;
 
 @Relation(collectionRelation = "items")
+@Data
 public class UserDto {
-    public Long id;
-    public String name;
-    public String email;
-    public String avatarUrl;
+    private Long id;
+    private String name;
+    private String email;
+    private String avatarUrl;
 
-    public String slug;
+    private String slug;
     public boolean isPremium;
     public UserDto(User user) {
         this.id = user.getId();
