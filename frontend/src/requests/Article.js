@@ -37,4 +37,9 @@ function comments(id) {
     return Http.get(`/articles/${id}/comments`)
 }
 
-export default { index, show, comments, store, userArticles, update, }
+//TODO correct endpoint after backend makes ir available
+function premiumIndex() {
+    return Http.get(`/articles`)
+}
+
+export default { index, show, comments, store, userArticles, update, premiumIndex }

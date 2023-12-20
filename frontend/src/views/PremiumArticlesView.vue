@@ -21,7 +21,8 @@ const links = [
 const articles = ref([])
 const loading = ref(true)
 
-Article.index().then((res) => {
+//TODO  await function for global loader????
+Article.premiumIndex().then((res) => {
     articles.value = res.data._embedded.items;
     loading.value = false
 })
@@ -30,15 +31,10 @@ Article.index().then((res) => {
 
 <template>
     <PremiumHeader />
-
     <section class="section__popularTopics">
         <div class="section__inner">
-
             <h2 class="section__heading">Premium</h2>
-
             <ArticlesList v-if="articles.length" :articleList="articles" :showAllArticles="false" />
-
         </div>
-
     </section>
 </template>
