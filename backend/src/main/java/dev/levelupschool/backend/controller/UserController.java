@@ -1,10 +1,7 @@
 package dev.levelupschool.backend.controller;
 
 import dev.levelupschool.backend.auth.AuthenticationProvider;
-import dev.levelupschool.backend.dtos.ArticleDto;
-import dev.levelupschool.backend.dtos.BookmarkDto;
-import dev.levelupschool.backend.dtos.CommentDto;
-import dev.levelupschool.backend.dtos.UserDto;
+import dev.levelupschool.backend.dtos.*;
 import dev.levelupschool.backend.exception.ModelNotFoundException;
 import dev.levelupschool.backend.model.User;
 import dev.levelupschool.backend.payment.PaymentDetailsDto;
@@ -13,6 +10,8 @@ import dev.levelupschool.backend.repository.UserRepository;
 import dev.levelupschool.backend.request.UpdateUserRequest;
 import dev.levelupschool.backend.service.TokenService;
 import dev.levelupschool.backend.service.UserService;
+import dev.levelupschool.backend.subscription.SubscriptionDto;
+import dev.levelupschool.backend.subscription.SubscriptionService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -20,6 +19,7 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -51,6 +51,9 @@ public class UserController {
 
     @Autowired
     private PaymentService paymentService;
+
+    @Autowired
+    private SubscriptionService subscriptionService;
 
     @GetMapping("/users")
     PagedModel<EntityModel<UserDto>> index(
@@ -177,18 +180,38 @@ public class UserController {
         }
     }
 
-    @PostMapping("/users/become-premium")
-    ResponseEntity<?> becomePremium(@RequestBody @Valid PaymentDetailsDto paymentDetailsDto) {
+    @PostMapping("/users/subscribe")
+    ResponseEntity<?> subscribe(@RequestBody @Valid PaymentDetailsDto paymentDetailsDto) {
+        var loggedInUser = authenticationProvider.getAuthenticatedUser();
+
+        if (paymentDetailsDto.subscriptionType.equals("monthly")) {
+            paymentDetailsDto.amount = 20;
+        } else if (paymentDetailsDto.subscriptionType.equals("yearly")){
+            paymentDetailsDto.amount = 180;
+        }
 
         try {
             var response = paymentService.processPayment(paymentDetailsDto);
-            // TODO: this will be one of the possible group projects next week
-            // var loggedInUser = authenticationProvider.getAuthenticatedUser();
-            // loggedInUser.setPremiumActivatedAt(now());
-            return response;
+
+            JSONObject jsonObject = new JSONObject(response.getBody());
+
+            if (subscriptionService.subscribe(loggedInUser, jsonObject, paymentDetailsDto.subscriptionType)){
+                return new ResponseEntity<>("Your subscription was successful", HttpStatus.OK);
+            }
+
+            return new ResponseEntity<>("Could not verify transaction. Please try again", HttpStatus.REQUEST_TIMEOUT);
+
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @GetMapping("/users/subscriptions")
+    public List<SubscriptionDto> getSubscriptions() {
+        var loggedInUser = authenticationProvider.getAuthenticatedUser();
+
+        return subscriptionService.getSubscriptions(loggedInUser);
+
     }
 
     @Getter

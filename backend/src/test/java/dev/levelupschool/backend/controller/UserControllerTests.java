@@ -3,17 +3,23 @@ package dev.levelupschool.backend.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.levelupschool.backend.auth.AuthenticationProvider;
 import dev.levelupschool.backend.model.Article;
+import dev.levelupschool.backend.model.CardExpiryDate;
 import dev.levelupschool.backend.model.Comment;
 import dev.levelupschool.backend.model.User;
+import dev.levelupschool.backend.payment.PaymentDetailsDto;
+import dev.levelupschool.backend.payment.PaymentService;
 import dev.levelupschool.backend.repository.ArticleRepository;
 import dev.levelupschool.backend.repository.CommentRepository;
+import dev.levelupschool.backend.repository.SubscriptionRepository;
 import dev.levelupschool.backend.repository.UserRepository;
 import dev.levelupschool.backend.service.TokenService;
 import dev.levelupschool.backend.service.UserService;
 import dev.levelupschool.backend.storage.StorageService;
+import dev.levelupschool.backend.subscription.SubscriptionService;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import org.json.JSONObject;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -22,7 +28,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.test.annotation.DirtiesContext;
@@ -77,6 +85,15 @@ public class UserControllerTests {
     @Qualifier("AWSStorageService")
     @MockBean
     private StorageService storageService;
+
+    @MockBean
+    private PaymentService paymentService;
+
+    @MockBean
+    private SubscriptionService subscriptionService;
+
+    @Autowired
+    private SubscriptionRepository subscriptionRepository;
 
 
     @Test
@@ -353,6 +370,44 @@ public class UserControllerTests {
                     .contentType(MediaType.APPLICATION_JSON)
             ).andExpect(status().isOk())
             .andExpect(jsonPath("$", hasSize(1)));
+    }
+
+    @Test
+    public void givenUser_whenSubscribeUser_thenMakePremium() throws Exception {
+        var authenticatedUser = userRepository.save(new User("johndoe@gmail.com", "John Uzodinma",  "password2"));
+
+        Mockito.when(authenticationProvider.getAuthenticatedUser()).thenReturn(authenticatedUser);
+
+        CardExpiryDate cardExpiryDate = new CardExpiryDate();
+        cardExpiryDate.setMonth(11);
+        cardExpiryDate.setYear(2024);
+
+        PaymentDetailsDto paymentDetailsDto = new PaymentDetailsDto();
+        paymentDetailsDto.cardNumber = "4751763236699647";
+        paymentDetailsDto.cardHolder = "Vivian Stephen";
+        paymentDetailsDto.cardCvv = "470";
+        paymentDetailsDto.cardPin = "3310";
+        paymentDetailsDto.email = "princejohnc35@gmail.com";
+        paymentDetailsDto.amount = 200;
+        paymentDetailsDto.phone = "08109514619";
+        paymentDetailsDto.subscriptionType = "monthly";
+        paymentDetailsDto.cardExpiryDate = cardExpiryDate;
+
+        var payload = objectMapper.writeValueAsString(paymentDetailsDto);
+
+        ResponseEntity<String> responseEntity = new ResponseEntity<>("{'error': False, 'status': 'success', 'validationRequired': False, 'txRef': 'MC-1703038981835', 'flwRef': 'FLW-MOCK-fe652982c08e124528277a3a2b9d1037', 'suggestedAuth': None, 'authUrl': 'https://ravesandboxapi.flutterwave.com/mockvbvpage?ref=FLW-MOCK-fe652982c08e124528277a3a2b9d1037&code=00&message=Approved. Successful&receiptno=RN1703038983175'}", HttpStatus.OK);
+
+        Mockito.when(paymentService.processPayment(Mockito.any(PaymentDetailsDto.class))).thenReturn(responseEntity);
+
+        Mockito.when(subscriptionService.subscribe(Mockito.any(User.class), Mockito.any(JSONObject.class), Mockito.any(String.class))).thenReturn(true);
+
+        mockMvc.perform(
+            post("/users/subscribe")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(payload)
+        ).andExpect(status().isOk());
+
+
     }
 
     @Getter

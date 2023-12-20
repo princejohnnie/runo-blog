@@ -3,6 +3,7 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 import datetime
 from datetime import datetime
+import json
  
 month = datetime.now().month
 year = datetime.now().year
@@ -20,7 +21,8 @@ class PaymentDetails(BaseModel):
     card_holder: str
     card_number: str
     card_cvv: str
-    card_expiry_date: str
+    card_expiry_month: int
+    card_expiry_year: int
     card_pin: str
     email: str
     phone: str
@@ -30,7 +32,7 @@ class PaymentDetails(BaseModel):
 
 CardType = str
 
-payload = {
+mockPayload = {
   "cardno": "4751763236699647",
   "cvv": "470",
   "expirymonth": "09",
@@ -61,13 +63,13 @@ def process_payment(payment_details: PaymentDetails) -> dict:
     firstName = payment_details.card_holder.split()[0]
     lastName = payment_details.card_holder.split()[1]
 
-    expiryMonth = payment_details.card_expiry_date.split("-")[0]
-    expiryYear = payment_details.card_expiry_date.split("-")[1][-2:]
+    expiryMonth = str(payment_details.card_expiry_month)
+    expiryYear = str(payment_details.card_expiry_year)
 
     print("expirymonth -> ", expiryMonth)
     print("expirymonth -> ", expiryYear)
 
-    payload2 = {
+    payload = {
         "cardno": payment_details.card_number,
         "cvv": payment_details.card_cvv,
         "expirymonth": expiryMonth,
@@ -82,19 +84,15 @@ def process_payment(payment_details: PaymentDetails) -> dict:
     }
 
     try:
-        res = rave.Card.charge(payload2)
-
-        print("First Card Res -> ", res)
+        res = rave.Card.charge(payload)
 
         if res["validationRequired"]:
             print("Validating Payment!")
             rave.Card.validate(res["flwRef"], "12345")
 
-        print("TESTING DOCKER!!!")
-
         transactionStatus = rave.Card.verify(res["txRef"])
 
-        print("Transaction Complete -> ", transactionStatus["transactionComplete"])
+        print("Transaction Status -> ", transactionStatus["transactionComplete"])
 
         return JSONResponse(res, status_code=status.HTTP_200_OK)
 
@@ -167,11 +165,10 @@ def validate_cvv(payment_details: PaymentDetails, card_type: CardType) -> None:
     
     
 def validate_card_expiry(payment_details: PaymentDetails) -> None:
-    print("Before Validate Card Expiry")
-    month = int(payment_details.card_expiry_date.split("-")[0])
-    year = int(payment_details.card_expiry_date.split("-")[1])
-    print("Month -> ", month)
-    print("Year -> ", year)
+    month = payment_details.card_expiry_month
+    year = payment_details.card_expiry_year
+    print("Expiry Month -> ", month)
+    print("Expiry Year -> ", year)
 
     currentMonth = datetime.now().month
     currentYear = datetime.now().year
