@@ -7,6 +7,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
+import java.util.Map;
 
 @Service
 public class MicroserviceProxyPaymentService implements PaymentService {
@@ -18,7 +19,7 @@ public class MicroserviceProxyPaymentService implements PaymentService {
     private String gatewayPort;
 
     @Override
-    public ResponseEntity<?> processPayment(PaymentDetailsDto paymentDetailsDto) {
+    public ResponseEntity<String> processPayment(PaymentDetailsDto paymentDetailsDto) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
@@ -26,7 +27,8 @@ public class MicroserviceProxyPaymentService implements PaymentService {
         requestBody.put("card_holder", paymentDetailsDto.cardHolder);
         requestBody.put("card_number", paymentDetailsDto.cardNumber);
         requestBody.put("card_cvv", paymentDetailsDto.cardCvv);
-        requestBody.put("card_expiry_date", paymentDetailsDto.cardExpiryDate);
+        requestBody.put("card_expiry_month", paymentDetailsDto.cardExpiryDate.getMonth());
+        requestBody.put("card_expiry_year", paymentDetailsDto.cardExpiryDate.getYear());
         requestBody.put("card_pin", paymentDetailsDto.cardPin);
         requestBody.put("email", paymentDetailsDto.email);
         requestBody.put("amount", paymentDetailsDto.amount);
@@ -37,6 +39,7 @@ public class MicroserviceProxyPaymentService implements PaymentService {
 
         try {
             ResponseEntity<String> response = new RestTemplate().postForEntity(url, request, String.class);
+            System.out.println("Microservice response -> " + response.getBody());
             return response;
         } catch (HttpClientErrorException e) {
             // TODO: report the error to the user informing them what went wrong

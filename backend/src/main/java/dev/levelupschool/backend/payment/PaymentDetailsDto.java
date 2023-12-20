@@ -1,5 +1,6 @@
 package dev.levelupschool.backend.payment;
 
+import dev.levelupschool.backend.model.CardExpiryDate;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -13,9 +14,7 @@ public class PaymentDetailsDto {
     @Size(min = 2, max = 64)
     public String cardHolder;
 
-    @NotNull
-    @Size(min = 7, max = 7)
-    public String cardExpiryDate; // YYYY-MM
+    public CardExpiryDate cardExpiryDate;
 
     @NotNull
     @Size(min = 3, max = 4)
@@ -31,4 +30,8 @@ public class PaymentDetailsDto {
     public int amount;
 
     public String phone;
+
+    public String address;
+
+    public String subscriptionType;
 }

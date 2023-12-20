@@ -31,6 +31,8 @@ public class User {
 
     private String avatarUrl;
 
+    private boolean isPremium;
+
     @OneToMany(mappedBy = "author", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Article> articles;
@@ -38,6 +40,10 @@ public class User {
     @OneToMany(mappedBy = "author", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Comment> comments;
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<Subscription> subscriptions;
 
     @ManyToMany
     @JoinTable(
@@ -87,6 +93,10 @@ public class User {
 
     public void setPassword(String password) {
         this.password = BCrypt.hashpw(password.getBytes(), BCrypt.gensalt());
+    }
+
+    public void setPremium(List<Subscription> subscriptions) {
+        this.isPremium = subscriptions.stream().anyMatch(subscription -> subscription.getUser().getId().equals(id) && subscription.isActive());
     }
 
     @Override
