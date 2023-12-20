@@ -93,7 +93,7 @@ const subscriptionMonthlyCost = computed(() => {
                 </div>
                 <Input type="text" name="number" label="Card number" placeholder=""
                     v-model:value="subscriptionData.cardNumber" required />
-                <div class="editSubscription__gridOptions">
+                <div class="editSubscription__gridOptionsModal">
                     <Input type="text" name="cvv" label="CVV" placeholder="" v-model:value="subscriptionData.cardCvv"
                         style="width:100%" required />
 
