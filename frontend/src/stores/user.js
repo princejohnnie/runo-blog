@@ -52,6 +52,37 @@ export const useUserStore = defineStore('user', () => {
 
     }
 
+    async function subscribe(data) {
+        try {
+            const response = await Auth.subscribe(data)
+            console.log("Got subscription: ", response.data)
+
+            Swal.fire({
+                title: "Success!",
+                text: "You have subscribed successfully!",
+                icon: "success"
+            });
+        } catch(error) {
+            console.log("Subscribe error: ", error)
+            Swal.fire({
+                title: "Error!",
+                text: error.message,
+                icon: "error"
+            });
+        }
+    }
+
+    async function subscriptions() {
+        try {
+            const response = await Auth.subscriptions()
+            console.log("Got subscriptions: ", response.data)
+            return response;
+        } catch(error) {
+            console.log("Subscriptions error: ", error)
+
+        }
+    }
+
     async function logout() {
         localStorage.removeItem('token')
         user.value = null
@@ -75,7 +106,8 @@ export const useUserStore = defineStore('user', () => {
         premium,
         wantsPremium,
         successNotification,
-        notificationClosed
-
+        notificationClosed,
+        subscribe,
+        subscriptions
     }
 })

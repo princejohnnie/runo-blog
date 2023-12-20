@@ -21,22 +21,21 @@ const monthlyCost = ref(20);
 const subscriptionData = ref({
     cardNumber: '',
     cardCvv: '',
+    cardPin: '',
     cardExpiryDate: '',
-    name: '',
-    surname: '',
+    cardHolder: '',
     address: '',
     subscriptionType: 'monthly',
     email: '',
+    phone: ''
 
 });
 
 //TODO define submit logic when backend endpoint exists
 const submitForm = async () => {
-    //const response = await Auth.register(data.value)
-    //localStorage.setItem('token', response.data);
-
-    //await userStore.me()
-
+    //console.log(subscriptionData.value);
+    const response = await userStore.subscribe(subscriptionData.value);
+    await userStore.me()
     showSuccessAlert()
 
 }
@@ -93,9 +92,12 @@ const subscriptionMonthlyCost = computed(() => {
                     </div>
                 </div>
                 <Input type="text" name="number" label="Card number" placeholder=""
-                    v-model:value="subscriptionData.cardNumber" />
+                    v-model:value="subscriptionData.cardNumber" required />
                 <div class="editSubscription__gridOptions">
                     <Input type="text" name="cvv" label="CVV" placeholder="" v-model:value="subscriptionData.cardCvv"
+                        style="width:100%" required />
+
+                    <Input type="text" name="pin" label="Pin" placeholder="" v-model:value="subscriptionData.cardPin"
                         style="width:100%" />
 
                     <div class="editSubscription__gridOption">
@@ -104,10 +106,11 @@ const subscriptionMonthlyCost = computed(() => {
                             required hideInputIcon placeholder="12/2023"></VueDatePicker>
                     </div>
                 </div>
-                <Input type="text" name="name" label="Name" placeholder="Your name" v-model:value="subscriptionData.name" />
-                <Input type="text" name="surname" label="Surname" placeholder="Your surname"
-                    v-model:value="subscriptionData.surname" />
+                <Input type="text" name="cardHolder" label="Card holder" placeholder=""
+                    v-model:value="subscriptionData.cardHolder" />
                 <Input type="text" name="address" label="Address" placeholder="" v-model:value="subscriptionData.address" />
+                <Input type="text" name="phone" label="Phone number" placeholder=""
+                    v-model:value="subscriptionData.phone" />
                 <Input type="email" name="email" label="Email" placeholder="" v-model:value="subscriptionData.email" />
 
                 <div class="editSubscription__inputWrapper">

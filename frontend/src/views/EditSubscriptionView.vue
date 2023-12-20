@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed } from 'vue';
 import { useUserStore } from '@/stores/user.js';
+import { useRouter } from 'vue-router';
 import ProfileHeader from "@/components/profile/ProfileHeader.vue";
 import Input from '@/components/form/Input.vue';
 import Form from '@/components/form/Form.vue';
@@ -8,7 +9,9 @@ import Button from '@/components/form/Button.vue';
 import VueDatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css';
 import ChevronDownIcon from '@/components/icons/ChevronDownIcon.vue'
+import Swal from 'sweetalert2';
 
+const router = useRouter()
 const userStore = useUserStore();
 const links = [
     {
@@ -21,50 +24,47 @@ const links = [
 const subscriptionData = ref({
     cardNumber: '',
     cardCvv: '',
+    cardPin: '',
     cardExpiryDate: '',
-    name: '',
-    surname: '',
+    cardHolder: '',
     address: '',
     subscriptionType: 'monthly',
     email: '',
+    phone: ''
 
 });
 
 const isVisible = ref(false);
 
-const history = [
-    {
-        transactionId: "1223",
-        start: "10.10.2021",
-        end: "10.10.22",
-        status: "Active"
-    },
-    {
-        transactionId: "564",
-        start: "9.10.2021",
-        end: "10.10.21",
-        status: "Ended"
-    }
-]
+const history = ref([]);
 
 const monthlyCost = ref(20);
+
+userStore.subscriptions().then((res) => {
+    console.log(res.data);
+    history.value = res.data;
+})
 
 const toggleTable = () => {
     isVisible.value = !isVisible.value;
 
 };
 
+const showSuccessAlert = () => {
+    Swal.fire({
+        title: "Success!",
+        text: "You have logged in successfully!",
+        icon: "success"
+    });
+}
+
 const submitForm = async () => {
-    //change to data
-    const formData = new FormData();
-    for (const key in subscriptionData.value) {
-        formData.append(key, subscriptionData.value[key]);
-    }
+    //console.log(subscriptionData.value);
+    const response = await userStore.subscribe(subscriptionData.value);
+    await userStore.me()
+    showSuccessAlert()
 
-    console.log(formData);
-
-    //const response = await userStore.editUser(userStore.user.id, formData);
-    //await userStore.me();
+    router.push({ name: 'my-profile' })
 };
 
 const subscriptionTotalCost = computed(() => {
@@ -82,6 +82,24 @@ const subscriptionMonthlyCost = computed(() => {
         return monthlyCost.value * 0.75;
     }
 })
+
+const subscriptionDate = (transaction) => {
+    const relevantDate = computed(() => {
+        const dateObject = new Date(transaction);
+        const day = dateObject.getDate();
+        const month = dateObject.getMonth() + 1;
+        const year = dateObject.getFullYear();
+        return `${day}.${month}.${year}`;
+    });
+    return relevantDate.value;
+};
+
+const subscriptionStatus = (transaction) => {
+    const relevantStatus = computed(() => {
+        return transaction.charAt(0).toUpperCase() + transaction.slice(1);
+    });
+    return relevantStatus.value;
+};
 
 </script>
 <template>
@@ -111,9 +129,12 @@ const subscriptionMonthlyCost = computed(() => {
                     </div>
                 </div>
                 <Input type="text" name="number" label="Card number" placeholder=""
-                    v-model:value="subscriptionData.cardNumber" />
+                    v-model:value="subscriptionData.cardNumber" required />
                 <div class="editSubscription__gridOptions">
                     <Input type="text" name="cvv" label="CVV" placeholder="" v-model:value="subscriptionData.cardCvv"
+                        style="width:100%" required />
+
+                    <Input type="text" name="pin" label="Pin" placeholder="" v-model:value="subscriptionData.cardPin"
                         style="width:100%" />
 
                     <div class="editSubscription__gridOption">
@@ -122,10 +143,11 @@ const subscriptionMonthlyCost = computed(() => {
                             required hideInputIcon placeholder="12/2023"></VueDatePicker>
                     </div>
                 </div>
-                <Input type="text" name="name" label="Name" placeholder="Your name" v-model:value="subscriptionData.name" />
-                <Input type="text" name="surname" label="Surname" placeholder="Your surname"
-                    v-model:value="subscriptionData.surname" />
+                <Input type="text" name="cardHolder" label="Card holder" placeholder=""
+                    v-model:value="subscriptionData.cardHolder" />
                 <Input type="text" name="address" label="Address" placeholder="" v-model:value="subscriptionData.address" />
+                <Input type="text" name="phone" label="Phone number" placeholder=""
+                    v-model:value="subscriptionData.phone" />
                 <Input type="email" name="email" label="Email" placeholder="" v-model:value="subscriptionData.email" />
 
                 <div class="editSubscription__inputWrapper">
@@ -154,10 +176,10 @@ const subscriptionMonthlyCost = computed(() => {
                         <template v-for="(transaction, index) in history" :key="index">
                             <tr>
                                 <td>{{ transaction.transactionId }}</td>
-                                <td>{{ transaction.start }}</td>
-                                <td>{{ transaction.end }}</td>
-                                <td :class="{ 'subscription__statusActive': transaction.status === 'Active' }">
-                                    {{ transaction.status }}
+                                <td>{{ subscriptionDate(transaction.startDate) }}</td>
+                                <td>{{ subscriptionDate(transaction.endDate) }}</td>
+                                <td :class="{ 'subscription__statusActive': transaction.status === 'active' }">
+                                    {{ subscriptionStatus(transaction.status) }}
                                 </td>
                             </tr>
                         </template>
