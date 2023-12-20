@@ -1,4 +1,6 @@
 <script setup>
+import { ref, computed } from 'vue';
+import { useUserStore } from '@/stores/user.js'
 import Modal from '@/components/modals/Modal.vue';
 import Swal from 'sweetalert2';
 import Input from '@/components//form/Input.vue';
@@ -8,12 +10,7 @@ import Auth from '@/requests/Auth.js';
 import VueDatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css';
 
-import { ref, computed } from 'vue';
-import { useUserStore } from '@/stores/user.js'
-
-
 const userStore = useUserStore()
-
 const emit = defineEmits(['closeModal'])
 
 const isProcessing = ref(false)
@@ -36,7 +33,7 @@ const submitForm = async () => {
     //console.log(subscriptionData.value);
     const response = await userStore.subscribe(subscriptionData.value);
     await userStore.me()
-    showSuccessAlert()
+    //showSuccessAlert()
 
 }
 

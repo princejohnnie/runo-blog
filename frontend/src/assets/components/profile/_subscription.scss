@@ -5,8 +5,8 @@
 .subscription__inner {
     display: flex;
     flex-direction: column;
-    padding: 30px 70px;
-    max-height: 377px;
+    padding: 30px 70px 80px 70px;
+    //max-height: 377px;
     background: rgba(229, 229, 229, 0.30);
 
     @include for-phone {
@@ -73,9 +73,64 @@
   background: $brandColor;
   border: none;
   color: $white;
+  transition: .5s all;
+
+  &:hover {
+      cursor: pointer;
+      background: #343A40;
+  }
 
     @include for-tablet {
         padding: 10px 25px;
     }
 
+}
+
+.subscription__logoBackground{
+    @extend .premiumHeader__logoBackground;
+    margin-right: 200px;
+}
+
+.subscription__ActiveType{
+    color: #D4A373;
+    font-family: $primaryFontFamily;
+    font-size: 1.714rem;
+    font-weight: 700;
+    line-height: 25px;
+    margin-top: 0;
+    margin-bottom: 28px;
+}
+
+.subscription__editOption{
+    color: #D4A373;
+    font-family: $primaryFontFamily;
+    font-size: 1.143rem;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 25px;
+    margin: 24px 0;
+}
+
+.subscription__activeDates{
+    display: flex;
+    gap: 5px;
+    padding-bottom: 8px;
+}
+
+.subscription__activeDate{
+    color: #495057;
+    font-family: $primaryFontFamily;
+    font-size: 1.143rem;
+    font-weight: 700;
+    line-height: 25px;
+    margin: 0 ;
+}
+
+.subscription__activeDateValue{
+    color: #495057;
+    font-family: $primaryFontFamily;
+    font-size: 1.143rem;
+    font-weight: 500;
+    line-height: 25px;
+    margin: 0;
 }
