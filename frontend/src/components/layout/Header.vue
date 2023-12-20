@@ -54,7 +54,7 @@ watch(() => [userStore.premium, userStore.successNotification], function () {
                         </router-link>
                     </li>
                     <li class="mainHeader__nav-item">
-                        <a href="#" class="mainHeader__nav-link" @click.prevent="openSubscribeModal()">About</a>
+                        <a href="#" class="mainHeader__nav-link">About</a>
                     </li>
                     <li class="mainHeader__nav-item">
                         <router-link to="/articles" class="mainHeader__nav-link">

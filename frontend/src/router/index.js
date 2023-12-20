@@ -8,6 +8,7 @@ import EditProfileView from "@/views/EditProfileView.vue";
 import CreateArticleView from "@/views/CreateArticleView.vue";
 import EditArticleView from "@/views/EditArticleView.vue";
 import EditSubscriptionView from '@/views/EditSubscriptionView.vue'
+import PremiumArticlesView from '@/views/PremiumArticlesView.vue'
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -69,6 +70,14 @@ const router = createRouter({
             path: '/edit-subscription',
             name: 'edit-subscription',
             component: EditSubscriptionView,
+            meta: {
+              requiresAuth: true
+            }
+          },
+          {
+            path: '/premium-articles',
+            name: 'premium-articles',
+            component: PremiumArticlesView,
             meta: {
               requiresAuth: true
             }
