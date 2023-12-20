@@ -1,7 +1,7 @@
 package dev.levelupschool.backend.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dev.levelupschool.backend.auth.AuthenticationProvider;
+import dev.levelupschool.backend.security.auth.AuthenticationProvider;
 import dev.levelupschool.backend.model.Article;
 import dev.levelupschool.backend.model.Comment;
 import dev.levelupschool.backend.model.User;
@@ -30,7 +30,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.net.URI;
 import java.net.URL;
-import java.nio.file.Path;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;

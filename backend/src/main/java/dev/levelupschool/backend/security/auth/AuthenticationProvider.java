@@ -1,4 +1,4 @@
-package dev.levelupschool.backend.auth;
+package dev.levelupschool.backend.security.auth;
 
 import dev.levelupschool.backend.model.User;
 

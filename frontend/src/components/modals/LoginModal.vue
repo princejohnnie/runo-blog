@@ -49,7 +49,9 @@ const showSuccessAlert = () => {
                 <Input type="text" name="email" label="Email:" placeholder="johndoe@gmail.com" v-model:value="data.email"/>
 
                 <Input type="password" name="password" label="Password:" placeholder="***********" v-model:value="data.password" />
-
+                <div class="loginWithGoogle">
+                    <h4><a href="/login/oauth2/code/google">Login with Google</a></h4>
+                </div>
                 <div class="modal__inputWrapper">
                     <Button type="submit" class="modal__inputButton" :isProcessing="isProcessing">
                         Log in

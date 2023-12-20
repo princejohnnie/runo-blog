@@ -2,6 +2,11 @@ package dev.levelupschool.backend.controller;
 
 import dev.levelupschool.backend.auth.AuthenticationProvider;
 import dev.levelupschool.backend.dtos.*;
+import dev.levelupschool.backend.security.auth.AuthenticationProvider;
+import dev.levelupschool.backend.dtos.ArticleDto;
+import dev.levelupschool.backend.dtos.BookmarkDto;
+import dev.levelupschool.backend.dtos.CommentDto;
+import dev.levelupschool.backend.dtos.UserDto;
 import dev.levelupschool.backend.exception.ModelNotFoundException;
 import dev.levelupschool.backend.model.User;
 import dev.levelupschool.backend.payment.PaymentDetailsDto;
@@ -226,7 +231,7 @@ public class UserController {
 
     @Getter
     @Setter
-    private static class RegisterDto {
+    public static class RegisterDto {
         @NotBlank
         @Email
         private String email;
