@@ -38,6 +38,13 @@ watch(() => [userStore.premium, userStore.successNotification], function () {
     }
 });
 
+const unCheckMenu = () => {
+    menuOpen.value = false;
+}
+
+watch(route, () => { unCheckMenu }
+);
+
 </script>
 <template>
     <header class="mainHeader">
@@ -77,13 +84,16 @@ watch(() => [userStore.premium, userStore.successNotification], function () {
                         </router-link>
                     </li>
                     <li v-if="userStore.isGuest" class="mainHeader__nav-item">
-                        <a href="#" @click.prevent="openLoginModal()" class="mainHeader__nav-link">Login</a>
+                        <a href="#" @click.prevent="openLoginModal()" class="mainHeader__nav-link"
+                            @click="unCheckMenu">Login</a>
                     </li>
                     <li v-if="userStore.isGuest" class="mainHeader__nav-item">
-                        <a href="#" @click.prevent="openRegisterModal()" class="mainHeader__nav-link">Register</a>
+                        <a href="#" @click.prevent="openRegisterModal()" class="mainHeader__nav-link"
+                            @click="unCheckMenu">Register</a>
                     </li>
                     <li v-if="userStore.isLoggedIn" class="mainHeader__nav-item">
-                        <a href="#" @click.prevent="logoutUser()" class="mainHeader__nav-link">Logout</a>
+                        <a href="#" @click.prevent="logoutUser()" class="mainHeader__nav-link"
+                            @click="unCheckMenu">Logout</a>
                     </li>
                 </ul>
             </nav>
