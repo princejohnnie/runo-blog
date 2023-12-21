@@ -23,7 +23,8 @@ const loading = ref(true)
 
 //TODO  await function for global loader????
 Article.premiumIndex().then((res) => {
-    articles.value = res.data;
+    console.log(res.data._embedded.items)
+    articles.value = res.data._embedded.items;
     loading.value = false
 })
 

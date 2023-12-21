@@ -16,8 +16,8 @@ const isProcessing = ref(false)
 
 
 const submitForm = async () => {
-    //const response = await userStore.cancelSubscription(userStore.user.currentSubscription.id)
-    //await userStore.me()
+    const response = await userStore.cancelSubscription(userStore.user.currentSubscription.id)
+    await userStore.me()
     modalStore.closeModal();
 }
 

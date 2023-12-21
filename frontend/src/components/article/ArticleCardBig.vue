@@ -53,13 +53,12 @@ const formattedDate = computed(() => {
         <router-link :to="`/articles/${article.id}`">
             <img class="editorArticle__image" :src="article.coverUrl || defaultCover">
             <div class="editorArticle__image--dullBackground"></div>
-        <router-link :to="`/articles/${article.id}/edit`">
-            <EditArticleIcon v-if="showCreateIcon" class="editorArticle__edit-icon"/>
-        </router-link>
+            <router-link :to="`/articles/${article.id}/edit`">
+                <EditArticleIcon v-if="showCreateIcon" class="editorArticle__edit-icon" />
+            </router-link>
             <div class="editorArticle__category">FASHION</div>
             <div class="editorArticle__inner">
-                <img src="/images/premium-icon.png" v-if="props.article.isPremium" class="editorArticle__premium-icon">
-                <PremiumIcon class="editorArticle__premium-icon"/>
+                <PremiumIcon class="editorArticle__premium-icon" v-if="article.isPremium" />
                 <time class="editorArticle__time">{{ formattedDate }}</time>
                 <p class="editorArticle__heading">{{ shortTitle }}</p>
                 <p class="editorArticle__text">{{ shortContent }}</p>
