@@ -45,8 +45,8 @@ public class BaseSubscriptionService implements SubscriptionService {
     }
 
     @Override
-    public List<SubscriptionDto> getSubscriptions(User user) {
-        return subscriptionRepository.findByUserId(user.getId()).stream().map(SubscriptionDto::new).toList();
+    public List<Subscription> getSubscriptions(User user) {
+        return subscriptionRepository.findByUserId(user.getId());
     }
 
     @Override

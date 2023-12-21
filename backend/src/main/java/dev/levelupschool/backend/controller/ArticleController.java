@@ -36,9 +36,14 @@ public class ArticleController {
     }
 
     @GetMapping("/articles-premium")
-    List<ArticleDto> indexPremium(
+    ResponseEntity<?> indexPremium(
         @PageableDefault(page = 0, size = Integer.MAX_VALUE, sort = {"title", "author"}) Pageable paging) {
-        return articleService.getPremiumArticles(paging);
+        try {
+            PagedModel<EntityModel<ArticleDto>> premiumArticles = articleService.getPremiumArticles(paging);
+            return new ResponseEntity<>(premiumArticles, HttpStatus.OK);
+        } catch (CustomValidationException e) {
+            return new ResponseEntity<>(e.reason, HttpStatus.UNAUTHORIZED);
+        }
     }
 
     @GetMapping("/articles/{id}")

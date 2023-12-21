@@ -2,7 +2,9 @@ package dev.levelupschool.backend.controller;
 
 import dev.levelupschool.backend.dtos.*;
 import dev.levelupschool.backend.auth.AuthenticationProvider;
+import dev.levelupschool.backend.exception.CustomValidationException;
 import dev.levelupschool.backend.exception.ModelNotFoundException;
+import dev.levelupschool.backend.model.Subscription;
 import dev.levelupschool.backend.model.User;
 import dev.levelupschool.backend.payment.PaymentDetailsDto;
 import dev.levelupschool.backend.payment.PaymentService;
@@ -60,9 +62,14 @@ public class UserController {
     }
 
     @GetMapping("/users")
-    PagedModel<EntityModel<UserDto>> index(
+    ResponseEntity<?> index(
         @PageableDefault(page = 0, size = Integer.MAX_VALUE, sort = {"name"}) Pageable paging) {
-        return userService.getAllUsers(paging);
+        try {
+            var users =  userService.getAllUsers(paging);
+            return new ResponseEntity<>(users, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
     }
 
     @GetMapping("/users/{id}")
@@ -215,14 +222,16 @@ public class UserController {
     @GetMapping("/user/subscriptions")
     public List<SubscriptionDto> getSubscriptions() {
         var loggedInUser = authenticationProvider.getAuthenticatedUser();
-        return subscriptionService.getSubscriptions(loggedInUser);
-
+        return subscriptionService.getSubscriptions(loggedInUser).stream().map(SubscriptionDto::new).toList();
     }
 
     @PostMapping("/user/cancel-subscription/{id}")
     public ResponseEntity<String> cancelSubscription(@PathVariable Long id) {
         var loggedInUser = authenticationProvider.getAuthenticatedUser();
         if (subscriptionService.cancelSubscription(id, loggedInUser)) {
+            var user = userRepository.findById(loggedInUser.getId()).orElseThrow(() -> new ModelNotFoundException(User.class, loggedInUser.getId()));
+            user.setPremium(subscriptionService.getSubscriptions(loggedInUser));
+            userRepository.save(user);
             return new ResponseEntity<>("Subscription cancelled successfully", HttpStatus.OK);
         } else {
             return new ResponseEntity<>("Could not cancel subscription", HttpStatus.BAD_REQUEST);

@@ -11,7 +11,7 @@ import java.util.List;
 public interface SubscriptionService {
     boolean subscribe(User user, JSONObject jsonObject, String subscriptionType);
 
-    List<SubscriptionDto> getSubscriptions(User user);
+    List<Subscription> getSubscriptions(User user);
     boolean cancelSubscription(Long subscriptionId, User user);
 
 
