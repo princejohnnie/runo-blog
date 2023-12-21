@@ -10,7 +10,7 @@ import slugify from '@/utils/slugify'
 import { ref, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { QuillEditor } from '@vueup/vue-quill'
-import ImageUpload from '../form/ImageUpload.vue'
+import ImageUpload from '@/form/ImageUpload.vue'
 import MultiSelectTags from '@/components/form/MultiSelectTags.vue'
 
 const isProcessing = ref(false)
