@@ -10,6 +10,7 @@ export const useUserStore = defineStore('user', () => {
 
     const isLoggedIn = computed(() => user.value !== null)
     const isGuest = computed(() => user.value === null )
+    const isPremium = computed(() => user.value !== null && user.value.isPremium )
 
     async function me() {
         try {
@@ -99,6 +100,7 @@ export const useUserStore = defineStore('user', () => {
         user,
         isLoggedIn,
         isGuest,
+        isPremium,
         me,
         login,
         register,

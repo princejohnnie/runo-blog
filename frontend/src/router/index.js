@@ -93,10 +93,17 @@ router.beforeEach(async(to, from, next) => {
         await userStore.me();
     }
 
+    if (to.meta.requiresAuth && to.name === 'premium-articles' ) {
+        if (userStore.isPremium) {
+            next();
+        } else {
+            next({ name: "home" });
+        }
+    }
+
     if(to.meta.requiresAuth && userStore.isGuest) {
         next({ name: "home" })
     }
-
     next();
 
 })
