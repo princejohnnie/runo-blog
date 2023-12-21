@@ -5,12 +5,15 @@ import SubscribeModal from "@/components/modals/SubscribeModal.vue";
 import { useModalStore } from '@/stores/modal'
 import { useUserStore } from '@/stores/user'
 import { useRouter } from 'vue-router';
-import { watch } from 'vue';
+import { ref, watch, watchEffect, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
 
 const modalStore = useModalStore();
 const userStore = useUserStore();
 const router = useRouter();
-
+const menuOpen = ref(false);
+const menuToggleRef = ref(false);
+const route = useRoute();
 
 const openLoginModal = () => {
     modalStore.openModal('login')
@@ -35,9 +38,19 @@ watch(() => [userStore.premium, userStore.successNotification], function () {
     }
 });
 
+watch('route.name', () => {
+    console.debug(`MyCoolComponent - watch route.name changed to ${route.name}`);
+})
+
+onMounted(() => {
+    // Assign the ref after the component is mounted
+    menuToggleRef.value = document.getElementById('menu-toggle');
+});
+
+watchEffect(() => {
+    menuOpen.value = false;
+});
 </script>
-
-
 <template>
     <header class="mainHeader">
         <div class="mainHeader__inner">
@@ -47,13 +60,22 @@ watch(() => [userStore.premium, userStore.successNotification], function () {
                 </router-link>
             </h1>
             <nav class="mainHeader__nav">
-                <ul class="mainHeader__nav-list">
+                <input id="menu-toggle" type="checkbox" v-model="menuOpen" />
+                <label class='menu-button-container' for="menu-toggle">
+                    <div class='menu-button'></div>
+                </label>
+                <ul class="mainHeader__nav-list menu">
                     <li class="mainHeader__nav-item">
                         <router-link to="/" class="mainHeader__nav-link">
                             Home
                         </router-link>
                     </li>
-                    <li class="mainHeader__nav-item">
+                    <li class="mainHeader__nav-item" v-if="userStore.isPremium">
+                        <router-link to="/premium-articles" class="mainHeader__nav-link">
+                            Premium
+                        </router-link>
+                    </li>
+                    <li class="mainHeader__nav-item" v-else>
                         <a href="#" class="mainHeader__nav-link">About</a>
                     </li>
                     <li class="mainHeader__nav-item">
