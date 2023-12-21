@@ -15,6 +15,7 @@ import dev.levelupschool.backend.subscription.SubscriptionService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
@@ -49,10 +50,14 @@ public class UserController {
     private AuthenticationProvider authenticationProvider;
 
     @Autowired
-    private PaymentService paymentService;
-
-    @Autowired
     private SubscriptionService subscriptionService;
+
+
+    private final PaymentService paymentService;
+
+    UserController(PaymentService paymentService) {
+        this.paymentService = paymentService;
+    }
 
     @GetMapping("/users")
     PagedModel<EntityModel<UserDto>> index(
@@ -192,24 +197,57 @@ public class UserController {
         try {
             var response = paymentService.processPayment(paymentDetailsDto);
 
-            JSONObject jsonObject = new JSONObject(response.getBody());
+            String newResponse = response.getBody().substring(response.getBody().indexOf("{"));
+
+            JSONObject jsonObject = new JSONObject(newResponse);
 
             if (subscriptionService.subscribe(loggedInUser, jsonObject, paymentDetailsDto.subscriptionType)){
                 return new ResponseEntity<>("Your subscription was successful", HttpStatus.OK);
             }
 
-            return new ResponseEntity<>("Could not verify transaction. Please try again", HttpStatus.REQUEST_TIMEOUT);
+            return new ResponseEntity<>(jsonObject.get("message"), HttpStatus.BAD_REQUEST);
 
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
-    @GetMapping("/users/subscriptions")
+    @GetMapping("/user/subscriptions")
     public List<SubscriptionDto> getSubscriptions() {
         var loggedInUser = authenticationProvider.getAuthenticatedUser();
-
         return subscriptionService.getSubscriptions(loggedInUser);
 
+    }
+
+    @PostMapping("/user/cancel-subscription/{id}")
+    public ResponseEntity<String> cancelSubscription(@PathVariable Long id) {
+        var loggedInUser = authenticationProvider.getAuthenticatedUser();
+        if (subscriptionService.cancelSubscription(id, loggedInUser)) {
+            return new ResponseEntity<>("Subscription cancelled successfully", HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("Could not cancel subscription", HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @Getter
+    @Setter
+    private static class LoginDto {
+        @NotBlank
+        @Email
+        private String email;
+        @NotEmpty
+        private String password;
+    }
+
+    @Getter
+    @Setter
+    private static class RegisterDto {
+        @NotBlank
+        @Email
+        private String email;
+        @Size(min = 1, max = 256)
+        private String name;
+        @Size(min = 3, max = 25)
+        private String password;
     }
 }

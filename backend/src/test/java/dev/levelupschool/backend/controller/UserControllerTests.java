@@ -378,9 +378,7 @@ public class UserControllerTests {
 
         Mockito.when(authenticationProvider.getAuthenticatedUser()).thenReturn(authenticatedUser);
 
-        CardExpiryDate cardExpiryDate = new CardExpiryDate();
-        cardExpiryDate.setMonth(11);
-        cardExpiryDate.setYear(2024);
+        CardExpiryDate cardExpiryDate = new CardExpiryDate(10, 2024);
 
         PaymentDetailsDto paymentDetailsDto = new PaymentDetailsDto();
         paymentDetailsDto.cardNumber = "4751763236699647";

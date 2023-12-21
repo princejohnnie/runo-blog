@@ -17,6 +17,9 @@ public class BearerTokenAuthenticationProvider implements AuthenticationProvider
     @Override
     public User getAuthenticatedUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth.getPrincipal().equals("anonymousUser")) {
+            return null;
+        }
         var userId = (Long) auth.getPrincipal();
 
         return  userRepository.findById(userId).orElseThrow(() -> new ModelNotFoundException(User.class, userId));

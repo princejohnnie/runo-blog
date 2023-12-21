@@ -1,5 +1,6 @@
 package dev.levelupschool.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -33,15 +34,16 @@ public class Subscription {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
+    @JsonBackReference
     private User user;
 
-    public Subscription(String transactionId, String subscriptionType, String status, User user) {
+    public Subscription(String transactionId, String subscriptionType, boolean active, User user) {
         this.transactionId = transactionId;
         this.subscriptionType = subscriptionType;
-        this.status = status;
         this.startDate = LocalDateTime.now();
         this.setEndDate(subscriptionType);
-        this.setActive(status);
+        this.isActive = active;
+        this.setStatus(active);
         this.user = user;
     }
 
@@ -54,14 +56,21 @@ public class Subscription {
         }
     }
 
-    public void setActive(String status) {
-        if (status.equals("active") && startDate.isBefore(endDate)) {
-            this.isActive = true;
-        }
+    public void setActive(boolean active) {
+        this.isActive = active;
+        setStatus(active);
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    public void setStatus(boolean isActive) {
+        if (isActive) {
+            this.status = "active";
+        }
+        if (startDate.isBefore(endDate)) {
+            this.status = "ended";
+        }
+        if (startDate.isBefore(endDate) && !isActive) {
+            this.status = "cancelled";
+        }
     }
 
 }
