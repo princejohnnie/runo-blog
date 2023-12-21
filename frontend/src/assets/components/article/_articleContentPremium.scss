@@ -1,0 +1,92 @@
+.premiumSymbol__background{
+    background: #D4A373;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.premiumContent__window{
+    display: flex;
+    justify-content: center;
+    margin: 40px 0 60px 0;
+}
+
+
+.premiumContent__windowInner{
+    max-width: 450px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.premiumContent__message{
+    border: 1px solid #495057;
+    padding: 55px;
+
+    color: #495057;
+    text-align: center;
+    font-family: $primaryFontFamily;
+    font-size: 1rem;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 25px;
+
+}
+
+.premiumSymbol__boundary{
+    position: relative;
+}
+
+.premiumContent_windowHeading{
+    position: absolute;
+    top: 0;
+    left: 31%;
+    background: white;
+    z-index: 20;
+    padding: 0 15px;
+    margin: 0;
+
+    color: #495057;
+    text-align: center;
+    font-family: $primaryFontFamily;
+    font-size: 1.286rem;
+    font-weight: 700;
+    line-height: 25px;
+}
+
+.premiumContent__buttons{
+    position: absolute;
+    bottom: 0;
+    left: 17%;
+    gap: 45px;
+    display: flex;
+}
+
+.premiumContent__button{
+    width: 125px;
+    margin: 0;
+    background: #495057;
+
+    &:hover{
+        background: #D9D9D9;
+        color: black;;
+    }
+}
+
+.premiumContent__buttonLogIn{
+    width: 125px;
+    margin: 0;
+}
+
+
+.premiumContent__buttonsSubscribe{
+    position: absolute;
+    bottom: 0;
+    left: 36%;
+    gap: 45px;
+    display: flex;
+}
