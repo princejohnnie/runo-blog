@@ -67,7 +67,7 @@ const formattedDate = computed(() => {
                 <img class="article__content-author-image" :src="article.author.avatarUrl || defaultAvatar">
                 <div>
                     <h4 class="article__content-author-name"> By {{ article.author.name }}</h4>
-                    <p class="article__content-author-title">Software Developer</p>
+                    <p class="article__content-author-title">{{ article.author?.description }}</p>
                 </div>
             </div>
         </div>

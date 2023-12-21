@@ -47,7 +47,7 @@ const defaultAvatar = computed(() => {
                     <img class="section__author-image" :src="article.author.avatarUrl || defaultAvatar">
                     <div class="section__author-details">
                         <h4 class="section__author-name"> By {{ article.author?.name }}</h4>
-                        <p class="section__author-slug">Software Developer</p>
+                        <p class="section__author-slug">{{ article.author?.description }}</p>
                     </div>
                 </div>
                 <div class="section__author-socials">
