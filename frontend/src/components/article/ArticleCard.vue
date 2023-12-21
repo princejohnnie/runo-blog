@@ -52,8 +52,7 @@ const formattedDate = computed(() => {
         <div class="article__content">
             <div class="article__content-inner">
                 <time class="article__time">{{ formattedDate }}</time>
-                <PremiumIcon class="article__premium"/>
-                <img class="article__premium-icon" src="/images/premium_icon2.png" v-if="article.isPremium">
+                <PremiumIcon class="article__premium" v-if="article.isPremium" />
             </div>
             <h3 class="article__heading">
                 <router-link class="article__heading-link" :to="`/articles/${article.id}`">
