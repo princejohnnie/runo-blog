@@ -1,28 +1,17 @@
 package dev.levelupschool.backend.model;
 
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 public class CardExpiryDate {
     private int month;
     private int year;
     public CardExpiryDate(int month, int year) {
-        this.month = month+1;
+        this.month = month;
         this.year = year;
     }
 
-    public void setMonth(int month) {
-        this.month = month+1;
-    }
-
-    public int getMonth() {
-        return month;
-    }
-
-    public void setYear(int year) {
-        this.year = year;
-    }
-
-    public int getYear() {
-        return year;
-    }
 }

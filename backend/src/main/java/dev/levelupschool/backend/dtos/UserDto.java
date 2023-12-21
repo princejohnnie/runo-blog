@@ -13,6 +13,7 @@ public class UserDto {
     public Long id;
     public String name;
     public String email;
+    public String description;
     public String avatarUrl;
 
     public String slug;
@@ -23,6 +24,7 @@ public class UserDto {
         this.id = user.getId();
         this.name = user.getName();
         this.email = user.getEmail();
+        this.description = user.getDescription();
         this.avatarUrl = user.getAvatarUrl();
         this.slug = user.getSlug();
         this.isPremium = user.isPremium();
