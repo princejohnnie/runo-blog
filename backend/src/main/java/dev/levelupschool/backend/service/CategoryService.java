@@ -2,6 +2,7 @@ package dev.levelupschool.backend.service;
 
 import dev.levelupschool.backend.auth.AuthenticationUtils;
 import dev.levelupschool.backend.dtos.CategoryDto;
+import dev.levelupschool.backend.exception.CustomValidationException;
 import dev.levelupschool.backend.exception.ModelNotFoundException;
 import dev.levelupschool.backend.model.Article;
 import dev.levelupschool.backend.model.Category;
@@ -40,13 +41,14 @@ public class CategoryService {
         return categoryOptional.map(this::convertToDto).orElseThrow(() -> new ModelNotFoundException(Category.class, id));
     }
 
-    public CategoryDto store(Category category) {
-      Category categoryName = categoryRepository.existsDistinctByName(category.getName());
-        if(categoryName == null) {
-            categoryName = new Category();
-            categoryName.setName(category.getName());
+    public CategoryDto store(Category category) throws CustomValidationException {
+        Category existingCategory = categoryRepository.findByName(category.getName());
+        if (existingCategory != null) {
+            return convertToDto(existingCategory);
+        } else {
+            Category storedCategory = categoryRepository.save(category);
+            return convertToDto(storedCategory);
         }
-        return convertToDto(categoryName);
     }
 
     public void delete(Long id) {
@@ -56,6 +58,7 @@ public class CategoryService {
         CategoryDto categoryDto = new CategoryDto();
         categoryDto.setId(category.getId());
         categoryDto.setName(category.getName());
+        categoryDto.setArticleId(category.getArticles().iterator().next().getId());
         return categoryDto;
     }
 }
