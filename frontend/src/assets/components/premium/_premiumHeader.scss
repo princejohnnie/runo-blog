@@ -47,3 +47,12 @@
     max-width: 420px;
     line-height: 20px;
 }
+
+.profileHeader__userAvatar{
+    position: relative;
+}
+
+.profileHeader__premiumIcon{
+    position: absolute;
+    left:70px;
+}

@@ -38,18 +38,6 @@ watch(() => [userStore.premium, userStore.successNotification], function () {
     }
 });
 
-watch('route.name', () => {
-    console.debug(`MyCoolComponent - watch route.name changed to ${route.name}`);
-})
-
-onMounted(() => {
-    // Assign the ref after the component is mounted
-    menuToggleRef.value = document.getElementById('menu-toggle');
-});
-
-watchEffect(() => {
-    menuOpen.value = false;
-});
 </script>
 <template>
     <header class="mainHeader">

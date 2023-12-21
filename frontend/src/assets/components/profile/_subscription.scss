@@ -89,6 +89,10 @@
 .subscription__logoBackground{
     @extend .premiumHeader__logoBackground;
     margin-right: 200px;
+
+    @include for-phone{
+        margin: 0;
+    }
 }
 
 .subscription__ActiveType{
@@ -142,5 +146,13 @@
 
     &:hover{
         cursor: pointer;
+    }
+}
+
+.subscription__activeInfo{
+    @include for-phone{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
     }
 }
