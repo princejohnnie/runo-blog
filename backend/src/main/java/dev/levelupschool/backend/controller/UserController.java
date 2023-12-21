@@ -112,7 +112,7 @@ public class UserController {
     @PostMapping("/register")
     ResponseEntity<?> register(@RequestBody @Valid RegisterDto registerDto) {
         try {
-            var newUser = new User(registerDto.getEmail(), registerDto.getName(), registerDto.getPassword());
+            var newUser = new User(registerDto.getEmail(), registerDto.getName(), registerDto.getDescription(), registerDto.getPassword());
             newUser.setDescription(registerDto.getDescription());
             var createdUser = userService.createUser(newUser);
             return ResponseEntity.ok(tokenService.generateToken(createdUser.getId()));
