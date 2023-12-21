@@ -2,7 +2,8 @@
 
 import { useUserStore } from '@/stores/user.js'
 import { ref, computed, defineProps } from 'vue';
-
+import PremiumIconWhite from '@/components/icons/PremiumIconWhite.vue';
+import PremiumIconWithBackground from '@/components/icons/PremiumIconWithBackground.vue';
 import myUpload from 'vue-image-crop-upload';
 
 const userStore = useUserStore()
@@ -42,16 +43,19 @@ const cropUploadSuccess = (jsonData) => {
 <template>
     <div class="profileHeader">
         <div class="profileHeader__inner">
-            <img :src="avatarUrl"
-                :class="editProfile ? 'profileHeader__image profileHeader__image--edit' : 'profileHeader__image'"
-                @click="showUploadDialog = true">
+            <div class="profileHeader__userAvatar">
+                <PremiumIconWithBackground class="profileHeader__premiumIcon" :isPremium="userStore.isPremium" />
+                <img :src="avatarUrl"
+                    :class="editProfile ? 'profileHeader__image profileHeader__image--edit' : 'profileHeader__image'"
+                    @click="showUploadDialog = true">
 
-            <my-upload langType="en" @crop-upload-success="cropUploadSuccess" v-model="showUploadDialog" :width="300"
-                :height="300" field="avatar" url="http://localhost:8080/user/upload-avatar" :headers="{
-                    Authorization: `Bearer ${token}`,
-                    Accept: 'application/json'
-                }" img-format="png">
-            </my-upload>
+                <my-upload langType="en" @crop-upload-success="cropUploadSuccess" v-model="showUploadDialog" :width="300"
+                    :height="300" field="avatar" url="http://localhost:8080/user/upload-avatar" :headers="{
+                        Authorization: `Bearer ${token}`,
+                        Accept: 'application/json'
+                    }" img-format="png">
+                </my-upload>
+            </div>
 
             <h2 class="profileHeader__name">
                 {{ userStore.user?.name }}

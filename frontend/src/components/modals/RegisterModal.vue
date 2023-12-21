@@ -17,120 +17,89 @@ const emit = defineEmits(['closeModal'])
 const isProcessing = ref(false)
 
 const data = ref({
-  email: '',
-  name: '',
-  slug: '',
-  description: '',
-  password: '',
-  premium: false
+    email: '',
+    name: '',
+    slug: '',
+    description: '',
+    password: '',
+    premium: false,
 })
 
 //TODO confirm after premium is accepted in backend
 const submitForm = async () => {
-  userStore.premium = data.value.premium
-  userStore.successNotification = true
+    userStore.premium = data.value.premium
+    userStore.successNotification = true
 
-  const registrationData = {
-    name: data.value.name,
-    email: data.value.email,
-    password: data.value.password,
-    slug: slugify(data.value.name),
-    premium: data.value.premium
-  }
-  const response = await Auth.register(registrationData)
-  localStorage.setItem('token', response.data)
+    const registrationData = {
+        name: data.value.name,
+        email: data.value.email,
+        password: data.value.password,
+        slug: slugify(data.value.name),
+        premium: data.value.premium,
+        description: data.value.description
+    }
+    const response = await Auth.register(registrationData)
+    localStorage.setItem('token', response.data)
 
-  await userStore.me()
+    await userStore.me()
 
-  showSuccessAlert()
+    showSuccessAlert()
 }
 
 watch(
-  () => data.value.name,
-  (newVal) => {
-    data.value.slug = slugify(newVal)
-  }
+    () => data.value.name,
+    (newVal) => {
+        data.value.slug = slugify(newVal)
+    }
 )
 const showSuccessAlert = () => {
-  Swal.fire({
-    title: 'Success!',
-    text: 'You have been registered successfully!',
-    icon: 'success',
-    willClose: onCloseNotification
-  })
+    Swal.fire({
+        title: 'Success!',
+        text: 'You have been registered successfully!',
+        icon: 'success',
+        willClose: onCloseNotification
+    })
 }
 
 const onCloseNotification = () => {
-  userStore.successNotification = false
+    userStore.successNotification = false
 }
 </script>
 
 <template>
-  <Modal @closeModal="onCloseModal()">
-    <div class="modal__form">
-      <h2 class="modal__heading">Register</h2>
+    <Modal @closeModal="onCloseModal()">
+        <div class="modal__form">
+            <h2 class="modal__heading">Register</h2>
 
-      <Form :handleLogic="submitForm" v-model:isProcessing="isProcessing">
-        <Input
-          type="text"
-          name="name"
-          label="Name:"
-          placeholder="Your Name"
-          v-model:value="data.name"
-        />
+            <Form :handleLogic="submitForm" v-model:isProcessing="isProcessing">
+                <Input type="text" name="name" label="Name:" placeholder="Your Name" v-model:value="data.name" />
 
-        <Input
-          type="email"
-          name="email"
-          label="Email:"
-          placeholder="johndoe@email.com"
-          v-model:value="data.email"
-        />
+                <Input type="email" name="email" label="Email:" placeholder="johndoe@email.com"
+                    v-model:value="data.email" />
 
-        <Input
-          :disabled="true"
-          type="text"
-          name="slug"
-          label="Slug:"
-          placeholder="Slug"
-          v-model:value="data.slug"
-        />
+                <Input :disabled="true" type="text" name="slug" label="Slug:" placeholder="Slug"
+                    v-model:value="data.slug" />
 
-        <Input
-          type="text"
-          name="description"
-          label="Description"
-          placeholder="A short description of yourself"
-          v-model:value="data.description"
-        />
+                <Input type="text" name="description" label="Description" placeholder="A short description of yourself"
+                    v-model:value="data.description" />
 
-        <Input
-          type="password"
-          name="password"
-          label="Password:"
-          placeholder="***********"
-          v-model:value="data.password"
-        />
+                <Input type="password" name="password" label="Password:" placeholder="***********"
+                    v-model:value="data.password" />
 
-        <Input
-          type="password"
-          name="password_confirmation"
-          label="Confirm Password:"
-          placeholder="***********"
-          v-model:value="data.password_confirmation"
-        />
+                <Input type="password" name="password_confirmation" label="Confirm Password:" placeholder="***********"
+                    v-model:value="data.password_confirmation" />
 
-        <input class="modal__checkbox" v-model="data.premium" type="checkbox" />
-        <label class="modal__checkLabel" for="checkbox">I want Premium </label>
+                <input class="modal__checkbox" v-model="data.premium" type="checkbox" />
+                <label class="modal__checkLabel" for="checkbox">I want Premium </label>
 
-        <div class="modal__inputWrapper">
-          <Button type="submit" class="modal__inputButton" :isProcessing="isProcessing">
-            Register
-          </Button>
+                <div class="modal__inputWrapper">
+                    <Button type="submit" class="modal__inputButton" :isProcessing="isProcessing">
+                        Register
+                    </Button>
+                </div>
+                <GoogleAuth @success="showSuccessAlert" />
+            </Form>
         </div>
-        <GoogleAuth @success="showSuccessAlert" />
-      </Form>
-    </div>
-  </Modal>
-  @success="showSuccessAlert"v
+    </Modal>
+    @success="showSuccessAlert"v
 </template>

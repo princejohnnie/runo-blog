@@ -1,6 +1,7 @@
 <script setup>
 import { computed } from 'vue'
 import PremiumIconWhite from '@/components/icons/PremiumIconWhite.vue';
+import PremiumIconWithBackground from '@/components/icons/PremiumIconWithBackground.vue';
 
 const props = defineProps({
     article: {
@@ -31,9 +32,7 @@ const shortContent = computed(() => {
         </div>
         <div class="mainArticleInner__imageCover"></div>
         <div class="mainArticle__inner mainArticle__header-inner">
-            <div class="premiumSymbol__background" v-if="article.isPremium">
-                <PremiumIconWhite />
-            </div>
+            <PremiumIconWithBackground :isPremium="article.isPremium" />
             <h2 class="mainArticle__heading articleDetail__heading">
                 {{ article.title }}
             </h2>

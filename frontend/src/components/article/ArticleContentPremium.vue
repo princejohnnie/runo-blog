@@ -10,6 +10,7 @@ import LoginModal from "@/components/modals/LoginModal.vue";
 import RegisterModal from "@/components/modals/RegisterModal.vue";
 import SubscribeModal from "@/components/modals/SubscribeModal.vue";
 import { useModalStore } from '@/stores/modal'
+import PremiumIconWithBackground from '@/components/icons/PremiumIconWithBackground.vue';
 
 const userStore = useUserStore();
 const modalStore = useModalStore();
@@ -57,9 +58,7 @@ const displayPremiumMessages = computed(() => {
         <div v-html="article.content"></div>
         <div class="premiumContent__window">
             <div class="premiumContent__windowInner">
-                <div class="premiumSymbol__background">
-                    <PremiumIconWhite />
-                </div>
+                <PremiumIconWithBackground :isPremium="true" />
                 <div class="premiumSymbol__boundary" v-if="displayPremiumMessages">
                     <h2 class="premiumContent_windowHeading">Premium article</h2>
                     <p class="premiumContent__message">
