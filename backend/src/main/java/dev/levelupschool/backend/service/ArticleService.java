@@ -16,6 +16,8 @@ import dev.levelupschool.backend.utils.StringCutter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.EntityModel;
@@ -62,30 +64,42 @@ public class ArticleService {
                     article.setContent(StringCutter.truncate(article.getContent()));
                 }
             });
-
             return pagedResourcesAssembler.toModel(result.map(ArticleDto::new));
-
         }
 
         return pagedResourcesAssembler.toModel(result.map(ArticleDto::new));
     }
 
-    public List<ArticleDto> getPremiumArticles(Pageable paging) {
-        return articleRepository.findAll(paging).stream().filter(Article::isPremium).map(ArticleDto::new).toList();
+    public PagedModel<EntityModel<ArticleDto>> getPremiumArticles(Pageable paging) throws CustomValidationException {
+        var loggedInUser = authProvider.getAuthenticatedUser();
+
+        if (loggedInUser == null || !loggedInUser.isPremium()) {
+            throw new CustomValidationException("message", "Sorry, you are not a Premium User! Upgrade to Premium to view Premium Articles");
+        }
+
+        List<ArticleDto> articleDtos = articleRepository.findAll(paging).stream().filter(Article::isPremium).map(ArticleDto::new).toList();
+
+        PageRequest pageRequest = PageRequest.of(0, articleDtos.size());
+        PageImpl<ArticleDto> page = new PageImpl<>(articleDtos, pageRequest, articleDtos.size());
+
+        return pagedResourcesAssembler.toModel(page);
 
     }
 
     public ArticleDto getArticle(Long id) {
-        var article = new ArticleDto(articleRepository.findById(id)
-            .orElseThrow(() -> new ModelNotFoundException(Article.class, id)));
+        var article = articleRepository.findById(id)
+            .orElseThrow(() -> new ModelNotFoundException(Article.class, id));
 
         var loggedInUser = authProvider.getAuthenticatedUser();
 
         if (loggedInUser == null || !loggedInUser.isPremium()) {
-            article.content = article.content.substring(0, 10);
+            if (article.isPremium()) {
+                article.setContent(StringCutter.truncate(article.getContent()));
+            }
+            return new ArticleDto(article);
         }
 
-        return article;
+        return new ArticleDto(article);
 
     }
 

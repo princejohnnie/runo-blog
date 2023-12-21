@@ -99,7 +99,9 @@ public class User {
     }
 
     public void setPremium(List<Subscription> subscriptions) {
-        this.isPremium = subscriptions.stream().anyMatch(subscription -> subscription.getUser().getId().equals(id) && subscription.isActive());
+        if (subscriptions != null && !subscriptions.isEmpty()) {
+            this.isPremium = subscriptions.stream().anyMatch(subscription -> subscription.getUser().getId().equals(id) && subscription.isActive());
+        }
     }
 
     @Override

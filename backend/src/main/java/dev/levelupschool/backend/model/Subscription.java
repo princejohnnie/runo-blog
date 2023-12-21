@@ -65,8 +65,9 @@ public class Subscription {
         if (isActive) {
             this.status = "active";
         }
-        if (startDate.isBefore(endDate)) {
+        if (startDate.isAfter(endDate)) {
             this.status = "ended";
+            setActive(false);
         }
         if (startDate.isBefore(endDate) && !isActive) {
             this.status = "cancelled";
