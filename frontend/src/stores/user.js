@@ -10,10 +10,12 @@ export const useUserStore = defineStore('user', () => {
 
     const isLoggedIn = computed(() => user.value !== null)
     const isGuest = computed(() => user.value === null )
+    const isPremium = computed(() => user.value !== null && user.value.isPremium )
 
     async function me() {
         try {
             const response = await Auth.me()
+            console.log(response);
             user.value = response.data
         } catch(error) {
             user.value = null;
@@ -72,6 +74,27 @@ export const useUserStore = defineStore('user', () => {
         }
     }
 
+
+    async function cancelSubscription(id) {
+        try {
+            const response = await Auth.cancelSubscription(id);
+            console.log(response)
+            Swal.fire({
+                title: "Success!",
+                text: "You have cancel your subscription!",
+                icon: "success"
+            });
+        } catch(error) {
+            Swal.fire({
+                title: "Error!",
+                text: error.message,
+                icon: "error"
+            });
+        }
+    }
+
+
+
     async function subscriptions() {
         try {
             const response = await Auth.subscriptions()
@@ -99,6 +122,7 @@ export const useUserStore = defineStore('user', () => {
         user,
         isLoggedIn,
         isGuest,
+        isPremium,
         me,
         login,
         register,
@@ -108,6 +132,7 @@ export const useUserStore = defineStore('user', () => {
         successNotification,
         notificationClosed,
         subscribe,
-        subscriptions
+        subscriptions,
+        cancelSubscription
     }
 })

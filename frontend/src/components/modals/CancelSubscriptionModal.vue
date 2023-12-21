@@ -14,18 +14,10 @@ const userStore = useUserStore();
 const modalStore = useModalStore();
 const isProcessing = ref(false)
 
-const data = ref({
-    email: '',
-    password: '',
-})
 
 const submitForm = async () => {
-    //const response = await Auth.login(data.value)
-    //localStorage.setItem('token', response.data);
-
-    //await userStore.me()
-
-    showSuccessAlert();
+    const response = await userStore.cancelSubscription(userStore.user.currentSubscription.id)
+    await userStore.me()
     modalStore.closeModal();
 }
 
@@ -36,8 +28,6 @@ const showSuccessAlert = () => {
         icon: "success"
     });
 }
-
-
 
 </script>
 

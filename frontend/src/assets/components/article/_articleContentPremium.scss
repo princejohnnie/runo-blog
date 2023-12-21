@@ -56,6 +56,10 @@
     font-size: 1.286rem;
     font-weight: 700;
     line-height: 25px;
+
+    @include for-phone {
+        left: 22%;
+      }
 }
 
 .premiumContent__buttons{
@@ -64,6 +68,11 @@
     left: 17%;
     gap: 45px;
     display: flex;
+
+    @include for-phone {
+        left: 5%;
+        gap: 20px;
+      }
 }
 
 .premiumContent__button{
@@ -89,4 +98,8 @@
     left: 36%;
     gap: 45px;
     display: flex;
+
+    @include for-phone {
+        left: 28%;
+      }
 }

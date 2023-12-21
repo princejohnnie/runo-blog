@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { useUserStore } from '@/stores/user.js';
 import { useRouter } from 'vue-router';
 import ProfileHeader from "@/components/profile/ProfileHeader.vue";
@@ -35,9 +35,8 @@ const subscriptionData = ref({
 });
 
 const isVisible = ref(false);
-
+const isProcessing = ref(false)
 const history = ref([]);
-
 const monthlyCost = ref(20);
 
 userStore.subscriptions().then((res) => {
@@ -47,8 +46,8 @@ userStore.subscriptions().then((res) => {
 
 const toggleTable = () => {
     isVisible.value = !isVisible.value;
-
 };
+
 
 const showSuccessAlert = () => {
     Swal.fire({
@@ -59,11 +58,9 @@ const showSuccessAlert = () => {
 }
 
 const submitForm = async () => {
-    //console.log(subscriptionData.value);
+    subscriptionData.value.cardExpiryDate.month += 1;
     const response = await userStore.subscribe(subscriptionData.value);
     await userStore.me()
-    showSuccessAlert()
-
     router.push({ name: 'my-profile' })
 };
 
@@ -100,6 +97,10 @@ const subscriptionStatus = (transaction) => {
     });
     return relevantStatus.value;
 };
+
+const hasHistory = computed(() => {
+    return history.value.length ? true : false;
+});
 
 </script>
 <template>
@@ -145,10 +146,11 @@ const subscriptionStatus = (transaction) => {
                 </div>
                 <Input type="text" name="cardHolder" label="Card holder" placeholder=""
                     v-model:value="subscriptionData.cardHolder" />
+                <Input type="email" name="email" label="Email" placeholder="" v-model:value="subscriptionData.email" />
                 <Input type="text" name="address" label="Address" placeholder="" v-model:value="subscriptionData.address" />
                 <Input type="text" name="phone" label="Phone number" placeholder=""
                     v-model:value="subscriptionData.phone" />
-                <Input type="email" name="email" label="Email" placeholder="" v-model:value="subscriptionData.email" />
+
 
                 <div class="editSubscription__inputWrapper">
                     <Button type="submit" class="editProfile__inputButton" :isProcessing="isProcessing">Go Premium</Button>
@@ -163,28 +165,31 @@ const subscriptionStatus = (transaction) => {
                     <h3 class="subscriptionHistory__heading">Purchase history</h3>
                     <ChevronDownIcon />
                 </div>
-                <table class="table" v-show="isVisible">
-                    <thead>
-                        <tr>
-                            <th>Transaction ID</th>
-                            <th>Start Date</th>
-                            <th>End Date</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <template v-for="(transaction, index) in history" :key="index">
+                <div v-show="isVisible">
+                    <table class="table" v-if="hasHistory">
+                        <thead>
                             <tr>
-                                <td>{{ transaction.transactionId }}</td>
-                                <td>{{ subscriptionDate(transaction.startDate) }}</td>
-                                <td>{{ subscriptionDate(transaction.endDate) }}</td>
-                                <td :class="{ 'subscription__statusActive': transaction.status === 'active' }">
-                                    {{ subscriptionStatus(transaction.status) }}
-                                </td>
+                                <th>Transaction ID</th>
+                                <th>Start Date</th>
+                                <th>End Date</th>
+                                <th>Status</th>
                             </tr>
-                        </template>
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            <template v-for="(transaction, index) in history" :key="index">
+                                <tr>
+                                    <td>{{ transaction.transactionId }}</td>
+                                    <td>{{ subscriptionDate(transaction.startDate) }}</td>
+                                    <td>{{ subscriptionDate(transaction.endDate) }}</td>
+                                    <td :class="{ 'subscription__statusActive': transaction.status === 'active' }">
+                                        {{ subscriptionStatus(transaction.status) }}
+                                    </td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                    <div class="subscriptionHistory__noHistory" v-else>No subscription history.</div>
+                </div>
             </div>
         </div>
     </div>
