@@ -33,6 +33,8 @@ import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -111,6 +113,7 @@ public class UserController {
     ResponseEntity<?> register(@RequestBody @Valid RegisterDto registerDto) {
         try {
             var newUser = new User(registerDto.getEmail(), registerDto.getName(), registerDto.getPassword());
+            newUser.setDescription(registerDto.getDescription());
             var createdUser = userService.createUser(newUser);
             return ResponseEntity.ok(tokenService.generateToken(createdUser.getId()));
         } catch (Exception e) {
@@ -256,6 +259,8 @@ public class UserController {
         private String email;
         @Size(min = 1, max = 256)
         private String name;
+        @Size(min = 5, max = 64)
+        private String description;
         @Size(min = 3, max = 25)
         private String password;
     }
