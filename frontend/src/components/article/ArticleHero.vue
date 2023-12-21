@@ -1,48 +1,49 @@
 <script setup>
 import { computed } from 'vue'
+import PremiumIconWhite from '@/components/icons/PremiumIconWhite.vue';
 
 const props = defineProps({
-  article: {
-    type: Object,
-    required: true
-  }
+    article: {
+        type: Object,
+        required: true
+    }
 })
 
 function removeHtmlTags(htmlString) {
-  var doc = new DOMParser().parseFromString(htmlString, 'text/html')
-  return doc.body.textContent || ''
+    var doc = new DOMParser().parseFromString(htmlString, 'text/html')
+    return doc.body.textContent || ''
 }
 
 const shortContent = computed(() => {
-  if (props.article.content?.length < 200) {
-    return removeHtmlTags(props.article.content)
-  } else {
-    return removeHtmlTags(props.article.content?.slice(0, 200) + '...')
-  }
+    if (props.article.content?.length < 200) {
+        return removeHtmlTags(props.article.content)
+    } else {
+        return removeHtmlTags(props.article.content?.slice(0, 200) + '...')
+    }
 })
 </script>
 
 <template>
-  <div class="mainArticle mainArticle__header">
-    <div class="mainArticle__imageWrapper">
-      <img
-        class="mainArticle__image"
-        :src="article.coverUrl ?? 'https://picsum.photos/400/400'"
-        alt="Artile cover image"
-      />
-    </div>
-    <div class="mainArticleInner__imageCover"></div>
-    <div class="mainArticle__inner mainArticle__header-inner">
-      <h2 class="mainArticle__heading articleDetail__heading">
-        {{ article.title }}
-      </h2>
+    <div class="mainArticle mainArticle__header">
+        <div class="mainArticle__imageWrapper">
+            <img class="mainArticle__image" :src="article.coverUrl ?? 'https://picsum.photos/400/400'"
+                alt="Artile cover image" />
+        </div>
+        <div class="mainArticleInner__imageCover"></div>
+        <div class="mainArticle__inner mainArticle__header-inner">
+            <div class="premiumSymbol__background" v-if="article.isPremium">
+                <PremiumIconWhite />
+            </div>
+            <h2 class="mainArticle__heading articleDetail__heading">
+                {{ article.title }}
+            </h2>
 
-      <p class="mainArticle__content articleDetail__content-short">
-        <span class="mainArticle__text">
-          {{ shortContent }}
-        </span>
-      </p>
-      <p class="articleDetail__author">By {{ article.author?.name }}</p>
+            <p class="mainArticle__content articleDetail__content-short">
+                <span class="mainArticle__text">
+                    {{ shortContent }}
+                </span>
+            </p>
+            <p class="articleDetail__author">By {{ article.author?.name }}</p>
+        </div>
     </div>
-  </div>
 </template>
