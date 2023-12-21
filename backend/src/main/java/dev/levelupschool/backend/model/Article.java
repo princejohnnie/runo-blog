@@ -12,7 +12,9 @@ import org.springframework.hateoas.server.core.Relation;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -56,6 +58,14 @@ public class Article {
         inverseJoinColumns = @JoinColumn(name = "bookmarker_id")
     )
     public List<User> bookmarkers = new ArrayList<>();
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "article_categories",
+        joinColumns = @JoinColumn(name = "article_id"),
+        inverseJoinColumns = @JoinColumn(name = "category_id")
+    )
+    private Set<Category> categories = new HashSet<>();
 
     public Article(String title, String content, User author) {
         this.title = title;
