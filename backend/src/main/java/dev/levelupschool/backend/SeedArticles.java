@@ -37,8 +37,10 @@ public class SeedArticles {
                 }
             }
 
+            final String[] descriptions = {"Software Developer", "Designer", "Journalist", "Cloud Engineer"};
+
             private void populateDatabase() {
-                for (int i = 0; i < 12; i++) {
+                for (int i = 1; i <= 12; i++) {
                     Faker faker = new Faker();
                     SlugService slug = new SlugService();
                     String name = faker.name().name();
@@ -48,7 +50,8 @@ public class SeedArticles {
 
                     String articleContent = faker.lorem().paragraph(50);
 
-                    var user = new User(email, name, "password");
+                    String description = descriptions[i%4];
+                    var user = new User(email, name, description, "password");
                     user.setSlug(slug.makeSlug(name));
                     userRepository.save(user);
 
