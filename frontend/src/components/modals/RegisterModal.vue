@@ -6,8 +6,8 @@ import Form from '@/components/form/Form.vue'
 import Button from '@/components/form/Button.vue'
 import Auth from '@/requests/Auth.js'
 import GoogleAuth from '@/components/GoogleAuth.vue'
-
-import { ref } from 'vue'
+import slugify from '@/utils/slugify'
+import { ref, watch } from 'vue'
 import { useUserStore } from '@/stores/user.js'
 
 const userStore = useUserStore()
@@ -20,6 +20,7 @@ const data = ref({
   email: '',
   name: '',
   slug: '',
+  description: '',
   password: '',
   premium: false
 })
@@ -28,7 +29,15 @@ const data = ref({
 const submitForm = async () => {
   userStore.premium = data.value.premium
   userStore.successNotification = true
-  const response = await Auth.register(data.value)
+
+  const registrationData = {
+    name: data.value.name,
+    email: data.value.email,
+    password: data.value.password,
+    slug: slugify(data.value.name),
+    premium: data.value.premium
+  }
+  const response = await Auth.register(registrationData)
   localStorage.setItem('token', response.data)
 
   await userStore.me()
@@ -36,6 +45,12 @@ const submitForm = async () => {
   showSuccessAlert()
 }
 
+watch(
+  () => data.value.name,
+  (newVal) => {
+    data.value.slug = slugify(newVal)
+  }
+)
 const showSuccessAlert = () => {
   Swal.fire({
     title: 'Success!',
@@ -58,6 +73,14 @@ const onCloseNotification = () => {
       <Form :handleLogic="submitForm" v-model:isProcessing="isProcessing">
         <Input
           type="text"
+          name="name"
+          label="Name:"
+          placeholder="Your Name"
+          v-model:value="data.name"
+        />
+
+        <Input
+          type="email"
           name="email"
           label="Email:"
           placeholder="johndoe@email.com"
@@ -65,14 +88,21 @@ const onCloseNotification = () => {
         />
 
         <Input
+          :disabled="true"
           type="text"
-          name="name"
-          label="Name:"
-          placeholder="Your Name"
-          v-model:value="data.name"
+          name="slug"
+          label="Slug:"
+          placeholder="Slug"
+          v-model:value="data.slug"
         />
 
-        <Input type="text" name="slug" label="Slug:" placeholder="Slug" v-model:value="data.slug" />
+        <Input
+          type="text"
+          name="description"
+          label="Description"
+          placeholder="A short description of yourself"
+          v-model:value="data.description"
+        />
 
         <Input
           type="password"
@@ -80,6 +110,14 @@ const onCloseNotification = () => {
           label="Password:"
           placeholder="***********"
           v-model:value="data.password"
+        />
+
+        <Input
+          type="password"
+          name="password_confirmation"
+          label="Confirm Password:"
+          placeholder="***********"
+          v-model:value="data.password_confirmation"
         />
 
         <input class="modal__checkbox" v-model="data.premium" type="checkbox" />
@@ -94,4 +132,5 @@ const onCloseNotification = () => {
       </Form>
     </div>
   </Modal>
-@success="showSuccessAlert"v</template>
+  @success="showSuccessAlert"v
+</template>
