@@ -1,8 +1,9 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import SubscribeModal from "@/components/modals/SubscribeModal.vue";
 import CancelSubscriptionModal from "@/components/modals/CancelSubscriptionModal.vue";
 import PremiumIconLarge from '@/components/icons/PremiumIconLarge.vue';
+import dateFormatter from '@/utils/date.js'
 import { useModalStore } from '@/stores/modal'
 import { useUserStore } from '@/stores/user'
 
@@ -17,14 +18,19 @@ const openCancelSubscriptionModal = () => {
     modalStore.openModal('cancelSub')
 }
 
-openCancelSubscriptionModal
 
-const test = ref(false)
 
-const history = ref([]);
-userStore.subscriptions().then((res) => {
-    console.log(res.data);
-    history.value = res.data;
+const subscriptionStatus = computed(() => {
+    let subType = userStore.user.currentSubscription.subscriptionType;
+    return subType.charAt(0).toUpperCase() + subType.slice(1);
+});
+
+const formattedStartDate = computed(() => {
+    return dateFormatter.formatDate(userStore.user.currentSubscription.startDate)
+})
+
+const formattedEndDate = computed(() => {
+    return dateFormatter.formatDate(userStore.user.currentSubscription.endDate)
 })
 </script>
 
@@ -65,14 +71,15 @@ userStore.subscriptions().then((res) => {
 
             <div class="subscription__active">
                 <div class="subscription__activeInfo">
-                    <h3 class="subscription__ActiveType">Monthly Premium</h3>
+                    <h3 class="subscription__ActiveType">{{ subscriptionStatus }} Premium
+                    </h3>
                     <div class="subscription__activeDates">
                         <p class="subscription__activeDate">Start date: </p>
-                        <p class="subscription__activeDateValue">10.11.2023</p>
+                        <p class="subscription__activeDateValue">{{ formattedStartDate }}</p>
                     </div>
                     <div class="subscription__activeDates">
                         <p class="subscription__activeDate">End date: </p>
-                        <p class="subscription__activeDateValue">10.12.2023</p>
+                        <p class="subscription__activeDateValue">{{ formattedEndDate }}</p>
                     </div>
                     <router-link :to="{ name: 'edit-subscription' }">
                         <h3 class="subscription__editOption">Edit payment</h3>
