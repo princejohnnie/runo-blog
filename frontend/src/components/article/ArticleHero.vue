@@ -25,7 +25,11 @@ const shortContent = computed(() => {
 <template>
   <div class="mainArticle mainArticle__header">
     <div class="mainArticle__imageWrapper">
-      <img class="mainArticle__image" :src="article.coverUrl" alt="Artile cover image" />
+      <img
+        class="mainArticle__image"
+        :src="article.coverUrl ?? 'https://picsum.photos/400/400'"
+        alt="Artile cover image"
+      />
     </div>
     <div class="mainArticleInner__imageCover"></div>
     <div class="mainArticle__inner mainArticle__header-inner">

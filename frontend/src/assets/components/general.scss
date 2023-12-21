@@ -33,10 +33,21 @@ main {
 }
 
 .ql-editor {
-  min-height: 200px;
   background: $white;
 }
 .loginWithGoogle {
   display: flex;
   justify-content: center;
+}
+.ql-container > .ql-editor {
+  background: #fff;
+  height: 300px;
+}
+.ql-tooltip {
+  width: 400px;
+}
+.multiselect_wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
