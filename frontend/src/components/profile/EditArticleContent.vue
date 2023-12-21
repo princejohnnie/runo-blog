@@ -78,53 +78,59 @@ watch(
 </script>
 
 <template>
-  <div class="editProfile__form">
+  <div class="editArticle__form">
     <div class="editArticle__form-inner">
-      <h2 class="editProfile__heading">{{ isNew ? 'Add content' : 'Edit content' }}</h2>
+      <h2 class="editArticle__heading">{{ isNew ? 'Add content' : 'Edit content' }}</h2>
 
       <Form
-        class="form-column"
         :handleLogic="isNew ? createArticle : updateArticle"
         v-model:isProcessing="isProcessing"
       >
-        <Input
-          type="text"
-          name="title"
-          label="Title"
-          placeholder="Set Title"
-          v-model:value="data.title"
-        />
-        <MultiSelectTags />
-        <Input
-          :disabled="true"
-          type="text"
-          name="slug"
-          label="Slug"
-          placeholder="Set slug"
-          v-model:value="data.slug"
-        />
-        <Input
-          class="premium__check"
-          type="checkbox"
-          label="I want premium"
-          :inputValue="data.premium"
-        />
-        <div class="modal__inputWrapper">
-          <label class="modal__inputLabel"> Content </label>
-          <QuillEditor theme="snow" v-model:content="data.content" contentType="html" />
-        </div>
-
-        <ImageUpload
-          label="Article Image"
-          name="Cover"
-          :url="article?.coverUrl"
-          @setCover="(cover) => setArticleCover(cover)"
-        />
-
-        <div class="editArticle__inputWrapper">
-          <Button type="submit" class="editProfile__inputButton" :isProcessing="isProcessing">
-            {{ isNew ? 'Add new' : 'Update' }}
-          </Button>
+        <div class="editArticle__formContent">
+          <Input
+            type="text"
+            name="title"
+            label="Title"
+            placeholder="Set Title"
+            v-model:value="data.title"
+          />
+          <MultiSelectTags />
+          <Input
+            :disabled="true"
+            class="editArticle__input"
+            type="text"
+            name="slug"
+            label="Slug"
+            placeholder="Set slug"
+            v-model:value="data.slug"
+          />
+          <Input
+            class="editArticles__premium"
+            type="checkbox"
+            label="Make premium"
+            v-model="data.isPremium"
+          />
+          <div class="modal__inputWrapper">
+            <label class="modal__inputLabel"> Content </label>
+            <div class="modal__quillEditor">
+              <QuillEditor theme="snow" v-model:content="data.content" contentType="html" />
+            </div>
+          </div>
+          <div class="group__class">
+            <div class="modal__inputWrapper">
+              <ImageUpload
+                label="Article Image"
+                name="Cover"
+                :url="article?.coverUrl"
+                @setCover="(cover) => setArticleCover(cover)"
+              />
+            </div>
+          </div>
+          <div class="editArticle__inputWrapper">
+            <Button type="submit" class="editProfile__inputButton" :isProcessing="isProcessing">
+              {{ isNew ? 'Add new' : 'Update' }}
+            </Button>
+          </div>
         </div>
       </Form>
     </div>

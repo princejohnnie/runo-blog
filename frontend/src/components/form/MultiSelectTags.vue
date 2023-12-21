@@ -14,7 +14,7 @@ const tags = ref([])
 </script>
 
 <template>
-  <div class="imageupload">
+  <div class="multiselect_wrapper">
     <label class="modal__inputLabel">Tags</label>
 
     <VueMultiSelect
