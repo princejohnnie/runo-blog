@@ -30,11 +30,9 @@ const subscriptionData = ref({
 
 //TODO define submit logic when backend endpoint exists
 const submitForm = async () => {
-    //console.log(subscriptionData.value);
+    subscriptionData.value.cardExpiryDate.month += 1;
     const response = await userStore.subscribe(subscriptionData.value);
     await userStore.me()
-    //showSuccessAlert()
-
 }
 
 const showSuccessAlert = () => {
@@ -105,10 +103,11 @@ const subscriptionMonthlyCost = computed(() => {
                 </div>
                 <Input type="text" name="cardHolder" label="Card holder" placeholder=""
                     v-model:value="subscriptionData.cardHolder" />
+                <Input type="email" name="email" label="Email" placeholder="" v-model:value="subscriptionData.email" />
                 <Input type="text" name="address" label="Address" placeholder="" v-model:value="subscriptionData.address" />
                 <Input type="text" name="phone" label="Phone number" placeholder=""
                     v-model:value="subscriptionData.phone" />
-                <Input type="email" name="email" label="Email" placeholder="" v-model:value="subscriptionData.email" />
+
 
                 <div class="editSubscription__inputWrapper">
                     <Button type="submit" class="editProfile__inputButton" :isProcessing="isProcessing">Go Premium</Button>

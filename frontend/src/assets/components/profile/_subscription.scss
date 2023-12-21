@@ -134,3 +134,13 @@
     line-height: 25px;
     margin: 0;
 }
+
+
+.subscription__cancelLink{
+    @extend .subscription__active-text;
+    transition: .5s all;
+
+    &:hover{
+        cursor: pointer;
+    }
+}

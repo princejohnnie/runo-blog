@@ -84,7 +84,7 @@ const formattedEndDate = computed(() => {
                     <router-link :to="{ name: 'edit-subscription' }">
                         <h3 class="subscription__editOption">Edit payment</h3>
                     </router-link>
-                    <p class="subscription__active-text" @click.prevent="openCancelSubscriptionModal()">Cancel subscription
+                    <p class="subscription__cancelLink " @click.prevent="openCancelSubscriptionModal()">Cancel subscription
                     </p>
                 </div>
                 <div class="subscription__logoBackground">

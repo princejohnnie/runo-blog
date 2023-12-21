@@ -25,7 +25,11 @@ function subscribe(data) {
 }
 
 function subscriptions() {
-    return Http.get(`/users/subscriptions`)
+    return Http.get(`/user/subscriptions`)
+}
+
+function cancelSubscription(id) {
+    return Http.post(`/user/cancel-subscription/${id}`)
 }
 
 export default {
@@ -35,5 +39,6 @@ export default {
     googleAuth,
     editProfile,
     subscribe,
-    subscriptions
+    subscriptions,
+    cancelSubscription
 };
