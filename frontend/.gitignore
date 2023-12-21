@@ -27,3 +27,5 @@ coverage
 *.sln
 *.sw?
 .env
+
+backend/payment-gateway/__pycache__/main.cpython-310.pyc
