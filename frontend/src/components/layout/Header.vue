@@ -78,16 +78,5 @@ watch(() => [userStore.premium, userStore.successNotification], function () {
                 </ul>
             </nav>
         </div>
-
-        <Teleport to="body">
-            <LoginModal v-if="modalStore.showLoginModal" />
-        </Teleport>
-        <Teleport to="body">
-            <RegisterModal v-if="modalStore.showRegisterModal" />
-        </Teleport>
-        <Teleport to="body">
-            <SubscribeModal v-if="modalStore.showSubscribeModal" />
-        </Teleport>
-
     </header>
 </template>

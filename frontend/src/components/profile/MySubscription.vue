@@ -93,14 +93,6 @@ const formattedEndDate = computed(() => {
             </div>
         </div>
 
-
-        <Teleport to="body">
-            <SubscribeModal v-if="modalStore.showSubscribeModal" />
-        </Teleport>
-        <Teleport to="body">
-            <CancelSubscriptionModal v-if="modalStore.showCancelSubscriptionModal" />
-        </Teleport>
-
     </section>
 </template>
 <style scoped></style>
