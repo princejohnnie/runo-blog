@@ -67,7 +67,7 @@ export const useUserStore = defineStore('user', () => {
         } catch(error) {
             console.log("Subscribe error: ", error)
             Swal.fire({
-                title: error.message,
+                title: "Error",
                 text: error.response?.data,
                 icon: "error"
             });
@@ -87,7 +87,7 @@ export const useUserStore = defineStore('user', () => {
         } catch(error) {
             Swal.fire({
                 title: "Error!",
-                text: error.message,
+                text: error.response?.data,
                 icon: "error"
             });
         }

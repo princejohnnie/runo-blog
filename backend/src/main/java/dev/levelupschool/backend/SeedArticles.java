@@ -57,6 +57,10 @@ public class SeedArticles {
 
                     var article = new Article(articleTitle, articleContent, user);
                     article.setSlug(articleSlug);
+                    if (i%4 == 0) {
+                        article.setPremium(true);
+                    }
+
                     articleRepository.save(article);
 
                     for (int j = 0; j < 3; j++) {

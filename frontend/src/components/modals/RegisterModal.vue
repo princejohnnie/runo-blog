@@ -86,8 +86,8 @@ const onCloseNotification = () => {
                 <Input type="password" name="password" label="Password:" placeholder="***********"
                     v-model:value="data.password" />
 
-                <Input type="password" name="password_confirmation" label="Confirm Password:" placeholder="***********"
-                    v-model:value="data.password_confirmation" />
+                <!-- <Input type="password" name="password_confirmation" label="Confirm Password:" placeholder="***********"
+                    v-model:value="data.password_confirmation" /> -->
 
                 <input class="modal__checkbox" v-model="data.premium" type="checkbox" />
                 <label class="modal__checkLabel" for="checkbox">I want Premium </label>

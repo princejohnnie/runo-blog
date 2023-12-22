@@ -123,6 +123,7 @@ public class UserController {
         try {
             var newUser = new User(registerDto.getEmail(), registerDto.getName(), registerDto.getDescription(), registerDto.getPassword());
             var createdUser = userService.createUser(newUser);
+            emailService.sendMail(createdUser.getEmail(), "Welcome to the Code Ninjas Blog", "Hello, \n I am John from the CodeNinjas Team. \n You are getting this email because you just registered to CodeNinjas Blog. We hope you enjoy our platform and get to make the best out of our platform. \n Regards, \n The CodeNinjas Team");
             return ResponseEntity.ok(tokenService.generateToken(createdUser.getId()));
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
@@ -262,12 +263,12 @@ public class UserController {
         PasswordResetToken token = new PasswordResetToken();
         token.setToken(UUID.randomUUID().toString());
         token.setUser(user);
-        token.setExpiryTime(LocalDateTime.now().plusMinutes(30));
+        token.setExpiryTime(LocalDateTime.now().plusMinutes(1));
 
         token = passwordResetTokenRepository.save(token);
 
         try {
-            String body = "Use this link to reset your password. Expires after 30 minutes\nhttp://localhost:80/reset-password?token="+token.getToken();
+            String body = "Use this link to reset your password. Expires after 1 minute\nhttp://localhost:80/reset-password?token="+token.getToken();
             emailService.sendMail(request.getEmail(), "Password Reset link", body);
 
             System.out.println("Got token -> " + token.getToken());
@@ -290,7 +291,7 @@ public class UserController {
 
             if (resetToken.getExpiryTime().isBefore(LocalDateTime.now())) {
                 passwordResetTokenRepository.deleteById(resetToken.getId());
-                return new ResponseEntity<>("Password reset link has expired", HttpStatus.UNAUTHORIZED);
+                return new ResponseEntity<>("Sorry, this password reset link has expired", HttpStatus.UNAUTHORIZED);
             }
 
             User user = userRepository.findById(resetToken.getUser().getId()).orElseThrow(() -> new ModelNotFoundException(User.class, resetToken.getUser().getId()));

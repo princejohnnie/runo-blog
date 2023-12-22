@@ -63,8 +63,8 @@ const showSuccessAlert = () => {
                 <Input type="text" name="description" label="Description:" placeholder="Update description"
                     v-model:value="data.description" />
 
-                <Input type="password" name="password" label="New Password:" placeholder="***********"
-                    v-model:value="data.password" />
+                <!-- <Input type="password" name="password" label="New Password:" placeholder="***********"
+                    v-model:value="data.password" /> -->
 
                 <div class="editProfile__inputWrapper">
                     <Button type="submit" class="editProfile__inputButton" :isProcessing="isProcessing">

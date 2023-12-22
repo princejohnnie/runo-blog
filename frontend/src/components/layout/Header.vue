@@ -58,7 +58,7 @@ watch(route, () => { unCheckMenu }
         <div class="mainHeader__inner">
             <h1 class="mainHeader__logo">
                 <router-link class="mainHeader__logo-link" to="/">
-                    Levelup Blog
+                    CodeNinjas Blog
                 </router-link>
             </h1>
             <nav class="mainHeader__nav">
