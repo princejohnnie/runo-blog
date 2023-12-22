@@ -37,7 +37,7 @@ const formattedEndDate = computed(() => {
     <div class="subscription__inner" v-if="userStore.user.isPremium === false">
       <div class="subscription__addSub">
         <h3 class="section__heading">My Subscription</h3>
-        <router-link :to="{ name: 'edit-subscription' }">
+        <router-link class="subscription__link" :to="{ name: 'edit-subscription' }">
           <p class="subscription__add-text">Add subscription</p>
         </router-link>
       </div>
@@ -53,7 +53,10 @@ const formattedEndDate = computed(() => {
     <div class="subscription__inner" v-else>
       <div class="subscription__addSub">
         <h3 class="section__heading">My Subscription</h3>
-        <router-link :to="{ name: 'edit-subscription' }" class="subscription__add">
+        <router-link
+          :to="{ name: 'edit-subscription' }"
+          class="subscription__add subscription__link"
+        >
           <p class="subscription__add-text">Manage subscription</p>
         </router-link>
       </div>

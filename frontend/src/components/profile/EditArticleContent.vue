@@ -19,14 +19,14 @@ const isProcessing = ref(false)
 const router = useRouter()
 const userStore = useUserStore()
 const props = defineProps({
-    article: {
-        type: Object,
-        required: false
-    },
-    isNew: Boolean
+  article: {
+    type: Object,
+    required: false
+  },
+  isNew: Boolean
 })
 
-const existingTags = computed(() => props.article.categories)
+const existingTags = computed(() => props.article?.categories)
 
 const data = ref({
   title: props?.article?.title,
@@ -38,44 +38,43 @@ const data = ref({
 })
 
 const currentDate = computed(() => {
-    if (props.isNew) {
-        return dateFormatter.formatDate(new Date())
-    } else {
-        return dateFormatter.formatDate(props.article.updatedAt)
-    }
+  if (props.isNew) {
+    return dateFormatter.formatDate(new Date())
+  } else {
+    return dateFormatter.formatDate(props.article.updatedAt)
+  }
 })
 
 const createArticle = async () => {
-    const response = await Article.store(data.value)
+  const response = await Article.store(data.value)
 
-    showSuccessAlert()
+  showSuccessAlert()
 
-    router.push({ name: 'my-profile' })
+  router.push({ name: 'my-profile' })
 }
 
 const updateArticle = async () => {
-  
   if (data.value.categories.length === 0) {
-    data.value.categories = props?.article?.categories.map(category => category.id)
+    data.value.categories = props?.article?.categories.map((category) => category.id)
   }
-  
+
   const response = await Article.update(data.value, props.article.id)
 
-    showSuccessAlert()
+  showSuccessAlert()
 
-    router.push({ name: 'my-profile' })
+  router.push({ name: 'my-profile' })
 }
 
 const setArticleCover = (cover) => {
-    data.value.cover = cover
+  data.value.cover = cover
 }
 
 const showSuccessAlert = () => {
-    Swal.fire({
-        title: 'Success!',
-        text: 'Article created successfully!',
-        icon: 'success'
-    })
+  Swal.fire({
+    title: 'Success!',
+    text: 'Article created successfully!',
+    icon: 'success'
+  })
 }
 
 const updateTags = (tags) => {
@@ -83,21 +82,21 @@ const updateTags = (tags) => {
 }
 
 watch(
-    () => data.value.title,
-    (newVal) => {
-        data.value.slug = slugify(newVal)
-    }
+  () => data.value.title,
+  (newVal) => {
+    data.value.slug = slugify(newVal)
+  }
 )
 
 const disabledStatus = computed(() => {
-    return userStore.isPremium ? false : true;
-});
+  return userStore.isPremium ? false : true
+})
 </script>
 
 <template>
-    <div class="editArticle__form">
-        <div class="editArticle__form-inner">
-            <h2 class="editArticle__heading">{{ isNew ? 'Add content' : 'Edit content' }}</h2>
+  <div class="editArticle__form">
+    <div class="editArticle__form-inner">
+      <h2 class="editArticle__heading">{{ isNew ? 'Add content' : 'Edit content' }}</h2>
 
       <Form
         :handleLogic="isNew ? createArticle : updateArticle"
@@ -111,7 +110,7 @@ const disabledStatus = computed(() => {
             placeholder="Set Title"
             v-model:value="data.title"
           />
-          <MultiSelectTags @onTagsUpdate="updateTags" :existingTags="existingTags"/>
+          <MultiSelectTags @onTagsUpdate="updateTags" :existingTags="existingTags" />
           <Input
             :disabled="true"
             class="editArticle__input"
@@ -149,5 +148,7 @@ const disabledStatus = computed(() => {
             </Button>
           </div>
         </div>
+      </Form>
     </div>
+  </div>
 </template>

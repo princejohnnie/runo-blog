@@ -1,70 +1,70 @@
 .subscription {
-    width: 100%;
+  width: 100%;
 }
 
 .subscription__inner {
-    display: flex;
-    flex-direction: column;
-    padding: 30px 70px 80px 70px;
-    //max-height: 377px;
-    background: rgba(229, 229, 229, 0.30);
+  display: flex;
+  flex-direction: column;
+  padding: 30px 70px 80px 70px;
+  //max-height: 377px;
+  background: rgba(229, 229, 229, 0.3);
 
-    @include for-phone {
-        padding: 15px 20px;
-    }
+  @include for-phone {
+    padding: 15px 20px;
+  }
 }
 
 .subscription__heading {
-    color: #495057;
-    font-family: $primaryFontFamily;
-    font-size: 2.25rem;
-    font-weight: $baseFontWeight;
+  color: #495057;
+  font-family: $primaryFontFamily;
+  font-size: 2.25rem;
+  font-weight: $baseFontWeight;
 }
 
 .subscription__addSub {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 
-    @include for-phone {
-        flex-direction: column;
-    }
+  @include for-phone {
+    flex-direction: column;
+  }
 }
 
 .subscription__add-text {
-    color: $brandColor;
-    text-align: right;
-    font-family: $primaryFontFamily;
-    font-size: 1.125rem;
-    font-weight: $baseFontWeight;
-    line-height: 20px;
+  color: $brandColor;
+  text-align: right;
+  font-family: $primaryFontFamily;
+  font-size: 1.125rem;
+  font-weight: $baseFontWeight;
+  line-height: 20px;
 }
 
 .subscription__active {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-    padding: 40px;
-    border: 1px dashed #495057;
-    background: $white;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 40px;
+  border: 1px dashed #495057;
+  background: $white;
 
-    @include for-phone {
-        flex-direction: column;
-        padding: 20px 10px;
-    }
+  @include for-phone {
+    flex-direction: column;
+    padding: 20px 10px;
+  }
 }
 
 .subscription__active-text {
-    color: $headingColor;
-    font-family: $primaryFontFamily;
-    font-size: 1.125rem;
-    font-weight: $baseFontWeight;
-    line-height: 25px;
+  color: $headingColor;
+  font-family: $primaryFontFamily;
+  font-size: 1.125rem;
+  font-weight: $baseFontWeight;
+  line-height: 25px;
 
-    @include for-phone {
-        text-align: center;
-    }
+  @include for-phone {
+    text-align: center;
+  }
 }
 
 .subscription__premiumButton {
@@ -73,86 +73,88 @@
   background: $brandColor;
   border: none;
   color: $white;
-  transition: .5s all;
+  transition: 0.5s all;
 
   &:hover {
-      cursor: pointer;
-      background: #343A40;
+    cursor: pointer;
+    background: #343a40;
   }
 
-    @include for-tablet {
-        padding: 10px 25px;
-    }
-
+  @include for-tablet {
+    padding: 10px 25px;
+  }
 }
 
-.subscription__logoBackground{
-    @extend .premiumHeader__logoBackground;
-    margin-right: 200px;
+.subscription__logoBackground {
+  @extend .premiumHeader__logoBackground;
+  margin-right: 200px;
 
-    @include for-phone{
-        margin: 0;
-    }
-}
-
-.subscription__ActiveType{
-    color: #D4A373;
-    font-family: $primaryFontFamily;
-    font-size: 1.714rem;
-    font-weight: 700;
-    line-height: 25px;
-    margin-top: 0;
-    margin-bottom: 28px;
-}
-
-.subscription__editOption{
-    color: #D4A373;
-    font-family: $primaryFontFamily;
-    font-size: 1.143rem;
-    font-style: normal;
-    font-weight: 700;
-    line-height: 25px;
-    margin: 24px 0;
-}
-
-.subscription__activeDates{
-    display: flex;
-    gap: 5px;
-    padding-bottom: 8px;
-}
-
-.subscription__activeDate{
-    color: #495057;
-    font-family: $primaryFontFamily;
-    font-size: 1.143rem;
-    font-weight: 700;
-    line-height: 25px;
-    margin: 0 ;
-}
-
-.subscription__activeDateValue{
-    color: #495057;
-    font-family: $primaryFontFamily;
-    font-size: 1.143rem;
-    font-weight: 500;
-    line-height: 25px;
+  @include for-phone {
     margin: 0;
+  }
 }
 
-
-.subscription__cancelLink{
-    @extend .subscription__active-text;
-    transition: .5s all;
-
-    &:hover{
-        cursor: pointer;
-    }
+.subscription__ActiveType {
+  color: #d4a373;
+  font-family: $primaryFontFamily;
+  font-size: 1.714rem;
+  font-weight: 700;
+  line-height: 25px;
+  margin-top: 0;
+  margin-bottom: 28px;
 }
 
-.subscription__activeInfo{
-    @include for-phone{
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
+.subscription__editOption {
+  color: #d4a373;
+  font-family: $primaryFontFamily;
+  font-size: 1.143rem;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 25px;
+  margin: 24px 0;
+}
+
+.subscription__activeDates {
+  display: flex;
+  gap: 5px;
+  padding-bottom: 8px;
+}
+
+.subscription__activeDate {
+  color: #495057;
+  font-family: $primaryFontFamily;
+  font-size: 1.143rem;
+  font-weight: 700;
+  line-height: 25px;
+  margin: 0;
+}
+
+.subscription__activeDateValue {
+  color: #495057;
+  font-family: $primaryFontFamily;
+  font-size: 1.143rem;
+  font-weight: 500;
+  line-height: 25px;
+  margin: 0;
+}
+
+.subscription__cancelLink {
+  @extend .subscription__active-text;
+  transition: 0.5s all;
+
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+.subscription__activeInfo {
+  @include for-phone {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
+.subscription__link {
+  text-decoration: none;
 }
