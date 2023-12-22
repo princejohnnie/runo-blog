@@ -2,9 +2,11 @@ package dev.levelupschool.backend;
 
 import com.github.javafaker.Faker;
 import dev.levelupschool.backend.model.Article;
+import dev.levelupschool.backend.model.Category;
 import dev.levelupschool.backend.model.Comment;
 import dev.levelupschool.backend.model.User;
 import dev.levelupschool.backend.repository.ArticleRepository;
+import dev.levelupschool.backend.repository.CategoryRepository;
 import dev.levelupschool.backend.repository.CommentRepository;
 import dev.levelupschool.backend.repository.UserRepository;
 import dev.levelupschool.backend.service.SlugService;
@@ -15,6 +17,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Configuration
 @Profile("dev")
 public class SeedArticles {
@@ -24,7 +29,8 @@ public class SeedArticles {
     CommandLineRunner init(
         ArticleRepository articleRepository,
         CommentRepository commentRepository,
-        UserRepository userRepository
+        UserRepository userRepository,
+        CategoryRepository categoryRepository
     ) {
         return new CommandLineRunner() {
             @Override
@@ -67,6 +73,51 @@ public class SeedArticles {
                         String commentString = faker.lorem().paragraph(20);
                         commentRepository.save(new Comment(commentString, user, article));
                     }
+
+                    List<Category> categoryList = new ArrayList<>();
+
+                    Category category1 = new Category();
+                    category1.setName("Adventure");
+                    categoryList.add(category1);
+
+                    Category category2 = new Category();
+                    category2.setName("Travel");
+                    categoryList.add(category2);
+
+                    Category category3 = new Category();
+                    category3.setName("Fashion");
+                    categoryList.add(category3);
+
+                    Category category4 = new Category();
+                    category4.setName("Lifestyle");
+                    categoryList.add(category4);
+
+                    Category category5 = new Category();
+                    category5.setName("Science Fiction");
+                    categoryList.add(category5);
+
+
+                    Category category6 = new Category();
+                    category6.setName(" Thriller");
+                    categoryList.add(category6);
+
+                    Category category7 = new Category();
+                    category7.setName("Sports");
+                    categoryList.add(category7);
+
+                    Category category8 = new Category();
+                    category8.setName("History");
+                    categoryList.add(category8);
+
+                    Category category9 = new Category();
+                    category9.setName("Education");
+                    categoryList.add(category9);
+
+                    Category category10 = new Category();
+                    category10.setName("Technology");
+                    categoryList.add(category10);
+
+                    categoryRepository.saveAll(categoryList);
                 }
             }
         };
