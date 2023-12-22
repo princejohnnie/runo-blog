@@ -32,6 +32,14 @@ function cancelSubscription(id) {
     return Http.post(`/user/cancel-subscription/${id}`)
 }
 
+function forgotPassword(data) {
+    return Http.post(`/forgot-password`, data)
+}
+
+function resetPassword(data) {
+    return Http.post(`/reset-password`, data)
+}
+
 export default {
     login,
     register,
@@ -40,5 +48,7 @@ export default {
     editProfile,
     subscribe,
     subscriptions,
-    cancelSubscription
+    cancelSubscription,
+    forgotPassword,
+    resetPassword
 };

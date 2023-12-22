@@ -123,3 +123,18 @@
 .modal__inputWrapper--error .modal__input {
   border: 1px solid red;
 }
+
+
+.modal__forgotPassword{
+    color: $inputTextColor;
+    font-family: $primaryFontFamily;
+    font-size: 1rem;
+    font-weight: $baseFontWeight;
+    transition: 0.5s all;
+    margin-bottom: 7px;
+
+    &:hover{
+        cursor: pointer;
+        color: $brandColor;
+    }
+}
