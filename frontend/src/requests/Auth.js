@@ -1,4 +1,4 @@
-import Http from './Http.js';
+import Http from '@/requests//Http.js';
 
 function login(data) {
     return Http.post(`/login`, data)

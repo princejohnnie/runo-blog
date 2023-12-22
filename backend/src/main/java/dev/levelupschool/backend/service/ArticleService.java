@@ -7,8 +7,10 @@ import dev.levelupschool.backend.dtos.UserDto;
 import dev.levelupschool.backend.exception.CustomValidationException;
 import dev.levelupschool.backend.exception.ModelNotFoundException;
 import dev.levelupschool.backend.model.Article;
+import dev.levelupschool.backend.model.Category;
 import dev.levelupschool.backend.model.User;
 import dev.levelupschool.backend.repository.ArticleRepository;
+import dev.levelupschool.backend.repository.CategoryRepository;
 import dev.levelupschool.backend.repository.UserRepository;
 import dev.levelupschool.backend.request.UpdateArticleRequest;
 import dev.levelupschool.backend.storage.StorageService;
@@ -28,6 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.naming.OperationNotSupportedException;
 import java.nio.file.AccessDeniedException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,6 +47,9 @@ public class ArticleService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private CategoryRepository categoryRepository;
 
     @Autowired
     private SlugService slugService;
@@ -129,6 +135,16 @@ public class ArticleService {
 
         var article = articleRepository.findById(id)
             .orElseThrow(() -> new ModelNotFoundException(Article.class, id));
+
+        List<Category> existingCategories = new ArrayList<>();
+        newArticle.getCategories().forEach(category -> {
+            Category newCategory = categoryRepository.findById(category).get();
+            if (newCategory != null) {
+                existingCategories.add(newCategory);
+            }
+        });
+
+        article.setCategories(existingCategories);
 
         if (!article.getAuthor().getId().equals(loggedInUser.getId())) {
             throw new AccessDeniedException("You cannot edit an article not created by you!");

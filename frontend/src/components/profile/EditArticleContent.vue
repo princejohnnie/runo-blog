@@ -26,12 +26,15 @@ const props = defineProps({
     isNew: Boolean
 })
 
+const existingTags = computed(() => props.article.categories)
+
 const data = ref({
-    title: props?.article?.title,
-    slug: props?.article?.slug,
-    content: props?.article?.content,
-    cover: null,
-    premium: false
+  title: props?.article?.title,
+  slug: props?.article?.slug,
+  content: props?.article?.content,
+  cover: null,
+  isPremium: false,
+  categories: []
 })
 
 const currentDate = computed(() => {
@@ -51,7 +54,12 @@ const createArticle = async () => {
 }
 
 const updateArticle = async () => {
-    const response = await Article.update(data.value, props.article.id)
+  
+  if (data.value.categories.length === 0) {
+    data.value.categories = props?.article?.categories.map(category => category.id)
+  }
+  
+  const response = await Article.update(data.value, props.article.id)
 
     showSuccessAlert()
 
@@ -68,6 +76,10 @@ const showSuccessAlert = () => {
         text: 'Article created successfully!',
         icon: 'success'
     })
+}
+
+const updateTags = (tags) => {
+  data.value.categories = tags
 }
 
 watch(
@@ -87,36 +99,55 @@ const disabledStatus = computed(() => {
         <div class="editArticle__form-inner">
             <h2 class="editArticle__heading">{{ isNew ? 'Add content' : 'Edit content' }}</h2>
 
-            <Form :handleLogic="isNew ? createArticle : updateArticle" v-model:isProcessing="isProcessing">
-                <div class="editArticle__formContent">
-                    <Input type="text" name="title" label="Title" placeholder="Set Title" v-model:value="data.title" />
-                    <MultiSelectTags />
-                    <Input :disabled="true" class="editArticle__input" type="text" name="slug" label="Slug"
-                        placeholder="Set slug" v-model:value="data.slug" />
-                    <div class="createArticle__premiumCheckbox">
-                        <input class="createArticle__checkbox" type="checkbox" id="checkbox" v-model="data.premium"
-                            :disabled="disabledStatus" />
-                        <label class="createArticle__premiumLabel" for="checkbox">Make premium</label>
-                    </div>
-                    <div class="modal__inputWrapper">
-                        <label class="modal__inputLabel"> Content </label>
-                        <div class="modal__quillEditor">
-                            <QuillEditor theme="snow" v-model:content="data.content" contentType="html" />
-                        </div>
-                    </div>
-                    <div class="group__class">
-                        <div class="modal__inputWrapper">
-                            <ImageUpload label="Article Image" name="Cover" :url="article?.coverUrl"
-                                @setCover="(cover) => setArticleCover(cover)" />
-                        </div>
-                    </div>
-                    <div class="editArticle__inputWrapper">
-                        <Button type="submit" class="editProfile__inputButton" :isProcessing="isProcessing">
-                            {{ isNew ? 'Add new' : 'Update' }}
-                        </Button>
-                    </div>
-                </div>
-            </Form>
+      <Form
+        :handleLogic="isNew ? createArticle : updateArticle"
+        v-model:isProcessing="isProcessing"
+      >
+        <div class="editArticle__formContent">
+          <Input
+            type="text"
+            name="title"
+            label="Title"
+            placeholder="Set Title"
+            v-model:value="data.title"
+          />
+          <MultiSelectTags @onTagsUpdate="updateTags" :existingTags="existingTags"/>
+          <Input
+            :disabled="true"
+            class="editArticle__input"
+            type="text"
+            name="slug"
+            label="Slug"
+            placeholder="Set slug"
+            v-model:value="data.slug"
+          />
+          <Input
+            class="editArticles__premium"
+            type="checkbox"
+            label="Make premium"
+            v-model="data.isPremium"
+          />
+          <div class="modal__inputWrapper">
+            <label class="modal__inputLabel"> Content </label>
+            <div class="modal__quillEditor">
+              <QuillEditor theme="snow" v-model:content="data.content" contentType="html" />
+            </div>
+          </div>
+          <div class="group__class">
+            <div class="modal__inputWrapper">
+              <ImageUpload
+                label="Article Image"
+                name="Cover"
+                :url="article?.coverUrl"
+                @setCover="(cover) => setArticleCover(cover)"
+              />
+            </div>
+          </div>
+          <div class="editArticle__inputWrapper">
+            <Button type="submit" class="editProfile__inputButton" :isProcessing="isProcessing">
+              {{ isNew ? 'Add new' : 'Update' }}
+            </Button>
+          </div>
         </div>
     </div>
 </template>

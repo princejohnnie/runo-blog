@@ -1,5 +1,6 @@
 package dev.levelupschool.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
@@ -12,7 +13,9 @@ import org.springframework.hateoas.server.core.Relation;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -56,6 +59,15 @@ public class Article {
         inverseJoinColumns = @JoinColumn(name = "bookmarker_id")
     )
     public List<User> bookmarkers = new ArrayList<>();
+
+    @JsonBackReference
+    @ManyToMany
+    @JoinTable(
+        name = "article_categories",
+        joinColumns = @JoinColumn(name = "article_id"),
+        inverseJoinColumns = @JoinColumn(name = "category_id")
+    )
+    private List<Category> categories = new ArrayList<>();
 
     public Article(String title, String content, User author) {
         this.title = title;
