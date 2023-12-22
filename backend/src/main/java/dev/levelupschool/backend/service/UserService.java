@@ -109,6 +109,7 @@ public class UserService {
 
         user.setEmail(newUser.getEmail() == null ? user.getEmail() : newUser.getEmail());
         user.setName(newUser.getName() == null ? user.getName() : newUser.getName());
+        user.setDescription(newUser.getDescription() == null ? user.getDescription() : newUser.getDescription());
 
         if (newUser.getPassword() != null && !newUser.getPassword().isBlank()) {
             user.setPassword(newUser.getPassword());

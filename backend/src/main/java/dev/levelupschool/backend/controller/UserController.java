@@ -2,18 +2,21 @@ package dev.levelupschool.backend.controller;
 
 import dev.levelupschool.backend.dtos.*;
 import dev.levelupschool.backend.auth.AuthenticationProvider;
-import dev.levelupschool.backend.exception.CustomValidationException;
 import dev.levelupschool.backend.exception.ModelNotFoundException;
-import dev.levelupschool.backend.model.Subscription;
+import dev.levelupschool.backend.mail.EmailService;
+import dev.levelupschool.backend.model.PasswordResetToken;
 import dev.levelupschool.backend.model.User;
 import dev.levelupschool.backend.payment.PaymentDetailsDto;
 import dev.levelupschool.backend.payment.PaymentService;
+import dev.levelupschool.backend.repository.PasswordResetTokenRepository;
 import dev.levelupschool.backend.repository.UserRepository;
+import dev.levelupschool.backend.request.PasswordResetRequest;
 import dev.levelupschool.backend.request.UpdateUserRequest;
 import dev.levelupschool.backend.service.TokenService;
 import dev.levelupschool.backend.service.UserService;
 import dev.levelupschool.backend.subscription.SubscriptionDto;
 import dev.levelupschool.backend.subscription.SubscriptionService;
+import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -25,8 +28,6 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCrypt;
@@ -37,6 +38,7 @@ import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @RestController
 public class UserController {
@@ -56,11 +58,18 @@ public class UserController {
     @Autowired
     private SubscriptionService subscriptionService;
 
+    @Autowired
+    private PasswordResetTokenRepository passwordResetTokenRepository;
+
+    private final EmailService emailService;
+
 
     private final PaymentService paymentService;
 
-    UserController(PaymentService paymentService) {
+    @Autowired
+    UserController(PaymentService paymentService, EmailService emailService) {
         this.paymentService = paymentService;
+        this.emailService = emailService;
     }
 
     @GetMapping("/users")
@@ -113,7 +122,6 @@ public class UserController {
     ResponseEntity<?> register(@RequestBody @Valid RegisterDto registerDto) {
         try {
             var newUser = new User(registerDto.getEmail(), registerDto.getName(), registerDto.getDescription(), registerDto.getPassword());
-            newUser.setDescription(registerDto.getDescription());
             var createdUser = userService.createUser(newUser);
             return ResponseEntity.ok(tokenService.generateToken(createdUser.getId()));
         } catch (Exception e) {
@@ -238,6 +246,70 @@ public class UserController {
             return new ResponseEntity<>("Subscription cancelled successfully", HttpStatus.OK);
         } else {
             return new ResponseEntity<>("Could not cancel subscription", HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<String> forgotPassword(@RequestBody PasswordResetRequest request) {
+        System.out.println("Got Email -> " + request.getEmail());
+
+        var user = userRepository.findByEmail(request.getEmail());
+
+        if (user == null) {
+            return new ResponseEntity<String>("User with email does not exist", HttpStatus.NOT_FOUND);
+        }
+
+        PasswordResetToken token = new PasswordResetToken();
+        token.setToken(UUID.randomUUID().toString());
+        token.setUser(user);
+        token.setExpiryTime(LocalDateTime.now().plusMinutes(30));
+
+        token = passwordResetTokenRepository.save(token);
+
+        try {
+            String body = "Use this link to reset your password. Expires after 30 minutes\nhttp://localhost:80/reset-password?token="+token;
+            emailService.sendMail(request.getEmail(), "Password Reset link", body);
+
+            System.out.println("Got token -> " + token.getToken());
+
+            return new ResponseEntity<String>("A Password reset link has been sent to your email", HttpStatus.OK);
+
+        } catch (MessagingException e) {
+            return new ResponseEntity<String>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<String> resetPassword(@RequestBody Map<String, String> request) {
+        String token = request.get("token");
+        String newPassword = request.get("password");
+
+        try {
+            var resetToken = passwordResetTokenRepository.findByToken(token);
+
+            if (resetToken.getExpiryTime().isBefore(LocalDateTime.now())) {
+                passwordResetTokenRepository.deleteById(resetToken.getId());
+                return new ResponseEntity<>("Password reset link has expired", HttpStatus.UNAUTHORIZED);
+            }
+
+            User user = userRepository.findById(resetToken.getUser().getId()).orElseThrow(() -> new ModelNotFoundException(User.class, resetToken.getUser().getId()));
+
+            user.setPassword(newPassword);
+
+            User updatedUser = userRepository.save(user);
+
+            if (updatedUser.getId().equals(user.getId())) {
+                passwordResetTokenRepository.deleteById(resetToken.getId());
+                return new ResponseEntity<>("Password reset successfully", HttpStatus.OK);
+            }
+
+            return new ResponseEntity<>("Could not complete request. Please try again later.", HttpStatus.SERVICE_UNAVAILABLE);
+
+        } catch (Exception e) {
+
+            return new ResponseEntity<>("Sorry, you are unauthorized to perform this operation", HttpStatus.UNAUTHORIZED);
+
         }
     }
 
