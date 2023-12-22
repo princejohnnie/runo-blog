@@ -9,6 +9,7 @@ import CreateArticleView from "@/views/CreateArticleView.vue";
 import EditArticleView from "@/views/EditArticleView.vue";
 import EditSubscriptionView from '@/views/EditSubscriptionView.vue'
 import PremiumArticlesView from '@/views/PremiumArticlesView.vue'
+import ResetPassRequestView from '@/views/ResetPassRequestView.vue'
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -81,7 +82,12 @@ const router = createRouter({
             meta: {
               requiresAuth: true
             }
-          }
+          },
+          {
+            path: "/reset-password",
+            name: "reset-password",
+            component: ResetPassRequestView,
+        },
     ],
     linkActiveClass: 'mainHeader__nav-link--active'
 });

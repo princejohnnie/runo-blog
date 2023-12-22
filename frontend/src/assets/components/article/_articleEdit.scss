@@ -62,3 +62,21 @@
 .group__class {
   height: 350px;
 }
+
+
+.createArticle__premiumCheckbox {
+    display: flex;
+    align-items: center;
+    margin-top: 39px;
+    margin-bottom: 20px;
+
+}
+
+.createArticle__premiumLabel {
+    color: #818181;
+    font-family: $primaryFontFamily;
+    font-size: 0.786rem;
+    font-weight: 500;
+    line-height: 25px;
+    padding-left: 15px;
+}
