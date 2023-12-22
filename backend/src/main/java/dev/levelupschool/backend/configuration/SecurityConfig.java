@@ -20,7 +20,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests((authorization) -> authorization
-            .requestMatchers(HttpMethod.POST, "/login", "/register", "/google-auth")
+            .requestMatchers(HttpMethod.POST, "/login", "/register", "/google-auth", "/forgot-password", "/reset-password")
             .permitAll()
             .requestMatchers(HttpMethod.DELETE, "/**")
             .authenticated()
