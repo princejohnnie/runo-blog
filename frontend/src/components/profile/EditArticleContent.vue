@@ -30,7 +30,8 @@ const data = ref({
   slug: props?.article?.slug,
   content: props?.article?.content,
   cover: null,
-  isPremium: false
+  isPremium: false,
+  categories: []
 })
 
 const currentDate = computed(() => {
@@ -43,6 +44,7 @@ const currentDate = computed(() => {
 
 const createArticle = async () => {
   const response = await Article.store(data.value)
+  console.log('resp', response)
 
   showSuccessAlert()
 
@@ -67,6 +69,10 @@ const showSuccessAlert = () => {
     text: 'Article created successfully!',
     icon: 'success'
   })
+}
+
+const updateTags = (tags) => {
+  data.value.categories = tags
 }
 
 watch(
@@ -94,7 +100,7 @@ watch(
             placeholder="Set Title"
             v-model:value="data.title"
           />
-          <MultiSelectTags />
+          <MultiSelectTags @onTagsUpdate="updateTags" />
           <Input
             :disabled="true"
             class="editArticle__input"

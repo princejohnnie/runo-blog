@@ -1,5 +1,6 @@
 package dev.levelupschool.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
@@ -59,13 +60,14 @@ public class Article {
     )
     public List<User> bookmarkers = new ArrayList<>();
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @JsonBackReference
+    @ManyToMany
     @JoinTable(
         name = "article_categories",
         joinColumns = @JoinColumn(name = "article_id"),
         inverseJoinColumns = @JoinColumn(name = "category_id")
     )
-    private Set<Category> categories = new HashSet<>();
+    private List<Category> categories = new ArrayList<>();
 
     public Article(String title, String content, User author) {
         this.title = title;

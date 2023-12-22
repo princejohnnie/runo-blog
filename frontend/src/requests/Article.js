@@ -1,4 +1,4 @@
-import Http from './Http.js';
+import Http from '@/requests//Http.js';
 
 function index() {
     return Http.get(`/articles`)

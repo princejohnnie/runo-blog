@@ -1,6 +1,7 @@
 package dev.levelupschool.backend.dtos;
 
 import dev.levelupschool.backend.model.Article;
+import dev.levelupschool.backend.model.Category;
 import org.springframework.hateoas.server.core.Relation;
 
 import java.time.LocalDateTime;
@@ -19,6 +20,7 @@ public class ArticleDto {
     public List<CommentDto> comments;
     public LocalDateTime createdAt;
     public LocalDateTime updatedAt;
+    public List<Category> categories;
 
     public ArticleDto(Article article) {
         this.id = article.getId();
@@ -30,8 +32,10 @@ public class ArticleDto {
         this.updatedAt = article.getUpdatedAt();
         this.isPremium = article.isPremium();
         this.slug = article.getSlug();
+        this.categories = article.getCategories();
         if (article.getComments() != null) {
             this.comments = article.getComments().stream().map(CommentDto::new).toList();
         }
+
     }
 }

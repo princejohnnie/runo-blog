@@ -1,16 +1,40 @@
 <script setup>
-import { ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import VueMultiSelect from 'vue-multiselect'
+import categoryRoutes from '@/requests/Category.js'
 
 const props = defineProps({
   tags: Array
 })
 
-const emit = defineEmits(['update:tags'])
+const emit = defineEmits(['OnTagsUpdate'])
 
-const options = [{ name: 'Adventure' }, { name: 'Travel' }, { name: 'Tech' }, { name: 'Fashion' }]
-
+const options = ref([])
 const tags = ref([])
+
+const updateTags = (tags) => {
+  emit(
+    'onTagsUpdate',
+    tags.value.map((tag) => tag.id)
+  )
+}
+
+const addTag = async (tag) => {
+  const resp = await categoryRoutes.store({ name: tag })
+  const tagToAdd = { name: resp.data.name, id: resp.data.id }
+  tags.value.push(tagToAdd)
+  options.value.push(tagToAdd)
+  updateTags(tags)
+}
+
+onMounted(async () => {
+  const resp = await categoryRoutes.index()
+  options.value = resp.data
+})
+
+watch(tags, () => {
+  updateTags(tags)
+})
 </script>
 
 <template>
@@ -29,6 +53,8 @@ const tags = ref([])
       :internal-search="true"
       :show-no-results="false"
       :show-labels="false"
+      :hide-selected="true"
+      @tag="addTag"
     >
       <template #noOptions>
         <div class="multiselect__option">Start typing to see options</div>

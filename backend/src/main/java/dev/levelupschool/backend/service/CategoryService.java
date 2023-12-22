@@ -58,7 +58,6 @@ public class CategoryService {
         CategoryDto categoryDto = new CategoryDto();
         categoryDto.setId(category.getId());
         categoryDto.setName(category.getName());
-        categoryDto.setArticleId(category.getArticles().iterator().next().getId());
         return categoryDto;
     }
 }

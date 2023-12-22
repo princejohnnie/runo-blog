@@ -7,6 +7,7 @@ import dev.levelupschool.backend.dtos.UserDto;
 import dev.levelupschool.backend.exception.CustomValidationException;
 import dev.levelupschool.backend.exception.ModelNotFoundException;
 import dev.levelupschool.backend.model.Article;
+import dev.levelupschool.backend.model.Category;
 import dev.levelupschool.backend.model.User;
 import dev.levelupschool.backend.repository.ArticleRepository;
 import dev.levelupschool.backend.repository.UserRepository;
