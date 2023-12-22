@@ -8,7 +8,7 @@ import Swal from 'sweetalert2'
 import { ref } from 'vue'
 import { useModalStore } from '@/stores/modal'
 import { useUserStore } from '@/stores/user.js'
-import GoogleAuth from '@/components/GoogleAuth.vue'
+//import Auth from '@/requests/Auth.js';
 
 const userStore = useUserStore()
 const modalStore = useModalStore();
@@ -19,12 +19,24 @@ const data = ref({
 })
 
 const submitForm = async () => {
-    //const response = await Auth.login(data.value)
-    //localStorage.setItem('token', response.data)
+    console.log("teste")
+    try {
+        const response = await Auth.forgotPassword(data.value);
+        console.log(response)
+        Swal.fire({
+            title: "Success!",
+            text: response.message,
+            icon: "success"
+        });
+    } catch (error) {
+        console.log(error)
+        Swal.fire({
+            title: "Error!",
+            text: error.message,
+            icon: "error"
+        });
+    }
 
-    //await userStore.me()
-
-    showSuccessAlert()
 }
 
 const showSuccessAlert = () => {
@@ -39,7 +51,7 @@ const showSuccessAlert = () => {
 <template>
     <Modal>
         <div class="modal__form">
-            <h2 class="modal__heading">Login</h2>
+            <h2 class="modal__heading">Forgot password?</h2>
 
             <Form :handleLogic="submitForm" v-model:isProcessing="isProcessing">
                 <Input type="text" name="email" label="Email:" placeholder="johndoe@gmail.com" v-model:value="data.email" />

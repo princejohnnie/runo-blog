@@ -39,6 +39,8 @@ watch(() => [userStore.premium, userStore.successNotification], function () {
 });
 
 watch(() => modalStore.passResetModal, function () {
+    modalStore.closeModal()
+    modalStore.passResetModal = false;
     modalStore.openModal('resetPassword')
 });
 

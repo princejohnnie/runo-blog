@@ -1,13 +1,16 @@
 <script setup>
 
 import EditArticleHeader from '@/components/profile/EditArticleHeader.vue';
-import EditArticleContent from '@/components/profile/EditArticleContent.vue';
-
-import Article from '@/requests/Article.js';
-
+import Input from '@/components//form/Input.vue'
+import Form from '@/components/form/Form.vue'
+import Button from '@/components/form/Button.vue'
+import Auth from '@/requests/Auth.js';
+import Swal from 'sweetalert2'
 import { ref } from 'vue';
 import { useRoute } from 'vue-router';
+import { useRouter } from 'vue-router'
 
+const router = useRouter()
 const route = useRoute()
 const isProcessing = ref(false)
 
@@ -19,40 +22,58 @@ const links = [
     }
 ];
 
-
-
-
 const data = ref({
-    email: '',
+    token: route.query.token,
+    password: '',
 })
 
+
 const submitForm = async () => {
-    //const response = await Auth.editProfile(userStore.user.id, data.value)
-    showSuccessAlert()
-    router.push({ name: 'home' })
+    console.log("teste")
+    try {
+        const response = await Auth.resetPassword(data.value);
+        console.log(response)
+        Swal.fire({
+            title: "Success!",
+            text: response.message,
+            icon: "success"
+        });
+        router.push({ name: 'home' })
+    } catch (error) {
+        console.log(error)
+        Swal.fire({
+            title: "Error!",
+            text: error.message,
+            icon: "error"
+        });
+    }
+
 }
 
-const showSuccessAlert = () => {
-    Swal.fire({
-        title: 'Success!',
-        text: 'Verification email was sent',
-        icon: 'success'
-    })
-}
 
+console.log(route.query.token)
 </script>
 
 <template>
     <EditArticleHeader :title="'Reset Password'" :links="links" />
 
-    <Form class="column" :handleLogic="submitForm" v-model:isProcessing="isProcessing">
+    <div class="editProfile__form">
+        <div class="editProfile__form-inner">
+            <h2 class="editProfile__heading">Reset password</h2>
 
-        <Input type="text" name="email" label="Email:" placeholder="johndoe@email.com" v-model:value="data.email" />
+            <Form class="column" :handleLogic="submitForm" v-model:isProcessing="isProcessing">
 
-        <div class="editProfile__inputWrapper">
-            <Button type="submit" class="editProfile__inputButton" :isProcessing="isProcessing">
-                Update
-            </Button>
+
+
+                <Input type="password" name="password" label="New Password:" placeholder="***********"
+                    v-model:value="data.password" />
+
+                <div class="editProfile__inputWrapper">
+                    <Button type="submit" class="editProfile__inputButton" :isProcessing="isProcessing">
+                        Change password
+                    </Button>
+                </div>
+            </Form>
         </div>
-    </Form>
+    </div>
 </template>
