@@ -7,6 +7,7 @@ import LoginModal from "@/components/modals/LoginModal.vue";
 import RegisterModal from "@/components/modals/RegisterModal.vue";
 import SubscribeModal from "@/components/modals/SubscribeModal.vue";
 import CancelSubscriptionModal from "@/components/modals/CancelSubscriptionModal.vue";
+import ResetPassModal from "@/components/modals/ResetPassModal.vue";
 
 const modalStore = useModalStore();
 </script>
@@ -24,6 +25,7 @@ const modalStore = useModalStore();
     <SubscribeModal v-if="modalStore.modal === 'subscribe'" @close-modal="openSubscribeModel = false" />
     <RegisterModal v-if="modalStore.modal === 'register'" @close-modal="openRegisterModel = false" />
     <CancelSubscriptionModal v-if="modalStore.modal === 'cancelSub'" @close-modal="openCancelSubscriptionModel = false" />
+    <ResetPassModal v-if="modalStore.modal === 'resetPassword'" @close-modal="openResetPassModalModel = false" />
 </template>
 
 <style lang="scss">

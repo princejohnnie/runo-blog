@@ -38,6 +38,11 @@ watch(() => [userStore.premium, userStore.successNotification], function () {
     }
 });
 
+watch(() => modalStore.passResetModal, function () {
+    modalStore.openModal('resetPassword')
+});
+
+
 const unCheckMenu = () => {
     menuOpen.value = false;
 }

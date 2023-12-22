@@ -16,14 +16,13 @@ const isProcessing = ref(false)
 
 const data = ref({
     email: '',
-    password: ''
 })
 
 const submitForm = async () => {
-    const response = await Auth.login(data.value)
-    localStorage.setItem('token', response.data)
+    //const response = await Auth.login(data.value)
+    //localStorage.setItem('token', response.data)
 
-    await userStore.me()
+    //await userStore.me()
 
     showSuccessAlert()
 }
@@ -35,10 +34,6 @@ const showSuccessAlert = () => {
         icon: 'success'
     })
 }
-
-const passResetRequest = () => {
-    modalStore.passResetModal = true;
-}
 </script>
 
 <template>
@@ -49,17 +44,11 @@ const passResetRequest = () => {
             <Form :handleLogic="submitForm" v-model:isProcessing="isProcessing">
                 <Input type="text" name="email" label="Email:" placeholder="johndoe@gmail.com" v-model:value="data.email" />
 
-                <Input type="password" name="password" label="Password:" placeholder="***********"
-                    v-model:value="data.password" />
-
-                <p class="modal__forgotPassword" @click="passResetRequest">Forgot password?</p>
-
                 <div class="modal__inputWrapper">
                     <Button type="submit" class="modal__inputButton" :isProcessing="isProcessing">
-                        Log in
+                        Send email
                     </Button>
                 </div>
-                <GoogleAuth @success="showSuccessAlert" />
             </Form>
         </div>
     </Modal>

@@ -31,7 +31,7 @@ const data = ref({
     slug: props?.article?.slug,
     content: props?.article?.content,
     cover: null,
-    isPremium: false
+    premium: false
 })
 
 const currentDate = computed(() => {
@@ -94,7 +94,7 @@ const disabledStatus = computed(() => {
                     <Input :disabled="true" class="editArticle__input" type="text" name="slug" label="Slug"
                         placeholder="Set slug" v-model:value="data.slug" />
                     <div class="createArticle__premiumCheckbox">
-                        <input class="createArticle__checkbox" type="checkbox" id="checkbox" v-model="data.isPremium"
+                        <input class="createArticle__checkbox" type="checkbox" id="checkbox" v-model="data.premium"
                             :disabled="disabledStatus" />
                         <label class="createArticle__premiumLabel" for="checkbox">Make premium</label>
                     </div>
