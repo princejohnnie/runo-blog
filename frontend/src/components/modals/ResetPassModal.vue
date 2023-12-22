@@ -25,14 +25,14 @@ const submitForm = async () => {
         console.log(response)
         Swal.fire({
             title: "Success!",
-            text: response.message,
+            text: response.data,
             icon: "success"
         });
     } catch (error) {
         console.log(error)
         Swal.fire({
             title: "Error!",
-            text: error.message,
+            text: error.response.data,
             icon: "error"
         });
     }
@@ -54,11 +54,11 @@ const showSuccessAlert = () => {
             <h2 class="modal__heading">Forgot password?</h2>
 
             <Form :handleLogic="submitForm" v-model:isProcessing="isProcessing">
-                <Input type="text" name="email" label="Email:" placeholder="johndoe@gmail.com" v-model:value="data.email" />
+                <Input type="text" name="email" label="Enter your registered email:" placeholder="johndoe@gmail.com" v-model:value="data.email" />
 
                 <div class="modal__inputWrapper">
                     <Button type="submit" class="modal__inputButton" :isProcessing="isProcessing">
-                        Send email
+                        Reset Password
                     </Button>
                 </div>
             </Form>

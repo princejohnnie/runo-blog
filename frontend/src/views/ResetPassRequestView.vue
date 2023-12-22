@@ -35,7 +35,7 @@ const submitForm = async () => {
         console.log(response)
         Swal.fire({
             title: "Success!",
-            text: response.message,
+            text: response.data,
             icon: "success"
         });
         router.push({ name: 'home' })
@@ -43,7 +43,7 @@ const submitForm = async () => {
         console.log(error)
         Swal.fire({
             title: "Error!",
-            text: error.message,
+            text: error.response.data,
             icon: "error"
         });
     }
@@ -70,7 +70,7 @@ console.log(route.query.token)
 
                 <div class="editProfile__inputWrapper">
                     <Button type="submit" class="editProfile__inputButton" :isProcessing="isProcessing">
-                        Change password
+                        Proceed
                     </Button>
                 </div>
             </Form>
