@@ -4,13 +4,17 @@ import VueMultiSelect from 'vue-multiselect'
 import categoryRoutes from '@/requests/Category.js'
 
 const props = defineProps({
-  tags: Array
+  tags: Array,
+  existingTags: {
+    type: Array,
+    default: []
+  }
 })
 
 const emit = defineEmits(['OnTagsUpdate'])
 
 const options = ref([])
-const tags = ref([])
+const tags = ref(props.existingTags)
 
 const updateTags = (tags) => {
   emit(

@@ -25,6 +25,8 @@ const props = defineProps({
   isNew: Boolean
 })
 
+const existingTags = computed(() => props.article.categories)
+
 const data = ref({
   title: props?.article?.title,
   slug: props?.article?.slug,
@@ -52,6 +54,11 @@ const createArticle = async () => {
 }
 
 const updateArticle = async () => {
+  
+  if (data.value.categories.length === 0) {
+    data.value.categories = props?.article?.categories.map(category => category.id)
+  }
+  
   const response = await Article.update(data.value, props.article.id)
 
   showSuccessAlert()
@@ -100,7 +107,7 @@ watch(
             placeholder="Set Title"
             v-model:value="data.title"
           />
-          <MultiSelectTags @onTagsUpdate="updateTags" />
+          <MultiSelectTags @onTagsUpdate="updateTags" :existingTags="existingTags"/>
           <Input
             :disabled="true"
             class="editArticle__input"
