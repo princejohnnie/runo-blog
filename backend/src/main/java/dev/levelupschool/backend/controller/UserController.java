@@ -267,7 +267,7 @@ public class UserController {
         token = passwordResetTokenRepository.save(token);
 
         try {
-            String body = "Use this link to reset your password. Expires after 30 minutes\nhttp://localhost:80/reset-password?token="+token;
+            String body = "Use this link to reset your password. Expires after 30 minutes\nhttp://localhost:80/reset-password?token="+token.getToken();
             emailService.sendMail(request.getEmail(), "Password Reset link", body);
 
             System.out.println("Got token -> " + token.getToken());
