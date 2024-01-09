@@ -15,7 +15,7 @@ app.use(createPinia())
 app.use(router)
 app.use(VueSweetalert2);
 app.use(vue3GoogleLogin, {
-    clientId: '608909873783-2sqj1phfijkms47vo8hk2t90lekn9r4p.apps.googleusercontent.com',
+    clientId: import.meta.env.CLIENT_ID,
     scope: 'profile email',
     prompt: 'select_account',
 });
